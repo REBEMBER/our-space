@@ -26,10 +26,10 @@
       padding: 0;
       width: 100%;
       height: 100%;
-      font-family: Arial, Helvetica, sans-serif;
+      overflow: hidden;
       background: #F7F9FC;
       color: #26313D;
-      overflow: hidden;
+      font-family: Arial, Helvetica, sans-serif;
     }
 
     body {
@@ -89,9 +89,7 @@
       cursor: pointer;
       user-select: none;
 
-      transition:
-        transform 0.08s ease,
-        filter 0.08s ease;
+      transition: transform 0.08s ease, filter 0.08s ease;
     }
 
     button:active {
@@ -191,19 +189,6 @@
       display.textContent = value || "0";
     }
 
-    function checkUnlock() {
-      /*
-       * Only unlock when the displayed calculator input
-       * becomes exactly 0000.
-       */
-      if (currentInput === UNLOCK_CODE) {
-        window.location.href = "index.html";
-        return true;
-      }
-
-      return false;
-    }
-
     function pressNumber(number) {
 
       if (justCalculated) {
@@ -212,15 +197,15 @@
       }
 
       /*
-       * Do not allow multiple leading zeros.
+       * Keep leading zeros visible.
+       * This is important because 0000 must remain 0000.
        */
-      if (currentInput === "0" && number === "0") {
+      if (number === "0") {
+        currentInput += "0";
+        updateDisplay(currentInput);
         return;
       }
 
-      /*
-       * Keep calculator normal.
-       */
       if (number === ".") {
         if (currentInput.includes(".")) {
           return;
@@ -231,16 +216,13 @@
         } else {
           currentInput += ".";
         }
-      } else {
-        currentInput += number;
+
+        updateDisplay(currentInput);
+        return;
       }
 
+      currentInput += number;
       updateDisplay(currentInput);
-
-      /*
-       * Secret entry.
-       */
-      checkUnlock();
     }
 
     function pressOperator(selectedOperator) {
@@ -252,12 +234,32 @@
       previousInput = currentInput;
       currentInput = "";
       operator = selectedOperator;
+      justCalculated = false;
 
       updateDisplay(selectedOperator);
     }
 
     function calculate() {
 
+      /*
+       * SECRET UNLOCK
+       *
+       * The code is checked ONLY when "=" is pressed.
+       *
+       * 0 → 0 → 0 → 0 → =
+       */
+      if (
+        currentInput === UNLOCK_CODE &&
+        previousInput === "" &&
+        operator === null
+      ) {
+        window.location.href = "index.html";
+        return;
+      }
+
+      /*
+       * Normal calculator behavior.
+       */
       if (
         previousInput === "" ||
         currentInput === "" ||
@@ -286,9 +288,12 @@
       if (operator === "÷") {
         if (b === 0) {
           updateDisplay("Error");
+
           currentInput = "";
           previousInput = "";
           operator = null;
+          justCalculated = true;
+
           return;
         }
 
@@ -296,9 +301,12 @@
       }
 
       if (Number.isInteger(result)) {
-        result = result.toString();
+        result = String(result);
       } else {
-        result = result.toFixed(8).replace(/0+$/, "").replace(/\.$/, "");
+        result = result
+          .toFixed(8)
+          .replace(/0+$/, "")
+          .replace(/\.$/, "");
       }
 
       currentInput = result;
@@ -319,6 +327,7 @@
     }
 
     function deleteLast() {
+
       if (justCalculated) {
         clearDisplay();
         return;
@@ -330,6 +339,7 @@
     }
 
     function percent() {
+
       if (currentInput === "") {
         return;
       }
@@ -340,7 +350,7 @@
     }
 
     /*
-     * Keyboard support.
+     * Keyboard support
      */
     document.addEventListener("keydown", function(event) {
 
