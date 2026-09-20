@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,12 +9,12 @@
   <title>Calculator</title>
 
   <!-- Calculator icon -->
-  <link rel="icon" type="image/jpeg" href="calculator-icon.jpeg">
-  <link rel="apple-touch-icon" href="calculator-icon.jpeg">
+  <link rel="icon" type="image/png" href="calculator.png">
+  <link rel="apple-touch-icon" href="calculator.png">
 
   <!-- PWA -->
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0B1628">
+  <meta name="theme-color" content="#F7F9FC">
 
   <style>
     * {
@@ -24,13 +23,33 @@
       padding: 0;
     }
 
+    :root {
+      --navy: #152B46;
+      --navy-dark: #102238;
+      --navy-soft: #294967;
+
+      --peach: #F3B29F;
+      --peach-soft: #F9D5C9;
+
+      --blue: #DCEAF5;
+      --blue-light: #EEF5FA;
+
+      --white: #FFFFFF;
+      --off-white: #F7F9FC;
+
+      --charcoal: #26313D;
+      --muted: #718092;
+
+      --border: #E2E9F0;
+    }
+
     html,
     body {
       width: 100%;
       min-height: 100%;
       font-family: Arial, Helvetica, sans-serif;
-      background: #111111;
-      color: white;
+      background: var(--off-white);
+      color: var(--charcoal);
     }
 
     body {
@@ -54,34 +73,60 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #111111;
+
+      background:
+        radial-gradient(
+          circle at 15% 10%,
+          rgba(243, 178, 159, 0.18),
+          transparent 30%
+        ),
+        radial-gradient(
+          circle at 90% 85%,
+          rgba(220, 234, 245, 0.75),
+          transparent 35%
+        ),
+        var(--off-white);
+
       padding: 20px;
     }
 
     .calculator {
       width: min(100%, 390px);
-      background: #1b1b1b;
-      border-radius: 28px;
+
+      background: rgba(255, 255, 255, 0.94);
+
+      border: 1px solid rgba(21, 43, 70, 0.08);
+
+      border-radius: 30px;
       padding: 20px;
+
       box-shadow:
-        0 25px 60px rgba(0, 0, 0, 0.45),
-        inset 0 1px 0 rgba(255,255,255,0.05);
+        0 25px 70px rgba(21, 43, 70, 0.13),
+        0 5px 18px rgba(21, 43, 70, 0.06);
     }
 
     .calculator-brand {
       text-align: center;
-      color: #777;
+
+      color: var(--navy);
+
       font-size: 11px;
-      letter-spacing: 2px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+
       margin-bottom: 14px;
+
       user-select: none;
     }
 
     .display {
       width: 100%;
       min-height: 110px;
-      background: #090909;
-      border-radius: 18px;
+
+      background: var(--navy);
+
+      border-radius: 20px;
+
       padding: 18px;
       margin-bottom: 16px;
 
@@ -91,14 +136,20 @@
       align-items: flex-end;
 
       overflow: hidden;
+
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.08);
     }
 
     .previous-operation {
       width: 100%;
       min-height: 22px;
-      color: #777;
+
+      color: rgba(255,255,255,0.55);
+
       font-size: 15px;
       text-align: right;
+
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
@@ -106,11 +157,15 @@
 
     .current-display {
       width: 100%;
-      color: #f5f5f5;
+
+      color: #FFFFFF;
+
       font-size: 42px;
       font-weight: 300;
       line-height: 1.1;
+
       text-align: right;
+
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
@@ -124,36 +179,53 @@
 
     .calc-button {
       aspect-ratio: 1;
+
       border-radius: 18px;
 
-      background: #292929;
-      color: #f5f5f5;
+      background: var(--blue-light);
+      color: var(--charcoal);
 
       font-size: 23px;
-      font-weight: 400;
+      font-weight: 500;
+
+      border: 1px solid rgba(21, 43, 70, 0.045);
+
+      box-shadow:
+        0 3px 8px rgba(21, 43, 70, 0.05);
 
       transition:
         transform 0.08s ease,
-        background 0.08s ease;
+        background 0.08s ease,
+        box-shadow 0.08s ease;
     }
 
     .calc-button:active {
       transform: scale(0.94);
-      background: #3a3a3a;
+
+      box-shadow:
+        0 1px 3px rgba(21, 43, 70, 0.05);
     }
 
     .calc-button.operator {
-      background: #d99a86;
-      color: #161616;
+      background: var(--peach);
+      color: var(--navy-dark);
+
+      font-weight: 600;
     }
 
     .calc-button.operator:active {
-      background: #c98570;
+      background: #EAA08A;
     }
 
     .calc-button.function {
-      background: #454545;
-      color: #f2f2f2;
+      background: var(--navy);
+      color: #FFFFFF;
+
+      font-size: 20px;
+    }
+
+    .calc-button.function:active {
+      background: var(--navy-soft);
     }
 
     .calc-button.zero {
@@ -168,19 +240,21 @@
     #ourSpaceScreen {
       display: none;
       min-height: 100vh;
+
       background:
         radial-gradient(
-          circle at 15% 10%,
-          rgba(218, 151, 132, 0.12),
-          transparent 28%
+          circle at 8% 5%,
+          rgba(243, 178, 159, 0.20),
+          transparent 27%
         ),
         radial-gradient(
-          circle at 90% 80%,
-          rgba(73, 113, 151, 0.12),
-          transparent 30%
+          circle at 92% 75%,
+          rgba(220, 234, 245, 0.75),
+          transparent 32%
         ),
-        #0b1628;
-      color: #f8fafc;
+        #F8FAFC;
+
+      color: var(--charcoal);
     }
 
     .space-header {
@@ -191,9 +265,11 @@
       align-items: center;
       justify-content: space-between;
 
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      background: rgba(11,22,40,0.88);
-      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+
+      background: rgba(255,255,255,0.88);
+
+      backdrop-filter: blur(18px);
 
       position: sticky;
       top: 0;
@@ -202,74 +278,95 @@
 
     .space-title {
       font-family: Georgia, serif;
+
       font-size: 25px;
       font-weight: 500;
-      color: #fff;
+
+      color: var(--navy);
     }
 
     .space-subtitle {
       margin-top: 2px;
-      color: #9eabba;
+
+      color: var(--muted);
+
       font-size: 11px;
     }
 
     .logout-button {
       padding: 9px 13px;
-      border-radius: 10px;
 
-      background: rgba(255,255,255,0.07);
-      color: #cbd5e1;
+      border-radius: 11px;
+
+      background: var(--blue-light);
+
+      color: var(--navy);
 
       font-size: 12px;
+      font-weight: 600;
+
+      border: 1px solid var(--border);
     }
 
     .logout-button:hover {
-      background: rgba(255,255,255,0.12);
+      background: var(--blue);
     }
 
     .space-content {
       width: min(100%, 900px);
+
       margin: 0 auto;
+
       padding: 28px 18px 50px;
     }
 
     .welcome-card {
-      padding: 25px;
-      border-radius: 22px;
+      padding: 26px;
 
-      background:
-        linear-gradient(
-          135deg,
-          rgba(255,255,255,0.08),
-          rgba(255,255,255,0.035)
-        );
+      border-radius: 24px;
 
-      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.90);
+
+      border: 1px solid var(--border);
+
+      box-shadow:
+        0 15px 45px rgba(21,43,70,0.07);
     }
 
     .welcome-card h1 {
       font-family: Georgia, serif;
+
       font-size: 30px;
       font-weight: 500;
+
+      color: var(--navy);
+
       margin-bottom: 8px;
     }
 
     .welcome-card p {
-      color: #aeb8c5;
+      color: var(--muted);
+
       line-height: 1.6;
+
       font-size: 14px;
     }
 
     .status {
       margin-top: 18px;
+
       padding: 12px 14px;
+
       border-radius: 12px;
 
-      background: rgba(217,154,134,0.10);
-      border: 1px solid rgba(217,154,134,0.18);
+      background: var(--peach-soft);
 
-      color: #e9b8a8;
+      border: 1px solid rgba(243,178,159,0.45);
+
+      color: var(--navy);
+
       font-size: 13px;
+      font-weight: 500;
     }
 
     /* =========================================================
@@ -285,13 +382,16 @@
       align-items: center;
       justify-content: center;
 
-      background: #0b1628;
-      color: white;
+      background: var(--off-white);
+
+      color: var(--navy);
     }
 
     .loading-text {
-      color: #aeb8c5;
+      color: var(--navy);
+
       font-size: 14px;
+      font-weight: 500;
     }
 
     /* =========================================================
@@ -299,12 +399,13 @@
        ========================================================= */
 
     @media (max-width: 480px) {
+
       #calculatorScreen {
         padding: 12px;
       }
 
       .calculator {
-        border-radius: 24px;
+        border-radius: 25px;
         padding: 15px;
       }
 
@@ -322,6 +423,10 @@
 
       .space-title {
         font-size: 22px;
+      }
+
+      .welcome-card {
+        padding: 22px;
       }
     }
   </style>
@@ -552,6 +657,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
+
     /* =========================================================
        SUPABASE CONFIG
        ========================================================= */
@@ -603,15 +709,6 @@
 
     /* =========================================================
        HIDDEN UNLOCK CODE
-       =========================================================
-
-       Change this to whatever code you want.
-
-       Example:
-       1432
-
-       The calculator will still behave normally.
-       When the exact code is entered, Our Space opens.
        ========================================================= */
 
     const UNLOCK_CODE = "1432";
@@ -626,11 +723,6 @@
     let currentOperator = null;
     let waitingForNewValue = false;
 
-    /*
-      Stores the digits entered since the last calculator reset.
-      This allows the secret code to be detected without changing
-      the normal calculator experience.
-    */
     let unlockSequence = "";
 
 
@@ -651,10 +743,6 @@
 
       unlockSequence += String(number);
 
-      /*
-        Keep only the last characters necessary to compare
-        against the secret code.
-      */
       if (unlockSequence.length > UNLOCK_CODE.length) {
         unlockSequence =
           unlockSequence.slice(-UNLOCK_CODE.length);
@@ -837,6 +925,7 @@
         case "/":
 
           if (current === 0) {
+
             currentValue = "Error";
             previousValue = null;
             currentOperator = null;
@@ -845,6 +934,7 @@
             previousOperation.textContent = "";
 
             updateDisplay();
+
             return;
           }
 
@@ -879,6 +969,7 @@
     function displayOperator(operator) {
 
       switch (operator) {
+
         case "*":
           return "×";
 
@@ -927,6 +1018,7 @@
             button.dataset.number;
 
           inputNumber(number);
+
         });
 
       });
@@ -1062,11 +1154,6 @@
 
     async function unlockOurSpace() {
 
-      /*
-        First validate the real Supabase account.
-        The calculator code is NOT the security mechanism.
-      */
-
       const {
         data,
         error
@@ -1149,13 +1236,6 @@
           return;
         }
 
-        /*
-          User is authenticated.
-
-          We intentionally keep the calculator visible
-          instead of automatically opening Our Space.
-        */
-
         loadingScreen.style.display =
           "none";
 
@@ -1201,8 +1281,7 @@
         ) {
 
           /*
-            Nothing needs to happen here.
-            The current screen remains the calculator
+            The calculator remains visible
             until the secret code is entered.
           */
 
