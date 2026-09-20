@@ -276,12 +276,7 @@
     }
 
     .message-row.mine .message-sender {
-      margin:
-        0
-        5px
-        5px
-        0;
-
+      margin: 0 5px 5px 0;
       text-align: right;
     }
 
@@ -322,7 +317,7 @@
     }
 
     /* ==========================================
-       EMPTY STATE
+       EMPTY / LOADING STATE
     ========================================== */
 
     .empty-state {
@@ -404,11 +399,7 @@
       width: 100%;
       min-height: 48px;
       max-height: 150px;
-      padding:
-        13px
-        46px
-        13px
-        15px;
+      padding: 13px 46px 13px 15px;
       border-radius: 16px;
       border: 1px solid var(--border);
       outline: none;
@@ -493,7 +484,7 @@
     }
 
     /* ==========================================
-       TOAST
+       ERROR / TOAST
     ========================================== */
 
     .toast {
@@ -501,13 +492,14 @@
       left: 50%;
       bottom: 22px;
       z-index: 100;
-      max-width: calc(100vw - 32px);
-      padding: 11px 15px;
+      width: min(520px, calc(100vw - 32px));
+      padding: 12px 15px;
       border-radius: 13px;
       background: var(--navy);
       color: var(--surface);
       font-size: 12px;
       font-weight: 600;
+      text-align: center;
       opacity: 0;
       pointer-events: none;
       transform: translate(-50%, 12px);
@@ -541,17 +533,11 @@
 
       .chat-header {
         min-height: 72px;
-        padding:
-          12px
-          12px
-          11px;
+        padding: 12px 12px 11px;
       }
 
       .messages-area {
-        padding:
-          18px
-          13px
-          20px;
+        padding: 18px 13px 20px;
       }
 
       .composer-area {
@@ -593,9 +579,7 @@
 
       .message-input {
         min-height: 46px;
-        padding:
-          12px
-          13px;
+        padding: 12px 13px;
       }
 
       .send-button {
@@ -794,7 +778,7 @@
 
   <script>
     /* ==========================================
-       SUPABASE CONFIG
+       SUPABASE
     ========================================== */
 
     const SUPABASE_URL =
@@ -827,8 +811,8 @@
     let currentUser = null;
     let currentUsername = "You";
     let partnerName = "Other";
-    let realtimeChannel = null;
 
+    let realtimeChannel = null;
     let toastTimer = null;
     let isSending = false;
 
@@ -872,7 +856,9 @@
       );
 
     const toast =
-      document.getElementById("toast");
+      document.getElementById(
+        "toast"
+      );
 
     /* ==========================================
        HELPERS
@@ -880,23 +866,32 @@
 
     function escapeHtml(value) {
       const div =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
 
       div.textContent = value;
 
       return div.innerHTML;
     }
 
-    function showToast(text) {
+    function showToast(
+      text,
+      long = false
+    ) {
       clearTimeout(toastTimer);
 
       toast.textContent = text;
-
       toast.classList.add("show");
 
-      toastTimer = setTimeout(() => {
-        toast.classList.remove("show");
-      }, 2200);
+      toastTimer = setTimeout(
+        () => {
+          toast.classList.remove(
+            "show"
+          );
+        },
+        long ? 5000 : 2200
+      );
     }
 
     function formatTime(timestamp) {
@@ -939,19 +934,17 @@
         yesterday.getDate() - 1
       );
 
-      const isToday =
+      if (
         date.toDateString() ===
-        now.toDateString();
-
-      const isYesterday =
-        date.toDateString() ===
-        yesterday.toDateString();
-
-      if (isToday) {
+        now.toDateString()
+      ) {
         return "Today";
       }
 
-      if (isYesterday) {
+      if (
+        date.toDateString() ===
+        yesterday.toDateString()
+      ) {
         return "Yesterday";
       }
 
@@ -968,16 +961,29 @@
     function scrollToBottom(
       smooth = true
     ) {
-      requestAnimationFrame(() => {
-        messagesArea.scrollTo({
-          top:
-            messagesArea.scrollHeight,
-          behavior:
-            smooth
-              ? "smooth"
-              : "auto"
-        });
-      });
+      requestAnimationFrame(
+        () => {
+          messagesArea.scrollTo({
+            top:
+              messagesArea.scrollHeight,
+            behavior:
+              smooth
+                ? "smooth"
+                : "auto"
+          });
+        }
+      );
+    }
+
+    function autoResizeInput() {
+      messageInput.style.height =
+        "48px";
+
+      messageInput.style.height =
+        `${Math.min(
+          messageInput.scrollHeight,
+          150
+        )}px`;
     }
 
     function messageAlreadyRendered(
@@ -1061,14 +1067,104 @@
         partnerName =
           "Other";
       }
-
-      document.title =
-        `Our Space — Chat`;
     }
 
     /* ==========================================
-       RENDER ONE MESSAGE
+       UI STATES
     ========================================== */
+
+    function renderLoadingState() {
+      messageList.innerHTML = `
+        <div class="empty-state">
+
+          <div class="empty-card">
+
+            <div class="empty-icon">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M7 9h10" />
+                <path d="M7 13h6" />
+                <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8A2.5 2.5 0 0 1 17.5 16H11l-4.5 4V16H6.5A2.5 2.5 0 0 1 4 13.5z" />
+              </svg>
+            </div>
+
+            <div class="empty-title">
+              Loading conversation
+            </div>
+
+            <div class="empty-description">
+              Getting your messages...
+            </div>
+
+          </div>
+
+        </div>
+      `;
+    }
+
+    function renderEmptyState() {
+      messageList.innerHTML = `
+        <div class="empty-state">
+
+          <div class="empty-card">
+
+            <div class="empty-icon">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M7 9h10" />
+                <path d="M7 13h6" />
+                <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8A2.5 2.5 0 0 1 17.5 16H11l-4.5 4V16H6.5A2.5 2.5 0 0 1 4 13.5z" />
+              </svg>
+            </div>
+
+            <div class="empty-title">
+              Start your conversation
+            </div>
+
+            <div class="empty-description">
+              Send the first message and your
+              conversation will appear here.
+            </div>
+
+          </div>
+
+        </div>
+      `;
+    }
+
+    /* ==========================================
+       MESSAGE ELEMENTS
+    ========================================== */
+
+    function createDateSeparator(
+      timestamp
+    ) {
+      const separator =
+        document.createElement(
+          "div"
+        );
+
+      separator.className =
+        "date-separator";
+
+      separator.dataset.date =
+        getDateKey(timestamp);
+
+      separator.textContent =
+        formatDateLabel(timestamp);
+
+      return separator;
+    }
 
     function createMessageElement(
       message
@@ -1137,140 +1233,17 @@
           message.created_at
         );
 
-      content.appendChild(
-        sender
-      );
+      content.appendChild(sender);
+      content.appendChild(bubble);
+      content.appendChild(meta);
 
-      content.appendChild(
-        bubble
-      );
-
-      content.appendChild(
-        meta
-      );
-
-      row.appendChild(
-        content
-      );
+      row.appendChild(content);
 
       return row;
     }
 
     /* ==========================================
-       DATE SEPARATOR
-    ========================================== */
-
-    function createDateSeparator(
-      timestamp
-    ) {
-      const separator =
-        document.createElement(
-          "div"
-        );
-
-      separator.className =
-        "date-separator";
-
-      separator.dataset.date =
-        getDateKey(timestamp);
-
-      separator.textContent =
-        formatDateLabel(
-          timestamp
-        );
-
-      return separator;
-    }
-
-    /* ==========================================
-       EMPTY STATE
-    ========================================== */
-
-    function renderEmptyState() {
-      messageList.innerHTML = "";
-
-      const empty =
-        document.createElement(
-          "div"
-        );
-
-      empty.className =
-        "empty-state";
-
-      empty.innerHTML = `
-        <div class="empty-card">
-
-          <div class="empty-icon">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M7 9h10" />
-              <path d="M7 13h6" />
-              <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8A2.5 2.5 0 0 1 17.5 16H11l-4.5 4V16H6.5A2.5 2.5 0 0 1 4 13.5z" />
-            </svg>
-          </div>
-
-          <div class="empty-title">
-            Start your conversation
-          </div>
-
-          <div class="empty-description">
-            Send the first message and your
-            conversation will stay here.
-          </div>
-
-        </div>
-      `;
-
-      messageList.appendChild(
-        empty
-      );
-    }
-
-    /* ==========================================
-       LOADING STATE
-    ========================================== */
-
-    function renderLoadingState() {
-      messageList.innerHTML = `
-        <div class="empty-state">
-
-          <div class="empty-card">
-
-            <div class="empty-icon">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M7 9h10" />
-                <path d="M7 13h6" />
-                <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8A2.5 2.5 0 0 1 17.5 16H11l-4.5 4V16H6.5A2.5 2.5 0 0 1 4 13.5z" />
-              </svg>
-            </div>
-
-            <div class="empty-title">
-              Loading conversation
-            </div>
-
-            <div class="empty-description">
-              Getting your messages...
-            </div>
-
-          </div>
-
-        </div>
-      `;
-    }
-
-    /* ==========================================
-       RENDER MESSAGES
+       RENDER ALL MESSAGES
     ========================================== */
 
     function renderMessages(
@@ -1323,7 +1296,7 @@
     ========================================== */
 
     async function loadMessages(
-      scroll = true
+      shouldScroll = true
     ) {
       renderLoadingState();
 
@@ -1363,7 +1336,10 @@
               </div>
 
               <div class="empty-description">
-                Please refresh the page and try again.
+                ${escapeHtml(
+                  error.message ||
+                  "Please refresh and try again."
+                )}
               </div>
 
             </div>
@@ -1378,83 +1354,9 @@
         data || []
       );
 
-      if (scroll) {
+      if (shouldScroll) {
         scrollToBottom(false);
       }
-    }
-
-    /* ==========================================
-       APPEND REALTIME MESSAGE
-    ========================================== */
-
-    function appendRealtimeMessage(
-      message
-    ) {
-      if (
-        !message ||
-        message.space_id !==
-          SPACE_ID
-      ) {
-        return;
-      }
-
-      if (
-        messageAlreadyRendered(
-          message.id
-        )
-      ) {
-        return;
-      }
-
-      const lastMessage =
-        messageList.querySelector(
-          ".message-row:last-of-type"
-        );
-
-      const lastDateSeparator =
-        messageList.querySelector(
-          ".date-separator:last-of-type"
-        );
-
-      const currentDate =
-        getDateKey(
-          message.created_at
-        );
-
-      let needsSeparator =
-        true;
-
-      if (
-        lastDateSeparator?.dataset.date ===
-        currentDate
-      ) {
-        needsSeparator = false;
-      }
-
-      if (
-        lastMessage &&
-        !needsSeparator
-      ) {
-        messageList.appendChild(
-          createMessageElement(
-            message
-          )
-        );
-      } else {
-        messageList.appendChild(
-          createDateSeparator(
-            message.created_at
-          )
-        );
-
-        messageList.appendChild(
-          createMessageElement(
-            message
-          )
-        );
-      }
-
-      scrollToBottom(true);
     }
 
     /* ==========================================
@@ -1474,6 +1376,10 @@
       }
 
       if (!currentUser) {
+        showToast(
+          "You are not signed in."
+        );
+
         return;
       }
 
@@ -1481,7 +1387,6 @@
       sendButton.disabled = true;
 
       const {
-        data,
         error
       } = await client
         .from("messages")
@@ -1493,20 +1398,18 @@
             currentUser.id,
 
           content
-        })
-        .select(
-          "id, sender_id, content, created_at"
-        )
-        .single();
+        });
 
       if (error) {
         console.error(
-          "Message send error:",
+          "Message insert error:",
           error
         );
 
         showToast(
-          "Message could not be sent."
+          error.message ||
+          "Message could not be sent.",
+          true
         );
 
         isSending = false;
@@ -1519,13 +1422,11 @@
       autoResizeInput();
 
       /*
-       * Add immediately in case Realtime takes
-       * a moment. The Realtime listener prevents
-       * duplicate rendering.
+       * The INSERT succeeded.
+       * Reload the chat so the newly-created
+       * message is displayed from the database.
        */
-      appendRealtimeMessage(
-        data
-      );
+      await loadMessages(true);
 
       isSending = false;
       sendButton.disabled = false;
@@ -1558,39 +1459,22 @@
               filter:
                 `space_id=eq.${SPACE_ID}`
             },
-            (payload) => {
-              appendRealtimeMessage(
-                payload.new
-              );
+            async () => {
+              /*
+               * Reloading the list is intentionally
+               * simple and reliable for now.
+               */
+              await loadMessages(true);
             }
           )
           .subscribe(
             (status) => {
-              if (
-                status ===
-                "CHANNEL_ERROR"
-              ) {
-                console.error(
-                  "Realtime channel error."
-                );
-              }
+              console.log(
+                "Realtime status:",
+                status
+              );
             }
           );
-    }
-
-    /* ==========================================
-       INPUT RESIZE
-    ========================================== */
-
-    function autoResizeInput() {
-      messageInput.style.height =
-        "48px";
-
-      messageInput.style.height =
-        `${Math.min(
-          messageInput.scrollHeight,
-          150
-        )}px`;
     }
 
     /* ==========================================
@@ -1613,17 +1497,8 @@
     );
 
     /* ==========================================
-       FORM
+       INPUT
     ========================================== */
-
-    messageForm.addEventListener(
-      "submit",
-      async (event) => {
-        event.preventDefault();
-
-        await sendMessage();
-      }
-    );
 
     messageInput.addEventListener(
       "input",
@@ -1641,6 +1516,19 @@
 
           await sendMessage();
         }
+      }
+    );
+
+    /* ==========================================
+       FORM
+    ========================================== */
+
+    messageForm.addEventListener(
+      "submit",
+      async (event) => {
+        event.preventDefault();
+
+        await sendMessage();
       }
     );
 
