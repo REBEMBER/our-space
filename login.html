@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Our Space — Login</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --green: #173f3b;
+      --green-light: #edf5f3;
+      --text: #202525;
+      --muted: #7c8583;
+      --line: #e0e5e3;
+      --bg: #fafbfa;
+      --white: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .page {
+      width: min(100%, 450px);
+      min-height: 100vh;
+      margin: auto;
+      padding: 25px;
+      display: flex;
+      align-items: center;
+    }
+
+    .box {
+      width: 100%;
+      background: var(--white);
+      border: 1px solid #e9edeb;
+      border-radius: 25px;
+      padding: 32px;
+    }
+
+    .back {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 13px;
+      margin-bottom: 30px;
+    }
+
+    .back:hover {
+      color: var(--green);
+    }
+
+    .logo {
+      width: 52px;
+      height: 52px;
+      border-radius: 17px;
+      background: var(--green-light);
+      color: var(--green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 25px;
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      font-size: 30px;
+      letter-spacing: -1px;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 25px;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: #f2f5f4;
+      padding: 4px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+    }
+
+    .tab {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      border-radius: 9px;
+      padding: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .tab.active {
+      background: white;
+      color: var(--green);
+      box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+    }
+
+    .field {
+      margin-bottom: 17px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 7px;
+      color: #4d5654;
+    }
+
+    input {
+      width: 100%;
+      height: 50px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: white;
+      padding: 0 14px;
+      outline: none;
+      font-size: 14px;
+      color: var(--text);
+      transition: 0.2s;
+    }
+
+    input:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(23,63,59,0.07);
+    }
+
+    .password {
+      position: relative;
+    }
+
+    .password input {
+      padding-right: 60px;
+    }
+
+    .show {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    .submit {
+      width: 100%;
+      height: 50px;
+      border: none;
+      border-radius: 12px;
+      background: var(--green);
+      color: white;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+
+    .submit:hover {
+      background: #10332f;
+    }
+
+    .submit:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
+    .forgot,
+    .resend {
+      display: block;
+      margin: 16px auto 0;
+      border: none;
+      background: transparent;
+      color: var(--green);
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .resend {
+      display: none;
+    }
+
+    .forgot:hover,
+    .resend:hover {
+      text-decoration: underline;
+    }
+
+    .message {
+      display: none;
+      padding: 11px 13px;
+      border-radius: 10px;
+      font-size: 12px;
+      line-height: 1.5;
+      margin-bottom: 15px;
+    }
+
+    .message.error {
+      display: block;
+      background: #fff1f1;
+      color: #a23c3c;
+    }
+
+    .message.success {
+      display: block;
+      background: #eff9f4;
+      color: #28704e;
+    }
+
+    .footer {
+      text-align: center;
+      color: #a2aaa8;
+      font-size: 10px;
+      line-height: 1.5;
+      margin-top: 25px;
+    }
+
+    @media (max-width: 500px) {
+      .page {
+        padding: 14px;
+      }
+
+      .box {
+        padding: 25px;
+        border-radius: 21px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="page">
+
+    <section class="box">
+
+      <button class="back" onclick="goHome()">
+        ← Our Space
+      </button>
+
+      <div class="logo">♡</div>
+
+      <h1 id="title">Welcome back</h1>
+
+      <p class="subtitle" id="subtitle">
+        Log in to enter your private space.
+      </p>
+
+      <div class="tabs">
+
+        <button
+          class="tab active"
+          id="loginTab"
+          onclick="setMode('login')"
+        >
+          Log In
+        </button>
+
+        <button
+          class="tab"
+          id="signupTab"
+          onclick="setMode('signup')"
+        >
+          Create Account
+        </button>
+
+      </div>
+
+      <div id="message" class="message"></div>
+
+      <form onsubmit="submitForm(event)">
+
+        <div class="field">
+          <label for="email">
+            EMAIL
+          </label>
+
+          <input
+            id="email"
+            type="email"
+            autocomplete="email"
+            placeholder="you@example.com"
+            required
+          >
+        </div>
+
+        <div class="field">
+          <label for="password">
+            PASSWORD
+          </label>
+
+          <div class="password">
+
+            <input
+              id="password"
+              type="password"
+              autocomplete="current-password"
+              minlength="6"
+              placeholder="Your password"
+              required
+            >
+
+            <button
+              type="button"
+              class="show"
+              onclick="togglePassword()"
+            >
+              Show
+            </button>
+
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="submit"
+          id="submitButton"
+        >
+          Log In
+        </button>
+
+      </form>
+
+      <button
+        class="forgot"
+        id="forgotButton"
+        onclick="forgotPassword()"
+      >
+        Forgot your password?
+      </button>
+
+      <button
+        class="resend"
+        id="resendButton"
+        onclick="resendConfirmation()"
+      >
+        Resend confirmation email
+      </button>
+
+      <div class="footer">
+        Our Space is private to its registered users.
+      </div>
+
+    </section>
+
+  </main>
+
+  <script>
+    const SUPABASE_URL =
+      "https://ywflohxufmfydkpkkqly.supabase.co";
+
+    const SUPABASE_PUBLISHABLE_KEY =
+      "sb_publishable_qTMUO8KxerEQBDQ-A7Huyg_8N2Tqpmr";
+
+    const APP_URL =
+      "https://our-space-topaz.vercel.app/";
+
+    const { createClient } = supabase;
+
+    const db = createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY,
+      {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true
+        }
+      }
+    );
+
+    let mode = "login";
+
+    function setMode(value) {
+
+      mode = value;
+
+      clearMessage();
+
+      const loginTab =
+        document.getElementById("loginTab");
+
+      const signupTab =
+        document.getElementById("signupTab");
+
+      const title =
+        document.getElementById("title");
+
+      const subtitle =
+        document.getElementById("subtitle");
+
+      const button =
+        document.getElementById("submitButton");
+
+      const forgot =
+        document.getElementById("forgotButton");
+
+      if (mode === "login") {
+
+        loginTab.classList.add("active");
+        signupTab.classList.remove("active");
+
+        title.textContent = "Welcome back";
+
+        subtitle.textContent =
+          "Log in to enter your private space.";
+
+        button.textContent = "Log In";
+
+        forgot.style.display = "block";
+
+      } else {
+
+        loginTab.classList.remove("active");
+        signupTab.classList.add("active");
+
+        title.textContent = "Create your space";
+
+        subtitle.textContent =
+          "Create your account and start building Our Space.";
+
+        button.textContent = "Create Account";
+
+        forgot.style.display = "none";
+      }
+    }
+
+    async function submitForm(event) {
+
+      event.preventDefault();
+
+      const email =
+        document.getElementById("email").value.trim();
+
+      const password =
+        document.getElementById("password").value;
+
+      const button =
+        document.getElementById("submitButton");
+
+      clearMessage();
+
+      button.disabled = true;
+
+      button.textContent =
+        mode === "login"
+          ? "Logging in..."
+          : "Creating account...";
+
+      try {
+
+        if (mode === "login") {
+          await login(email, password);
+        } else {
+          await createAccount(email, password);
+        }
+
+      } finally {
+
+        button.disabled = false;
+
+        button.textContent =
+          mode === "login"
+            ? "Log In"
+            : "Create Account";
+      }
+    }
+
+    async function login(email, password) {
+
+      const { data, error } =
+        await db.auth.signInWithPassword({
+          email,
+          password
+        });
+
+      if (error) {
+
+        if (
+          error.message.toLowerCase().includes(
+            "email not confirmed"
+          )
+        ) {
+
+          showMessage(
+            "Your email hasn't been confirmed yet. Check your inbox.",
+            "error"
+          );
+
+          document.getElementById(
+            "resendButton"
+          ).style.display = "block";
+
+          return;
+        }
+
+        showMessage(
+          error.message,
+          "error"
+        );
+
+        return;
+      }
+
+      if (data.session) {
+        window.location.href = "index.html";
+      }
+    }
+
+    async function createAccount(email, password) {
+
+      const { data, error } =
+        await db.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: APP_URL
+          }
+        });
+
+      if (error) {
+
+        showMessage(
+          error.message,
+          "error"
+        );
+
+        return;
+      }
+
+      /*
+        Supabase may hide whether an email already exists.
+        An empty identities array indicates that
+        no new identity was created.
+      */
+
+      if (
+        data.user &&
+        Array.isArray(data.user.identities) &&
+        data.user.identities.length === 0
+      ) {
+
+        showMessage(
+          "An account may already exist with this email. Try Log In instead.",
+          "error"
+        );
+
+        setTimeout(() => {
+          setMode("login");
+        }, 1200);
+
+        return;
+      }
+
+      sessionStorage.setItem(
+        "confirmationEmail",
+        email
+      );
+
+      /*
+        If email confirmation is required,
+        there won't be an active session.
+      */
+
+      if (!data.session) {
+
+        window.location.href =
+          "confirmation.html";
+
+        return;
+      }
+
+      window.location.href =
+        "index.html";
+    }
+
+    async function resendConfirmation() {
+
+      const email =
+        document.getElementById("email").value.trim();
+
+      if (!email) {
+
+        showMessage(
+          "Enter your email first.",
+          "error"
+        );
+
+        return;
+      }
+
+      const button =
+        document.getElementById("resendButton");
+
+      button.disabled = true;
+      button.textContent = "Sending...";
+
+      const { error } =
+        await db.auth.resend({
+          type: "signup",
+          email,
+          options: {
+            emailRedirectTo: APP_URL
+          }
+        });
+
+      button.disabled = false;
+      button.textContent =
+        "Resend confirmation email";
+
+      if (error) {
+
+        showMessage(
+          error.message,
+          "error"
+        );
+
+        return;
+      }
+
+      showMessage(
+        "A new confirmation email has been sent.",
+        "success"
+      );
+    }
+
+    async function forgotPassword() {
+
+      const email =
+        document.getElementById("email").value.trim();
+
+      if (!email) {
+
+        showMessage(
+          "Enter your email first.",
+          "error"
+        );
+
+        return;
+      }
+
+      const { error } =
+        await db.auth.resetPasswordForEmail(
+          email,
+          {
+            redirectTo: APP_URL
+          }
+        );
+
+      if (error) {
+
+        showMessage(
+          error.message,
+          "error"
+        );
+
+        return;
+      }
+
+      showMessage(
+        "If an account exists for this email, a password reset email has been sent.",
+        "success"
+      );
+    }
+
+    function togglePassword() {
+
+      const input =
+        document.getElementById("password");
+
+      const button =
+        document.querySelector(".show");
+
+      if (input.type === "password") {
+
+        input.type = "text";
+        button.textContent = "Hide";
+
+      } else {
+
+        input.type = "password";
+        button.textContent = "Show";
+      }
+    }
+
+    function showMessage(text, type) {
+
+      const message =
+        document.getElementById("message");
+
+      message.textContent = text;
+
+      message.className =
+        "message " + type;
+    }
+
+    function clearMessage() {
+
+      const message =
+        document.getElementById("message");
+
+      message.textContent = "";
+      message.className = "message";
+
+      document.getElementById(
+        "resendButton"
+      ).style.display = "none";
+    }
+
+    function goHome() {
+      window.location.href = "index.html";
+    }
+
+    async function checkSession() {
+
+      const { data } =
+        await db.auth.getSession();
+
+      if (data.session) {
+        window.location.href = "index.html";
+      }
+    }
+
+    const params =
+      new URLSearchParams(window.location.search);
+
+    if (params.get("mode") === "signup") {
+      setMode("signup");
+    } else {
+      setMode("login");
+    }
+
+    checkSession();
+  </script>
+
+</body>
+</html>
