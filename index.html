@@ -1,15 +1,21 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Our Space</title>
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-  <meta name="theme-color" content="#ffffff">
-  <meta name="description" content="A private space for two.">
+  <title>Calculator</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Calculator icon -->
+  <link rel="icon" type="image/jpeg" href="calculator-icon.jpeg">
+  <link rel="apple-touch-icon" href="calculator-icon.jpeg">
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0B1628">
 
   <style>
     * {
@@ -18,266 +24,304 @@
       padding: 0;
     }
 
-    :root {
-      --bg: #f7f8fa;
-      --white: #ffffff;
-      --text: #17181c;
-      --muted: #747782;
-      --border: #e8e9ed;
-      --accent: #6c63ff;
-      --accent-dark: #5750df;
-      --danger: #d94b5b;
-      --shadow: 0 20px 60px rgba(0,0,0,.07);
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #111111;
+      color: white;
     }
 
     body {
-      font-family:
-        Inter,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Arial,
-        sans-serif;
-
-      background: var(--bg);
-      color: var(--text);
       min-height: 100vh;
+      overflow-x: hidden;
     }
 
     button {
-      font: inherit;
+      font-family: inherit;
+      border: none;
       cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    /* Loading */
+    /* =========================================================
+       CALCULATOR
+       ========================================================= */
 
-    #loadingScreen {
-      position: fixed;
-      inset: 0;
-      background: var(--white);
+    #calculatorScreen {
+      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 9999;
+      background: #111111;
+      padding: 20px;
     }
 
-    .loader-box {
+    .calculator {
+      width: min(100%, 390px);
+      background: #1b1b1b;
+      border-radius: 28px;
+      padding: 20px;
+      box-shadow:
+        0 25px 60px rgba(0, 0, 0, 0.45),
+        inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+
+    .calculator-brand {
       text-align: center;
+      color: #777;
+      font-size: 11px;
+      letter-spacing: 2px;
+      margin-bottom: 14px;
+      user-select: none;
     }
 
-    .logo-small {
-      width: 52px;
-      height: 52px;
-      border-radius: 16px;
-      background: var(--text);
-      color: white;
+    .display {
+      width: 100%;
+      min-height: 110px;
+      background: #090909;
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 16px;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-end;
+
+      overflow: hidden;
+    }
+
+    .previous-operation {
+      width: 100%;
+      min-height: 22px;
+      color: #777;
+      font-size: 15px;
+      text-align: right;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .current-display {
+      width: 100%;
+      color: #f5f5f5;
+      font-size: 42px;
+      font-weight: 300;
+      line-height: 1.1;
+      text-align: right;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .calculator-buttons {
       display: grid;
-      place-items: center;
-      font-weight: 800;
-      font-size: 20px;
-      margin: 0 auto 18px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
     }
 
-    .spinner {
-      width: 24px;
-      height: 24px;
-      border: 3px solid #e7e7eb;
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin .8s linear infinite;
-      margin: auto;
+    .calc-button {
+      aspect-ratio: 1;
+      border-radius: 18px;
+
+      background: #292929;
+      color: #f5f5f5;
+
+      font-size: 23px;
+      font-weight: 400;
+
+      transition:
+        transform 0.08s ease,
+        background 0.08s ease;
     }
 
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
+    .calc-button:active {
+      transform: scale(0.94);
+      background: #3a3a3a;
     }
 
-    /* App */
+    .calc-button.operator {
+      background: #d99a86;
+      color: #161616;
+    }
 
-    #app {
+    .calc-button.operator:active {
+      background: #c98570;
+    }
+
+    .calc-button.function {
+      background: #454545;
+      color: #f2f2f2;
+    }
+
+    .calc-button.zero {
+      grid-column: span 2;
+      aspect-ratio: auto;
+    }
+
+    /* =========================================================
+       OUR SPACE
+       ========================================================= */
+
+    #ourSpaceScreen {
       display: none;
       min-height: 100vh;
+      background:
+        radial-gradient(
+          circle at 15% 10%,
+          rgba(218, 151, 132, 0.12),
+          transparent 28%
+        ),
+        radial-gradient(
+          circle at 90% 80%,
+          rgba(73, 113, 151, 0.12),
+          transparent 30%
+        ),
+        #0b1628;
+      color: #f8fafc;
     }
 
-    header {
+    .space-header {
       height: 72px;
-      background: rgba(255,255,255,.92);
-      backdrop-filter: blur(15px);
-      border-bottom: 1px solid var(--border);
+      padding: 0 20px;
 
       display: flex;
       align-items: center;
       justify-content: space-between;
 
-      padding: 0 28px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      background: rgba(11,22,40,0.88);
+      backdrop-filter: blur(16px);
 
       position: sticky;
       top: 0;
-      z-index: 50;
+      z-index: 10;
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      font-weight: 800;
-      font-size: 18px;
+    .space-title {
+      font-family: Georgia, serif;
+      font-size: 25px;
+      font-weight: 500;
+      color: #fff;
     }
 
-    .brand-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: 12px;
-      background: var(--text);
-      color: white;
-      display: grid;
-      place-items: center;
-      font-size: 14px;
+    .space-subtitle {
+      margin-top: 2px;
+      color: #9eabba;
+      font-size: 11px;
     }
 
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .user-email {
-      font-size: 13px;
-      color: var(--muted);
-      max-width: 220px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .logout-btn {
-      border: 1px solid var(--border);
-      background: white;
-      color: var(--text);
+    .logout-button {
+      padding: 9px 13px;
       border-radius: 10px;
-      padding: 9px 14px;
-      font-size: 13px;
-      font-weight: 600;
-    }
 
-    .logout-btn:hover {
-      background: #f4f4f6;
-    }
+      background: rgba(255,255,255,0.07);
+      color: #cbd5e1;
 
-    main {
-      max-width: 1100px;
-      margin: auto;
-      padding: 55px 24px 80px;
-    }
-
-    .hero {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 28px;
-      padding: 55px;
-      box-shadow: var(--shadow);
-      margin-bottom: 28px;
-    }
-
-    .eyebrow {
-      display: inline-block;
       font-size: 12px;
-      font-weight: 800;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 14px;
     }
 
-    h1 {
-      font-size: clamp(38px, 6vw, 66px);
-      line-height: .98;
-      letter-spacing: -0.045em;
-      margin-bottom: 20px;
-      max-width: 700px;
+    .logout-button:hover {
+      background: rgba(255,255,255,0.12);
     }
 
-    .hero p {
-      color: var(--muted);
-      font-size: 17px;
-      line-height: 1.65;
-      max-width: 620px;
+    .space-content {
+      width: min(100%, 900px);
+      margin: 0 auto;
+      padding: 28px 18px 50px;
     }
 
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 18px;
-    }
-
-    .card {
-      background: white;
-      border: 1px solid var(--border);
+    .welcome-card {
+      padding: 25px;
       border-radius: 22px;
-      padding: 28px;
-      min-height: 180px;
-      transition: transform .2s ease, box-shadow .2s ease;
+
+      background:
+        linear-gradient(
+          135deg,
+          rgba(255,255,255,0.08),
+          rgba(255,255,255,0.035)
+        );
+
+      border: 1px solid rgba(255,255,255,0.08);
     }
 
-    .card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 15px 35px rgba(0,0,0,.06);
-    }
-
-    .card-icon {
-      font-size: 26px;
-      margin-bottom: 18px;
-    }
-
-    .card h2 {
-      font-size: 20px;
+    .welcome-card h1 {
+      font-family: Georgia, serif;
+      font-size: 30px;
+      font-weight: 500;
       margin-bottom: 8px;
     }
 
-    .card p {
-      color: var(--muted);
+    .welcome-card p {
+      color: #aeb8c5;
+      line-height: 1.6;
       font-size: 14px;
-      line-height: 1.55;
     }
 
-    .coming {
-      margin-top: 12px;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      color: var(--accent);
-      font-weight: 800;
+    .status {
+      margin-top: 18px;
+      padding: 12px 14px;
+      border-radius: 12px;
+
+      background: rgba(217,154,134,0.10);
+      border: 1px solid rgba(217,154,134,0.18);
+
+      color: #e9b8a8;
+      font-size: 13px;
     }
 
-    /* Mobile */
+    /* =========================================================
+       LOADING
+       ========================================================= */
 
-    @media (max-width: 700px) {
-      header {
-        padding: 0 16px;
+    #loadingScreen {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background: #0b1628;
+      color: white;
+    }
+
+    .loading-text {
+      color: #aeb8c5;
+      font-size: 14px;
+    }
+
+    /* =========================================================
+       MOBILE
+       ========================================================= */
+
+    @media (max-width: 480px) {
+      #calculatorScreen {
+        padding: 12px;
       }
 
-      .user-email {
-        display: none;
+      .calculator {
+        border-radius: 24px;
+        padding: 15px;
       }
 
-      main {
-        padding: 25px 15px 50px;
+      .calc-button {
+        border-radius: 15px;
       }
 
-      .hero {
-        padding: 32px 25px;
-        border-radius: 22px;
+      .current-display {
+        font-size: 38px;
       }
 
-      .cards {
-        grid-template-columns: 1fr;
+      .space-header {
+        padding: 0 15px;
       }
 
-      h1 {
-        font-size: 43px;
+      .space-title {
+        font-size: 22px;
       }
     }
   </style>
@@ -285,102 +329,240 @@
 
 <body>
 
-  <!-- Loading screen -->
+  <!-- =========================================================
+       LOADING
+       ========================================================= -->
+
   <div id="loadingScreen">
-    <div class="loader-box">
-      <div class="logo-small">OS</div>
-      <div class="spinner"></div>
-    </div>
+    <div class="loading-text">Loading...</div>
   </div>
 
-  <!-- Main app -->
-  <div id="app">
 
-    <header>
-      <div class="brand">
-        <div class="brand-icon">OS</div>
-        <span>Our Space</span>
+  <!-- =========================================================
+       CALCULATOR SCREEN
+       ========================================================= -->
+
+  <section id="calculatorScreen">
+
+    <div class="calculator">
+
+      <div class="calculator-brand">
+        CALCULATOR
       </div>
 
-      <div class="header-right">
-        <span id="userEmail" class="user-email"></span>
-        <button id="logoutBtn" class="logout-btn">
-          Log out
+      <div class="display">
+
+        <div
+          id="previousOperation"
+          class="previous-operation">
+        </div>
+
+        <div
+          id="currentDisplay"
+          class="current-display">
+          0
+        </div>
+
+      </div>
+
+      <div class="calculator-buttons">
+
+        <button
+          class="calc-button function"
+          data-action="clear">
+          AC
         </button>
+
+        <button
+          class="calc-button function"
+          data-action="sign">
+          ±
+        </button>
+
+        <button
+          class="calc-button function"
+          data-action="percent">
+          %
+        </button>
+
+        <button
+          class="calc-button operator"
+          data-action="operator"
+          data-value="/">
+          ÷
+        </button>
+
+
+        <button
+          class="calc-button"
+          data-number="7">
+          7
+        </button>
+
+        <button
+          class="calc-button"
+          data-number="8">
+          8
+        </button>
+
+        <button
+          class="calc-button"
+          data-number="9">
+          9
+        </button>
+
+        <button
+          class="calc-button operator"
+          data-action="operator"
+          data-value="*">
+          ×
+        </button>
+
+
+        <button
+          class="calc-button"
+          data-number="4">
+          4
+        </button>
+
+        <button
+          class="calc-button"
+          data-number="5">
+          5
+        </button>
+
+        <button
+          class="calc-button"
+          data-number="6">
+          6
+        </button>
+
+        <button
+          class="calc-button operator"
+          data-action="operator"
+          data-value="-">
+          −
+        </button>
+
+
+        <button
+          class="calc-button"
+          data-number="1">
+          1
+        </button>
+
+        <button
+          class="calc-button"
+          data-number="2">
+          2
+        </button>
+
+        <button
+          class="calc-button"
+          data-number="3">
+          3
+        </button>
+
+        <button
+          class="calc-button operator"
+          data-action="operator"
+          data-value="+">
+          +
+        </button>
+
+
+        <button
+          class="calc-button zero"
+          data-number="0">
+          0
+        </button>
+
+        <button
+          class="calc-button"
+          data-action="decimal">
+          .
+        </button>
+
+        <button
+          class="calc-button operator"
+          data-action="equals">
+          =
+        </button>
+
       </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================================================
+       OUR SPACE
+       ========================================================= -->
+
+  <section id="ourSpaceScreen">
+
+    <header class="space-header">
+
+      <div>
+        <div class="space-title">
+          Our Space
+        </div>
+
+        <div class="space-subtitle">
+          Just us.
+        </div>
+      </div>
+
+      <button
+        id="logoutButton"
+        class="logout-button">
+        Log out
+      </button>
+
     </header>
 
-    <main>
 
-      <section class="hero">
-        <span class="eyebrow">Just us</span>
+    <main class="space-content">
+
+      <div class="welcome-card">
 
         <h1>
-          Welcome to<br>
-          Our Space.
+          Welcome to Our Space
         </h1>
 
         <p>
-          A private place for the two of you.
-          Chat, save memories, write little notes,
-          make plans, and build your own space together.
+          Your private space is unlocked.
         </p>
-      </section>
 
-      <section class="cards">
-
-        <div class="card">
-          <div class="card-icon">💬</div>
-          <h2>Chat</h2>
-          <p>
-            Your private conversation space.
-          </p>
-          <div class="coming">Coming next</div>
+        <div
+          id="userStatus"
+          class="status">
+          Checking your account...
         </div>
 
-        <div class="card">
-          <div class="card-icon">📸</div>
-          <h2>Memories</h2>
-          <p>
-            Keep your favorite moments in one place.
-          </p>
-          <div class="coming">Coming next</div>
-        </div>
-
-        <div class="card">
-          <div class="card-icon">💌</div>
-          <h2>Love Notes</h2>
-          <p>
-            Leave messages for each other to discover.
-          </p>
-          <div class="coming">Coming next</div>
-        </div>
-
-        <div class="card">
-          <div class="card-icon">📅</div>
-          <h2>Plans</h2>
-          <p>
-            Keep track of your dates, ideas and plans.
-          </p>
-          <div class="coming">Coming next</div>
-        </div>
-
-      </section>
+      </div>
 
     </main>
 
-  </div>
+  </section>
+
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
+    /* =========================================================
+       SUPABASE CONFIG
+       ========================================================= */
+
     const SUPABASE_URL =
       "https://ywflohxufmfydkpkkqly.supabase.co";
 
     const SUPABASE_PUBLISHABLE_KEY =
       "sb_publishable_qTMUO8KxerEQBDQ-A7Huyg_8N2Tqpmr";
 
-    const { createClient } = supabase;
-
-    const client = createClient(
+    const client = window.supabase.createClient(
       SUPABASE_URL,
       SUPABASE_PUBLISHABLE_KEY,
       {
@@ -392,122 +574,623 @@
       }
     );
 
+
+    /* =========================================================
+       ELEMENTS
+       ========================================================= */
+
     const loadingScreen =
       document.getElementById("loadingScreen");
 
-    const app =
-      document.getElementById("app");
+    const calculatorScreen =
+      document.getElementById("calculatorScreen");
 
-    const userEmail =
-      document.getElementById("userEmail");
+    const ourSpaceScreen =
+      document.getElementById("ourSpaceScreen");
 
-    const logoutBtn =
-      document.getElementById("logoutBtn");
+    const currentDisplay =
+      document.getElementById("currentDisplay");
 
-    let checkingAuth = false;
+    const previousOperation =
+      document.getElementById("previousOperation");
 
-    function goToLogin() {
-      window.location.replace("login.html");
+    const logoutButton =
+      document.getElementById("logoutButton");
+
+    const userStatus =
+      document.getElementById("userStatus");
+
+
+    /* =========================================================
+       HIDDEN UNLOCK CODE
+       =========================================================
+
+       Change this to whatever code you want.
+
+       Example:
+       1432
+
+       The calculator will still behave normally.
+       When the exact code is entered, Our Space opens.
+       ========================================================= */
+
+    const UNLOCK_CODE = "1432";
+
+
+    /* =========================================================
+       CALCULATOR STATE
+       ========================================================= */
+
+    let currentValue = "0";
+    let previousValue = null;
+    let currentOperator = null;
+    let waitingForNewValue = false;
+
+    /*
+      Stores the digits entered since the last calculator reset.
+      This allows the secret code to be detected without changing
+      the normal calculator experience.
+    */
+    let unlockSequence = "";
+
+
+    /* =========================================================
+       CALCULATOR DISPLAY
+       ========================================================= */
+
+    function updateDisplay() {
+      currentDisplay.textContent = currentValue;
     }
 
-    function showApp(user) {
-      if (!user) {
-        goToLogin();
+
+    /* =========================================================
+       SECRET CODE DETECTION
+       ========================================================= */
+
+    function registerUnlockDigit(number) {
+
+      unlockSequence += String(number);
+
+      /*
+        Keep only the last characters necessary to compare
+        against the secret code.
+      */
+      if (unlockSequence.length > UNLOCK_CODE.length) {
+        unlockSequence =
+          unlockSequence.slice(-UNLOCK_CODE.length);
+      }
+
+      if (unlockSequence === UNLOCK_CODE) {
+        unlockSequence = "";
+        unlockOurSpace();
+      }
+    }
+
+
+    /* =========================================================
+       NUMBER INPUT
+       ========================================================= */
+
+    function inputNumber(number) {
+
+      registerUnlockDigit(number);
+
+      if (waitingForNewValue) {
+        currentValue = String(number);
+        waitingForNewValue = false;
+      } else if (currentValue === "0") {
+        currentValue = String(number);
+      } else {
+        currentValue += String(number);
+      }
+
+      updateDisplay();
+    }
+
+
+    /* =========================================================
+       DECIMAL
+       ========================================================= */
+
+    function inputDecimal() {
+
+      if (waitingForNewValue) {
+        currentValue = "0.";
+        waitingForNewValue = false;
+        updateDisplay();
         return;
       }
 
-      userEmail.textContent = user.email || "";
-
-      loadingScreen.style.display = "none";
-      app.style.display = "block";
+      if (!currentValue.includes(".")) {
+        currentValue += ".";
+        updateDisplay();
+      }
     }
 
-    async function clearBrokenSession() {
-      try {
-        await client.auth.signOut({ scope: "local" });
-      } catch (error) {
-        console.warn("Session cleanup:", error);
+
+    /* =========================================================
+       CLEAR
+       ========================================================= */
+
+    function clearCalculator() {
+
+      currentValue = "0";
+      previousValue = null;
+      currentOperator = null;
+      waitingForNewValue = false;
+      unlockSequence = "";
+
+      previousOperation.textContent = "";
+
+      updateDisplay();
+    }
+
+
+    /* =========================================================
+       SIGN
+       ========================================================= */
+
+    function toggleSign() {
+
+      if (currentValue === "0") {
+        return;
       }
 
-      try {
-        sessionStorage.removeItem("confirmationEmail");
-      } catch (error) {}
+      if (currentValue.startsWith("-")) {
+        currentValue =
+          currentValue.substring(1);
+      } else {
+        currentValue =
+          "-" + currentValue;
+      }
 
-      goToLogin();
+      updateDisplay();
     }
 
-    async function verifyUser() {
-      if (checkingAuth) return;
 
-      checkingAuth = true;
+    /* =========================================================
+       PERCENT
+       ========================================================= */
+
+    function percentage() {
+
+      const number =
+        parseFloat(currentValue);
+
+      if (Number.isNaN(number)) {
+        return;
+      }
+
+      currentValue =
+        String(number / 100);
+
+      updateDisplay();
+    }
+
+
+    /* =========================================================
+       OPERATOR
+       ========================================================= */
+
+    function chooseOperator(operator) {
+
+      const inputValue =
+        parseFloat(currentValue);
+
+      if (Number.isNaN(inputValue)) {
+        return;
+      }
+
+      if (
+        previousValue !== null &&
+        currentOperator !== null &&
+        !waitingForNewValue
+      ) {
+        calculate();
+      }
+
+      previousValue =
+        parseFloat(currentValue);
+
+      currentOperator =
+        operator;
+
+      waitingForNewValue = true;
+
+      previousOperation.textContent =
+        `${formatNumber(previousValue)} ${displayOperator(operator)}`;
+    }
+
+
+    /* =========================================================
+       CALCULATION
+       ========================================================= */
+
+    function calculate() {
+
+      if (
+        previousValue === null ||
+        currentOperator === null
+      ) {
+        return;
+      }
+
+      const current =
+        parseFloat(currentValue);
+
+      let result;
+
+      switch (currentOperator) {
+
+        case "+":
+          result = previousValue + current;
+          break;
+
+        case "-":
+          result = previousValue - current;
+          break;
+
+        case "*":
+          result = previousValue * current;
+          break;
+
+        case "/":
+
+          if (current === 0) {
+            currentValue = "Error";
+            previousValue = null;
+            currentOperator = null;
+            waitingForNewValue = true;
+
+            previousOperation.textContent = "";
+
+            updateDisplay();
+            return;
+          }
+
+          result = previousValue / current;
+          break;
+
+        default:
+          return;
+      }
+
+      result =
+        Number.parseFloat(result.toPrecision(12));
+
+      currentValue =
+        String(result);
+
+      previousOperation.textContent =
+        `${formatNumber(previousValue)} ${displayOperator(currentOperator)} ${formatNumber(current)}`;
+
+      previousValue = null;
+      currentOperator = null;
+      waitingForNewValue = true;
+
+      updateDisplay();
+    }
+
+
+    /* =========================================================
+       OPERATOR DISPLAY
+       ========================================================= */
+
+    function displayOperator(operator) {
+
+      switch (operator) {
+        case "*":
+          return "×";
+
+        case "/":
+          return "÷";
+
+        case "-":
+          return "−";
+
+        case "+":
+          return "+";
+
+        default:
+          return operator;
+      }
+    }
+
+
+    /* =========================================================
+       NUMBER FORMATTING
+       ========================================================= */
+
+    function formatNumber(number) {
+
+      if (typeof number !== "number") {
+        return number;
+      }
+
+      return String(
+        Number.parseFloat(number.toPrecision(12))
+      );
+    }
+
+
+    /* =========================================================
+       BUTTON EVENTS
+       ========================================================= */
+
+    document
+      .querySelectorAll("[data-number]")
+      .forEach(button => {
+
+        button.addEventListener("click", () => {
+
+          const number =
+            button.dataset.number;
+
+          inputNumber(number);
+        });
+
+      });
+
+
+    document
+      .querySelectorAll('[data-action="decimal"]')
+      .forEach(button => {
+
+        button.addEventListener(
+          "click",
+          inputDecimal
+        );
+
+      });
+
+
+    document
+      .querySelectorAll('[data-action="clear"]')
+      .forEach(button => {
+
+        button.addEventListener(
+          "click",
+          clearCalculator
+        );
+
+      });
+
+
+    document
+      .querySelectorAll('[data-action="sign"]')
+      .forEach(button => {
+
+        button.addEventListener(
+          "click",
+          toggleSign
+        );
+
+      });
+
+
+    document
+      .querySelectorAll('[data-action="percent"]')
+      .forEach(button => {
+
+        button.addEventListener(
+          "click",
+          percentage
+        );
+
+      });
+
+
+    document
+      .querySelectorAll('[data-action="operator"]')
+      .forEach(button => {
+
+        button.addEventListener("click", () => {
+
+          chooseOperator(
+            button.dataset.value
+          );
+
+        });
+
+      });
+
+
+    document
+      .querySelectorAll('[data-action="equals"]')
+      .forEach(button => {
+
+        button.addEventListener(
+          "click",
+          calculate
+        );
+
+      });
+
+
+    /* =========================================================
+       KEYBOARD SUPPORT
+       ========================================================= */
+
+    document.addEventListener(
+      "keydown",
+      event => {
+
+        const key = event.key;
+
+        if (/^[0-9]$/.test(key)) {
+          inputNumber(key);
+          return;
+        }
+
+        if (key === ".") {
+          inputDecimal();
+          return;
+        }
+
+        if (
+          key === "+" ||
+          key === "-" ||
+          key === "*" ||
+          key === "/"
+        ) {
+          chooseOperator(key);
+          return;
+        }
+
+        if (
+          key === "Enter" ||
+          key === "="
+        ) {
+          calculate();
+          return;
+        }
+
+        if (
+          key === "Escape" ||
+          key === "Delete"
+        ) {
+          clearCalculator();
+        }
+
+      }
+    );
+
+
+    /* =========================================================
+       OUR SPACE UNLOCK
+       ========================================================= */
+
+    async function unlockOurSpace() {
+
+      /*
+        First validate the real Supabase account.
+        The calculator code is NOT the security mechanism.
+      */
+
+      const {
+        data,
+        error
+      } = await client.auth.getUser();
+
+      if (
+        error ||
+        !data ||
+        !data.user
+      ) {
+
+        await client.auth.signOut({
+          scope: "local"
+        });
+
+        window.location.href =
+          "login.html";
+
+        return;
+      }
+
+      calculatorScreen.style.display =
+        "none";
+
+      ourSpaceScreen.style.display =
+        "block";
+
+      userStatus.textContent =
+        "Your private space is unlocked.";
+
+      window.scrollTo(0, 0);
+    }
+
+
+    /* =========================================================
+       LOGOUT
+       ========================================================= */
+
+    logoutButton.addEventListener(
+      "click",
+      async () => {
+
+        await client.auth.signOut({
+          scope: "local"
+        });
+
+        window.location.href =
+          "login.html";
+
+      }
+    );
+
+
+    /* =========================================================
+       AUTH CHECK
+       ========================================================= */
+
+    async function checkAuthentication() {
 
       try {
-        /*
-          getUser() is intentionally used here.
-
-          getSession() reads the locally stored session.
-          getUser() validates the authenticated user with Supabase.
-
-          This prevents a deleted/invalid account from appearing
-          logged in simply because an old browser session remains.
-        */
 
         const {
           data,
           error
         } = await client.auth.getUser();
 
-        if (error || !data || !data.user) {
-          await clearBrokenSession();
+        if (
+          error ||
+          !data ||
+          !data.user
+        ) {
+
+          await client.auth.signOut({
+            scope: "local"
+          });
+
+          window.location.href =
+            "login.html";
+
           return;
         }
 
-        showApp(data.user);
+        /*
+          User is authenticated.
+
+          We intentionally keep the calculator visible
+          instead of automatically opening Our Space.
+        */
+
+        loadingScreen.style.display =
+          "none";
+
+        calculatorScreen.style.display =
+          "flex";
 
       } catch (error) {
-        console.error("Authentication check failed:", error);
-        await clearBrokenSession();
 
-      } finally {
-        checkingAuth = false;
-      }
-    }
+        console.error(
+          "Authentication check failed:",
+          error
+        );
 
-    logoutBtn.addEventListener("click", async () => {
-
-      logoutBtn.disabled = true;
-      logoutBtn.textContent = "Logging out...";
-
-      const { error } =
         await client.auth.signOut({
           scope: "local"
         });
 
-      if (error) {
-        console.error(error);
-
-        logoutBtn.disabled = false;
-        logoutBtn.textContent = "Log out";
-
-        alert(
-          "We couldn't log you out. Please try again."
-        );
-
-        return;
+        window.location.href =
+          "login.html";
       }
+    }
 
-      goToLogin();
-    });
 
-    /*
-      Listen for authentication changes.
-    */
+    /* =========================================================
+       SUPABASE AUTH STATE LISTENER
+       ========================================================= */
 
     client.auth.onAuthStateChange(
       async (event, session) => {
 
         if (event === "SIGNED_OUT") {
-          goToLogin();
+
+          window.location.href =
+            "login.html";
+
           return;
         }
 
@@ -516,20 +1199,27 @@
           event === "TOKEN_REFRESHED" ||
           event === "USER_UPDATED"
         ) {
-          if (session) {
-            userEmail.textContent =
-              session.user.email || "";
-          }
+
+          /*
+            Nothing needs to happen here.
+            The current screen remains the calculator
+            until the secret code is entered.
+          */
+
         }
+
       }
     );
 
-    /*
-      Start authentication check.
-    */
 
-    verifyUser();
+    /* =========================================================
+       START
+       ========================================================= */
+
+    checkAuthentication();
+
   </script>
 
 </body>
 </html>
+```
