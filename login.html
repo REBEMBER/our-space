@@ -2,776 +2,281 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Login — Our Space</title>
-  <meta name="description" content="Sign in to your private Our Space.">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <title>Our Space — Login</title>
+
+  <meta name="theme-color" content="#F7F9FC">
 
   <style>
+    :root {
+      --navy: #152B46;
+      --navy-dark: #102238;
+      --peach: #F3B29F;
+      --peach-soft: #F9D5C9;
+      --blue-light: #EEF5FA;
+      --white: #FFFFFF;
+      --off-white: #F7F9FC;
+      --charcoal: #26313D;
+      --muted: #718092;
+      --border: #E2E9F0;
+      --danger: #B14D4D;
+    }
+
     * {
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
       margin: 0;
       padding: 0;
-    }
-
-    :root {
-      --bg: #f7f8fa;
-      --white: #ffffff;
-      --text: #17181c;
-      --muted: #777a84;
-      --border: #e5e6ea;
-      --accent: #6c63ff;
-      --danger: #d94b5b;
-      --success: #278a61;
-    }
-
-    body {
-      min-height: 100vh;
+      min-height: 100%;
       font-family:
-        Inter,
         -apple-system,
         BlinkMacSystemFont,
         "Segoe UI",
         Roboto,
         Arial,
         sans-serif;
-
       background:
         radial-gradient(
-          circle at 10% 10%,
-          rgba(108, 99, 255, .08),
+          circle at 10% 5%,
+          rgba(243,178,159,0.2),
           transparent 30%
         ),
         radial-gradient(
-          circle at 90% 90%,
-          rgba(108, 99, 255, .07),
-          transparent 30%
+          circle at 95% 95%,
+          rgba(220,234,245,0.4),
+          transparent 35%
         ),
-        var(--bg);
+        var(--off-white);
+      color: var(--charcoal);
+    }
 
-      color: var(--text);
-
+    body {
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-
-      padding: 24px;
+      padding: 20px;
     }
 
-    button,
-    input {
-      font: inherit;
-    }
-
-    button {
-      cursor: pointer;
-    }
-
-    .page {
-      width: 100%;
-      max-width: 460px;
-    }
-
-    .brand {
-      text-align: center;
-      margin-bottom: 25px;
-    }
-
-    .brand-icon {
-      width: 55px;
-      height: 55px;
-      border-radius: 17px;
-      background: var(--text);
-      color: white;
-
-      display: grid;
-      place-items: center;
-
-      font-weight: 800;
-      margin: 0 auto 15px;
-    }
-
-    .brand h1 {
-      font-size: 24px;
-      letter-spacing: -.03em;
-    }
-
-    .brand p {
-      color: var(--muted);
-      font-size: 14px;
-      margin-top: 7px;
-    }
-
-    .box {
-      background: rgba(255,255,255,.95);
+    .card {
+      width: min(100%, 430px);
+      background: rgba(255,255,255,0.96);
       border: 1px solid var(--border);
-      border-radius: 25px;
+      border-radius: 28px;
       padding: 30px;
+      box-shadow: 0 20px 55px rgba(21,43,70,0.09);
+    }
 
-      box-shadow:
-        0 25px 70px rgba(0,0,0,.07);
+    .logo {
+      font-size: 27px;
+      font-weight: 750;
+      color: var(--navy);
+      letter-spacing: -0.8px;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 27px;
     }
 
     .tabs {
       display: grid;
       grid-template-columns: 1fr 1fr;
-
-      background: #f1f1f4;
-      border-radius: 12px;
+      background: var(--blue-light);
+      border-radius: 14px;
       padding: 4px;
-
-      margin-bottom: 28px;
+      margin-bottom: 23px;
     }
 
     .tab {
       border: 0;
       background: transparent;
-      border-radius: 9px;
-
       padding: 11px;
-
+      border-radius: 10px;
       color: var(--muted);
-      font-weight: 700;
-      font-size: 13px;
+      font-weight: 650;
+      cursor: pointer;
     }
 
     .tab.active {
-      background: white;
-      color: var(--text);
-
-      box-shadow:
-        0 2px 8px rgba(0,0,0,.06);
-    }
-
-    .intro {
-      margin-bottom: 24px;
-    }
-
-    .intro h2 {
-      font-size: 25px;
-      letter-spacing: -.03em;
-      margin-bottom: 7px;
-    }
-
-    .intro p {
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
-    .field {
-      margin-bottom: 17px;
+      background: var(--white);
+      color: var(--navy);
+      box-shadow: 0 2px 7px rgba(21,43,70,0.07);
     }
 
     label {
       display: block;
-      font-size: 12px;
-      font-weight: 800;
+      font-size: 13px;
+      font-weight: 650;
       margin-bottom: 7px;
-    }
-
-    .input-wrap {
-      position: relative;
+      color: var(--charcoal);
     }
 
     input {
       width: 100%;
-
       border: 1px solid var(--border);
-      background: #fafafd;
-
-      border-radius: 12px;
-
-      padding: 13px 14px;
-
-      color: var(--text);
+      background: var(--white);
+      border-radius: 13px;
+      padding: 14px;
+      font-size: 16px;
       outline: none;
-
-      transition:
-        border-color .2s,
-        box-shadow .2s,
-        background .2s;
+      color: var(--charcoal);
+      margin-bottom: 16px;
     }
 
     input:focus {
-      background: white;
-      border-color: var(--accent);
-
-      box-shadow:
-        0 0 0 4px rgba(108,99,255,.09);
-    }
-
-    input.password-input {
-      padding-right: 55px;
-    }
-
-    .show-password {
-      position: absolute;
-      right: 8px;
-      top: 50%;
-      transform: translateY(-50%);
-
-      border: 0;
-      background: transparent;
-
-      color: var(--muted);
-
-      padding: 7px;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .forgot-row {
-      display: flex;
-      justify-content: flex-end;
-
-      margin-top: -7px;
-      margin-bottom: 18px;
-    }
-
-    .link-btn {
-      border: 0;
-      background: transparent;
-
-      color: var(--accent);
-
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .link-btn:hover {
-      text-decoration: underline;
+      border-color: var(--navy);
+      box-shadow: 0 0 0 3px rgba(21,43,70,0.08);
     }
 
     .primary {
       width: 100%;
-
       border: 0;
-      border-radius: 13px;
-
-      padding: 14px;
-
-      background: var(--text);
+      background: var(--navy);
       color: white;
-
-      font-size: 14px;
-      font-weight: 800;
-
-      transition:
-        transform .15s,
-        background .2s;
-    }
-
-    .primary:hover {
-      background: #2b2c31;
-      transform: translateY(-1px);
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 4px;
     }
 
     .primary:disabled {
-      opacity: .55;
-      cursor: not-allowed;
-      transform: none;
+      opacity: 0.65;
+      cursor: wait;
     }
 
     .message {
-      display: none;
-
-      border-radius: 11px;
-
+      margin-top: 15px;
       padding: 12px 13px;
-
-      margin-bottom: 17px;
-
+      border-radius: 12px;
       font-size: 13px;
       line-height: 1.45;
+      display: none;
     }
 
     .message.error {
       display: block;
-
-      background: #fff1f3;
+      background: #FFF0F0;
       color: var(--danger);
-
-      border: 1px solid #ffd8de;
     }
 
     .message.success {
       display: block;
-
-      background: #eefaf4;
-      color: var(--success);
-
-      border: 1px solid #d0efdf;
+      background: var(--blue-light);
+      color: var(--navy);
     }
 
-    .strength {
-      display: none;
-
-      height: 4px;
-
-      background: #ededf0;
-      border-radius: 10px;
-
-      overflow: hidden;
-
-      margin-top: 8px;
-    }
-
-    .strength-bar {
-      width: 0%;
-      height: 100%;
-
-      transition: width .2s;
-    }
-
-    .password-hint {
-      display: none;
-
-      margin-top: 7px;
-
-      color: var(--muted);
-      font-size: 11px;
-    }
-
-    .bottom-note {
-      text-align: center;
-
-      color: var(--muted);
-
-      font-size: 11px;
-
-      margin-top: 20px;
-
-      line-height: 1.5;
-    }
-
-    /* Password reset modal */
-
-    .modal {
-      position: fixed;
-      inset: 0;
-
-      background: rgba(10,10,15,.45);
-
-      backdrop-filter: blur(5px);
-
-      display: none;
-
-      align-items: center;
-      justify-content: center;
-
-      padding: 20px;
-
-      z-index: 100;
-    }
-
-    .modal.show {
-      display: flex;
-    }
-
-    .modal-box {
-      width: 100%;
-      max-width: 390px;
-
-      background: white;
-
-      border-radius: 22px;
-
-      padding: 28px;
-
-      box-shadow:
-        0 30px 90px rgba(0,0,0,.2);
-    }
-
-    .modal-box h3 {
-      font-size: 21px;
-      margin-bottom: 8px;
-    }
-
-    .modal-box p {
-      color: var(--muted);
-
-      font-size: 13px;
-      line-height: 1.5;
-
-      margin-bottom: 18px;
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 9px;
-
-      margin-top: 15px;
-    }
-
-    .secondary,
-    .modal-primary {
-      flex: 1;
-
-      border-radius: 11px;
-
-      padding: 11px;
-
-      font-weight: 700;
-    }
-
-    .secondary {
-      border: 1px solid var(--border);
-      background: white;
-    }
-
-    .modal-primary {
-      border: 0;
-      background: var(--text);
-      color: white;
-    }
-
-    @media (max-width: 500px) {
-      body {
-        padding: 14px;
-      }
-
-      .box {
-        padding: 23px;
-      }
+    .hidden {
+      display: none !important;
     }
   </style>
 </head>
 
 <body>
 
-  <div class="page">
+  <main class="card">
 
-    <div class="brand">
-      <div class="brand-icon">OS</div>
+    <div class="logo">Our Space</div>
 
-      <h1>Our Space</h1>
-
-      <p>
-        Your private place for two.
-      </p>
+    <div class="subtitle">
+      A private space for the two of you.
     </div>
 
-
-    <div class="box">
-
-      <div class="tabs">
-
-        <button
-          id="loginTab"
-          class="tab active"
-          type="button"
-        >
-          Log in
-        </button>
-
-        <button
-          id="signupTab"
-          class="tab"
-          type="button"
-        >
-          Create account
-        </button>
-
-      </div>
-
-
-      <!-- LOGIN -->
-
-      <div id="loginForm">
-
-        <div class="intro">
-
-          <h2>
-            Welcome back.
-          </h2>
-
-          <p>
-            Sign in to continue to your space.
-          </p>
-
-        </div>
-
-
-        <div
-          id="loginMessage"
-          class="message"
-        ></div>
-
-
-        <form id="loginFormElement">
-
-          <div class="field">
-
-            <label for="loginEmail">
-              Email
-            </label>
-
-            <input
-              id="loginEmail"
-              type="email"
-              autocomplete="email"
-              placeholder="you@example.com"
-              required
-            >
-
-          </div>
-
-
-          <div class="field">
-
-            <label for="loginPassword">
-              Password
-            </label>
-
-            <div class="input-wrap">
-
-              <input
-                id="loginPassword"
-                class="password-input"
-                type="password"
-                autocomplete="current-password"
-                placeholder="Your password"
-                required
-              >
-
-              <button
-                class="show-password"
-                type="button"
-                data-target="loginPassword"
-              >
-                Show
-              </button>
-
-            </div>
-
-          </div>
-
-
-          <div class="forgot-row">
-
-            <button
-              id="forgotBtn"
-              class="link-btn"
-              type="button"
-            >
-              Forgot password?
-            </button>
-
-          </div>
-
-
-          <button
-            id="loginBtn"
-            class="primary"
-            type="submit"
-          >
-            Log in
-          </button>
-
-        </form>
-
-      </div>
-
-
-      <!-- SIGN UP -->
-
-      <div
-        id="signupForm"
-        style="display:none;"
+    <div class="tabs">
+      <button
+        id="loginTab"
+        class="tab active"
+        type="button"
       >
+        Log in
+      </button>
 
-        <div class="intro">
+      <button
+        id="signupTab"
+        class="tab"
+        type="button"
+      >
+        Create account
+      </button>
+    </div>
 
-          <h2>
-            Create your space.
-          </h2>
+    <form id="authForm">
 
-          <p>
-            Create an account to start your private space.
-          </p>
+      <div id="nameGroup" class="hidden">
+        <label for="name">Name</label>
 
-        </div>
-
-
-        <div
-          id="signupMessage"
-          class="message"
-        ></div>
-
-
-        <form id="signupFormElement">
-
-          <div class="field">
-
-            <label for="signupEmail">
-              Email
-            </label>
-
-            <input
-              id="signupEmail"
-              type="email"
-              autocomplete="email"
-              placeholder="you@example.com"
-              required
-            >
-
-          </div>
-
-
-          <div class="field">
-
-            <label for="signupPassword">
-              Password
-            </label>
-
-            <div class="input-wrap">
-
-              <input
-                id="signupPassword"
-                class="password-input"
-                type="password"
-                autocomplete="new-password"
-                placeholder="At least 6 characters"
-                minlength="6"
-                required
-              >
-
-              <button
-                class="show-password"
-                type="button"
-                data-target="signupPassword"
-              >
-                Show
-              </button>
-
-            </div>
-
-
-            <div
-              id="strength"
-              class="strength"
-            >
-              <div
-                id="strengthBar"
-                class="strength-bar"
-              ></div>
-            </div>
-
-
-            <div
-              id="passwordHint"
-              class="password-hint"
-            ></div>
-
-          </div>
-
-
-          <button
-            id="signupBtn"
-            class="primary"
-            type="submit"
-          >
-            Create account
-          </button>
-
-        </form>
-
+        <input
+          id="name"
+          type="text"
+          autocomplete="name"
+          placeholder="Your name"
+        >
       </div>
 
-    </div>
-
-
-    <div class="bottom-note">
-      Your account is protected by Supabase Authentication.
-    </div>
-
-  </div>
-
-
-  <!-- PASSWORD RESET MODAL -->
-
-  <div
-    id="resetModal"
-    class="modal"
-  >
-
-    <div class="modal-box">
-
-      <h3>
-        Reset your password
-      </h3>
-
-      <p>
-        Enter your email and we'll send you
-        a password reset link.
-      </p>
-
-
-      <div
-        id="resetMessage"
-        class="message"
-      ></div>
-
+      <label for="email">Email</label>
 
       <input
-        id="resetEmail"
+        id="email"
         type="email"
         autocomplete="email"
         placeholder="you@example.com"
+        required
       >
 
+      <label for="password">Password</label>
 
-      <div class="modal-actions">
+      <input
+        id="password"
+        type="password"
+        autocomplete="current-password"
+        placeholder="Your password"
+        required
+      >
 
-        <button
-          id="cancelReset"
-          class="secondary"
-          type="button"
-        >
-          Cancel
-        </button>
+      <button
+        id="submitButton"
+        class="primary"
+        type="submit"
+      >
+        Log in
+      </button>
 
-        <button
-          id="sendReset"
-          class="modal-primary"
-          type="button"
-        >
-          Send link
-        </button>
+    </form>
 
-      </div>
+    <div
+      id="message"
+      class="message"
+      aria-live="polite"
+    ></div>
 
-    </div>
+  </main>
 
-  </div>
-
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
-
-    /* ============================
-       SUPABASE
-    ============================ */
-
     const SUPABASE_URL =
       "https://ywflohxufmfydkpkkqly.supabase.co";
 
     const SUPABASE_PUBLISHABLE_KEY =
       "sb_publishable_qTMUO8KxerEQBDQ-A7Huyg_8N2Tqpmr";
 
-    const APP_URL =
-      "https://our-space-topaz.vercel.app/";
-
     const CONFIRMATION_URL =
       "https://our-space-topaz.vercel.app/confirmation.html";
 
-
-    const { createClient } = supabase;
-
-
-    const client = createClient(
+    const client = window.supabase.createClient(
       SUPABASE_URL,
       SUPABASE_PUBLISHABLE_KEY,
       {
@@ -783,747 +288,161 @@
       }
     );
 
+    const authForm = document.getElementById("authForm");
+    const loginTab = document.getElementById("loginTab");
+    const signupTab = document.getElementById("signupTab");
+    const nameGroup = document.getElementById("nameGroup");
+    const nameInput = document.getElementById("name");
+    const submitButton = document.getElementById("submitButton");
+    const message = document.getElementById("message");
 
-    /* ============================
-       ELEMENTS
-    ============================ */
+    let mode = "login";
 
-    const loginTab =
-      document.getElementById("loginTab");
-
-    const signupTab =
-      document.getElementById("signupTab");
-
-    const loginForm =
-      document.getElementById("loginForm");
-
-    const signupForm =
-      document.getElementById("signupForm");
-
-    const loginFormElement =
-      document.getElementById("loginFormElement");
-
-    const signupFormElement =
-      document.getElementById("signupFormElement");
-
-    const loginBtn =
-      document.getElementById("loginBtn");
-
-    const signupBtn =
-      document.getElementById("signupBtn");
-
-    const loginMessage =
-      document.getElementById("loginMessage");
-
-    const signupMessage =
-      document.getElementById("signupMessage");
-
-
-    /* ============================
-       HELPERS
-    ============================ */
-
-    function showMessage(
-      element,
-      message,
-      type
-    ) {
-      element.textContent = message;
-
-      element.className =
-        "message " + type;
+    function showMessage(text, type) {
+      message.textContent = text;
+      message.className = `message ${type}`;
     }
 
-
-    function clearMessage(element) {
-      element.textContent = "";
-      element.className = "message";
+    function clearMessage() {
+      message.textContent = "";
+      message.className = "message";
     }
 
+    function setMode(newMode) {
+      mode = newMode;
 
-    function goHome() {
-      window.location.replace("index.html");
-    }
+      clearMessage();
 
-
-    function goConfirmation(email) {
-
-      try {
-        sessionStorage.setItem(
-          "confirmationEmail",
-          email
-        );
-      } catch (error) {}
-
-      window.location.replace(
-        "confirmation.html"
-      );
-    }
-
-
-    function friendlyAuthError(error) {
-
-      const message =
-        String(error?.message || "")
-          .toLowerCase();
-
-
-      if (
-        message.includes(
-          "invalid login credentials"
-        )
-      ) {
-        return "The email or password is incorrect.";
-      }
-
-
-      if (
-        message.includes(
-          "email not confirmed"
-        )
-      ) {
-        return "Your email hasn't been confirmed yet.";
-      }
-
-
-      if (
-        message.includes("rate limit") ||
-        message.includes("rate exceeded") ||
-        message.includes("too many requests")
-      ) {
-        return "Too many requests right now. Please wait a little and try again.";
-      }
-
-
-      if (
-        message.includes(
-          "password should be at least"
-        )
-      ) {
-        return "Your password must contain at least 6 characters.";
-      }
-
-
-      if (
-        message.includes("invalid email")
-      ) {
-        return "Please enter a valid email address.";
-      }
-
-
-      if (
-        message.includes(
-          "user already registered"
-        )
-      ) {
-        return "This account may already exist. Try logging in instead.";
-      }
-
-
-      return (
-        error?.message ||
-        "Something went wrong. Please try again."
-      );
-    }
-
-
-    /* ============================
-       EXISTING SESSION
-    ============================ */
-
-    async function checkExistingUser() {
-
-      try {
-
-        const {
-          data,
-          error
-        } = await client.auth.getUser();
-
-
-        if (
-          !error &&
-          data?.user
-        ) {
-          goHome();
-        }
-
-      } catch (error) {
-
-        console.log(
-          "No active session."
-        );
-
-      }
-    }
-
-
-    checkExistingUser();
-
-
-    /* ============================
-       TABS
-    ============================ */
-
-    loginTab.addEventListener(
-      "click",
-      () => {
-
-        loginTab.classList.add("active");
-        signupTab.classList.remove("active");
-
-        loginForm.style.display = "block";
-        signupForm.style.display = "none";
-
-        clearMessage(loginMessage);
-        clearMessage(signupMessage);
-      }
-    );
-
-
-    signupTab.addEventListener(
-      "click",
-      () => {
-
-        signupTab.classList.add("active");
+      if (mode === "signup") {
         loginTab.classList.remove("active");
+        signupTab.classList.add("active");
 
-        signupForm.style.display = "block";
-        loginForm.style.display = "none";
+        nameGroup.classList.remove("hidden");
+        nameInput.required = true;
 
-        clearMessage(loginMessage);
-        clearMessage(signupMessage);
+        submitButton.textContent = "Create account";
+
+      } else {
+        signupTab.classList.remove("active");
+        loginTab.classList.add("active");
+
+        nameGroup.classList.add("hidden");
+        nameInput.required = false;
+
+        submitButton.textContent = "Log in";
       }
-    );
+    }
 
+    loginTab.addEventListener("click", () => {
+      setMode("login");
+    });
 
-    /* ============================
-       SHOW / HIDE PASSWORD
-    ============================ */
+    signupTab.addEventListener("click", () => {
+      setMode("signup");
+    });
 
-    document
-      .querySelectorAll(".show-password")
-      .forEach(button => {
+    authForm.addEventListener("submit", async event => {
+      event.preventDefault();
 
-        button.addEventListener(
-          "click",
-          () => {
+      clearMessage();
 
-            const target =
-              document.getElementById(
-                button.dataset.target
-              );
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const name = nameInput.value.trim();
 
+      submitButton.disabled = true;
+      submitButton.textContent =
+        mode === "signup"
+          ? "Creating account..."
+          : "Logging in...";
 
-            if (
-              target.type === "password"
-            ) {
+      try {
+        if (mode === "signup") {
 
-              target.type = "text";
-              button.textContent = "Hide";
-
-            } else {
-
-              target.type = "password";
-              button.textContent = "Show";
-
+          const {
+            data,
+            error
+          } = await client.auth.signUp({
+            email,
+            password,
+            options: {
+              data: {
+                name
+              },
+              emailRedirectTo: CONFIRMATION_URL
             }
+          });
 
+          if (error) {
+            throw error;
           }
-        );
 
-      });
+          if (data.user && data.session) {
+            window.location.replace("index.html");
+            return;
+          }
 
-
-    /* ============================
-       PASSWORD STRENGTH
-    ============================ */
-
-    const signupPassword =
-      document.getElementById(
-        "signupPassword"
-      );
-
-    const strength =
-      document.getElementById(
-        "strength"
-      );
-
-    const strengthBar =
-      document.getElementById(
-        "strengthBar"
-      );
-
-    const passwordHint =
-      document.getElementById(
-        "passwordHint"
-      );
-
-
-    signupPassword.addEventListener(
-      "input",
-      () => {
-
-        const value =
-          signupPassword.value;
-
-
-        if (!value) {
-
-          strength.style.display = "none";
-          passwordHint.style.display = "none";
-
-          return;
-        }
-
-
-        strength.style.display = "block";
-        passwordHint.style.display = "block";
-
-
-        let score = 0;
-
-
-        if (value.length >= 6)
-          score++;
-
-        if (value.length >= 10)
-          score++;
-
-        if (/[A-Z]/.test(value))
-          score++;
-
-        if (/[0-9]/.test(value))
-          score++;
-
-        if (/[^A-Za-z0-9]/.test(value))
-          score++;
-
-
-        strengthBar.style.width =
-          Math.min(score, 5) * 20 + "%";
-
-
-        if (score <= 1) {
-
-          passwordHint.textContent =
-            "Weak password";
-
-        } else if (score <= 3) {
-
-          passwordHint.textContent =
-            "Decent password";
+          showMessage(
+            "Account created. Check your email to confirm your account.",
+            "success"
+          );
 
         } else {
 
-          passwordHint.textContent =
-            "Strong password";
-
-        }
-
-      }
-    );
-
-
-    /* ============================
-       LOGIN
-    ============================ */
-
-    loginFormElement.addEventListener(
-      "submit",
-      async event => {
-
-        event.preventDefault();
-
-
-        clearMessage(loginMessage);
-
-
-        const email =
-          document
-            .getElementById("loginEmail")
-            .value
-            .trim()
-            .toLowerCase();
-
-
-        const password =
-          document
-            .getElementById("loginPassword")
-            .value;
-
-
-        if (!email || !password) {
-
-          showMessage(
-            loginMessage,
-            "Please enter your email and password.",
-            "error"
-          );
-
-          return;
-        }
-
-
-        loginBtn.disabled = true;
-        loginBtn.textContent =
-          "Logging in...";
-
-
-        const {
-          data,
-          error
-        } =
-          await client.auth.signInWithPassword({
+          const {
+            data,
+            error
+          } = await client.auth.signInWithPassword({
             email,
             password
           });
 
+          if (error) {
+            throw error;
+          }
 
-        if (error) {
-
-          showMessage(
-            loginMessage,
-            friendlyAuthError(error),
-            "error"
-          );
-
-          loginBtn.disabled = false;
-          loginBtn.textContent =
-            "Log in";
-
-          return;
+          if (data.user) {
+            window.location.replace("index.html");
+            return;
+          }
         }
 
-
-        if (!data?.user) {
-
-          showMessage(
-            loginMessage,
-            "We couldn't complete the login. Please try again.",
-            "error"
-          );
-
-          loginBtn.disabled = false;
-          loginBtn.textContent =
-            "Log in";
-
-          return;
-        }
-
-
-        goHome();
-
-      }
-    );
-
-
-    /* ============================
-       CREATE ACCOUNT
-    ============================ */
-
-    signupFormElement.addEventListener(
-      "submit",
-      async event => {
-
-        event.preventDefault();
-
-
-        clearMessage(signupMessage);
-
-
-        const email =
-          document
-            .getElementById("signupEmail")
-            .value
-            .trim()
-            .toLowerCase();
-
-
-        const password =
-          signupPassword.value;
-
-
-        if (!email || !password) {
-
-          showMessage(
-            signupMessage,
-            "Please complete all fields.",
-            "error"
-          );
-
-          return;
-        }
-
-
-        if (password.length < 6) {
-
-          showMessage(
-            signupMessage,
-            "Your password must contain at least 6 characters.",
-            "error"
-          );
-
-          return;
-        }
-
-
-        signupBtn.disabled = true;
-        signupBtn.textContent =
-          "Creating account...";
-
-
-        const {
-          data,
-          error
-        } =
-          await client.auth.signUp({
-
-            email,
-
-            password,
-
-            options: {
-
-              /*
-                IMPORTANT:
-                After clicking the confirmation
-                email, Supabase sends the user to
-                confirmation.html.
-              */
-
-              emailRedirectTo:
-                CONFIRMATION_URL
-
-            }
-
-          });
-
-
-        if (error) {
-
-          showMessage(
-            signupMessage,
-            friendlyAuthError(error),
-            "error"
-          );
-
-          signupBtn.disabled = false;
-          signupBtn.textContent =
-            "Create account";
-
-          return;
-        }
-
-
-        /*
-          If Supabase automatically created
-          a session, go directly into the app.
-        */
-
-        if (data?.session) {
-
-          goHome();
-
-          return;
-        }
-
-
-        /*
-          Email confirmation is required.
-          Save the email and show the
-          confirmation-success flow once
-          the user clicks the email.
-        */
-
-        goConfirmation(email);
-
-      }
-    );
-
-
-    /* ============================
-       FORGOT PASSWORD
-    ============================ */
-
-    const resetModal =
-      document.getElementById(
-        "resetModal"
-      );
-
-    const resetEmail =
-      document.getElementById(
-        "resetEmail"
-      );
-
-    const resetMessage =
-      document.getElementById(
-        "resetMessage"
-      );
-
-    const forgotBtn =
-      document.getElementById(
-        "forgotBtn"
-      );
-
-    const cancelReset =
-      document.getElementById(
-        "cancelReset"
-      );
-
-    const sendReset =
-      document.getElementById(
-        "sendReset"
-      );
-
-
-    forgotBtn.addEventListener(
-      "click",
-      () => {
-
-        resetEmail.value =
-          document
-            .getElementById(
-              "loginEmail"
-            )
-            .value
-            .trim();
-
-
-        clearMessage(resetMessage);
-
-        resetModal.classList.add(
-          "show"
-        );
-
-      }
-    );
-
-
-    cancelReset.addEventListener(
-      "click",
-      () => {
-
-        resetModal.classList.remove(
-          "show"
-        );
-
-      }
-    );
-
-
-    resetModal.addEventListener(
-      "click",
-      event => {
-
-        if (
-          event.target === resetModal
-        ) {
-
-          resetModal.classList.remove(
-            "show"
-          );
-
-        }
-
-      }
-    );
-
-
-    sendReset.addEventListener(
-      "click",
-      async () => {
-
-        const email =
-          resetEmail.value
-            .trim()
-            .toLowerCase();
-
-
-        clearMessage(resetMessage);
-
-
-        if (!email) {
-
-          showMessage(
-            resetMessage,
-            "Enter your email address.",
-            "error"
-          );
-
-          return;
-        }
-
-
-        sendReset.disabled = true;
-        sendReset.textContent =
-          "Sending...";
-
-
-        const {
-          error
-        } =
-          await client.auth
-            .resetPasswordForEmail(
-              email,
-              {
-                redirectTo:
-                  APP_URL
-              }
-            );
-
-
-        if (error) {
-
-          showMessage(
-            resetMessage,
-            friendlyAuthError(error),
-            "error"
-          );
-
-          sendReset.disabled = false;
-          sendReset.textContent =
-            "Send link";
-
-          return;
-        }
-
+      } catch (error) {
+        console.error(error);
 
         showMessage(
-          resetMessage,
-          "If this email belongs to an account, a reset link has been sent.",
-          "success"
+          error.message || "Something went wrong. Please try again.",
+          "error"
         );
 
+      } finally {
+        submitButton.disabled = false;
 
-        sendReset.disabled = false;
-
-        sendReset.textContent =
-          "Send link";
-
-      }
-    );
-
-
-    /* ============================
-       AUTH STATE
-    ============================ */
-
-    client.auth.onAuthStateChange(
-      (event, session) => {
-
-        if (
-          event === "SIGNED_IN" &&
-          session
-        ) {
-
-          goHome();
-
+        if (mode === "login") {
+          submitButton.textContent = "Log in";
+        } else {
+          submitButton.textContent = "Create account";
         }
-
       }
-    );
+    });
 
+    async function checkExistingSession() {
+      try {
+        const {
+          data: {
+            user
+          }
+        } = await client.auth.getUser();
+
+        if (user) {
+          window.location.replace("index.html");
+        }
+      } catch (error) {
+        console.log("No active user.");
+      }
+    }
+
+    checkExistingSession();
   </script>
 
 </body>
