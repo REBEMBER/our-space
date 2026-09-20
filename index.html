@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0"
@@ -42,10 +43,6 @@
       padding: 0;
     }
 
-    html {
-      scroll-behavior: smooth;
-    }
-
     body {
       min-height: 100vh;
 
@@ -66,23 +63,16 @@
         "Segoe UI",
         Arial,
         sans-serif;
-
-      line-height: 1.5;
-    }
-
-    button,
-    input {
-      font: inherit;
     }
 
     button {
+      font: inherit;
       border: none;
     }
 
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
+    /* ==========================================
+       APP
+    ========================================== */
 
     .app {
       min-height: 100vh;
@@ -103,6 +93,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+
       gap: 16px;
 
       padding:
@@ -114,6 +105,7 @@
     .brand {
       display: flex;
       align-items: center;
+
       gap: 12px;
     }
 
@@ -123,14 +115,18 @@
 
       border-radius: 14px;
 
-      background: var(--navy);
-      color: var(--surface);
+      background:
+        var(--navy);
+
+      color:
+        var(--surface);
 
       display: grid;
       place-items: center;
 
       box-shadow:
-        0 8px 20px rgba(21, 43, 70, 0.14);
+        0 8px 20px
+        rgba(21, 43, 70, 0.14);
     }
 
     .brand-mark svg {
@@ -146,18 +142,22 @@
     }
 
     .brand-title {
-      color: var(--navy);
+      color:
+        var(--navy);
 
       font-size: 16px;
+
       font-weight: 800;
 
-      letter-spacing: 0.08em;
+      letter-spacing:
+        0.08em;
     }
 
     .brand-subtitle {
       margin-top: 4px;
 
-      color: var(--muted);
+      color:
+        var(--muted);
 
       font-size: 12px;
     }
@@ -165,6 +165,7 @@
     .top-actions {
       display: flex;
       align-items: center;
+
       gap: 8px;
     }
 
@@ -175,11 +176,19 @@
       border-radius: 14px;
 
       background:
-        rgba(255, 255, 255, 0.78);
+        rgba(
+          255,
+          255,
+          255,
+          0.78
+        );
 
-      border: 1px solid var(--border);
+      border:
+        1px solid
+        var(--border);
 
-      color: var(--navy);
+      color:
+        var(--navy);
 
       display: grid;
       place-items: center;
@@ -193,13 +202,15 @@
     }
 
     .icon-button:hover {
-      background: var(--surface);
+      background:
+        var(--surface);
 
       transform:
         translateY(-1px);
 
       box-shadow:
-        0 8px 18px rgba(21, 43, 70, 0.08);
+        0 8px 18px
+        rgba(21, 43, 70, 0.08);
     }
 
     .icon-button svg {
@@ -210,386 +221,13 @@
     }
 
     /* ==========================================
-       HERO
+       MAIN HERO
     ========================================== */
 
     .hero {
-      display: grid;
+      min-height: 470px;
 
-      grid-template-columns:
-        1.35fr
-        0.65fr;
-
-      gap: 18px;
-
-      margin-bottom: 18px;
-    }
-
-    .hero-main {
-      position: relative;
-      overflow: hidden;
-
-      min-height: 330px;
-
-      padding: 38px;
-
-      border-radius:
-        var(--radius-lg);
-
-      background: var(--surface);
-
-      border: 1px solid
-        var(--border);
-
-      box-shadow:
-        var(--shadow);
-
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .hero-main::after {
-      content: "";
-
-      position: absolute;
-
-      width: 250px;
-      height: 250px;
-
-      border-radius: 50%;
-
-      right: -85px;
-      top: -95px;
-
-      background:
-        var(--peach);
-
-      opacity: 0.20;
-
-      pointer-events: none;
-    }
-
-    .hero-eyebrow {
-      position: relative;
-      z-index: 1;
-
-      display: inline-flex;
-      align-items: center;
-
-      width: fit-content;
-
-      padding:
-        7px
-        11px;
-
-      border-radius:
-        999px;
-
-      background:
-        var(--soft-surface);
-
-      color: var(--navy);
-
-      font-size: 11px;
-      font-weight: 700;
-
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .hero-title {
-      position: relative;
-      z-index: 1;
-
-      margin-top: 20px;
-
-      max-width: 650px;
-
-      color: var(--navy);
-
-      font-size:
-        clamp(
-          34px,
-          5vw,
-          52px
-        );
-
-      line-height: 1.02;
-
-      letter-spacing:
-        -0.04em;
-
-      font-weight: 800;
-    }
-
-    .hero-description {
-      position: relative;
-      z-index: 1;
-
-      max-width: 560px;
-
-      margin-top: 16px;
-
-      color: var(--muted);
-
-      font-size: 15px;
-    }
-
-    .hero-actions {
-      position: relative;
-      z-index: 2;
-
-      display: flex;
-      flex-wrap: wrap;
-
-      gap: 10px;
-
-      margin-top: 30px;
-    }
-
-    .primary-button,
-    .secondary-button {
-      min-height: 48px;
-
-      padding:
-        0
-        18px;
-
-      border-radius: 14px;
-
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-
-      gap: 9px;
-
-      cursor: pointer;
-
-      font-size: 14px;
-      font-weight: 700;
-
-      transition:
-        transform 0.18s ease,
-        box-shadow 0.18s ease,
-        background 0.18s ease;
-    }
-
-    .primary-button {
-      background:
-        var(--navy);
-
-      color:
-        var(--surface);
-
-      box-shadow:
-        0 10px 24px
-        rgba(21, 43, 70, 0.16);
-    }
-
-    .primary-button:hover {
-      transform:
-        translateY(-1px);
-
-      box-shadow:
-        0 14px 28px
-        rgba(21, 43, 70, 0.20);
-
-      background:
-        #1C3553;
-    }
-
-    .secondary-button {
-      background:
-        var(--peach);
-
-      color:
-        var(--navy);
-    }
-
-    .secondary-button:hover {
-      transform:
-        translateY(-1px);
-
-      box-shadow:
-        0 10px 22px
-        rgba(243, 178, 159, 0.22);
-    }
-
-    .button-icon {
-      width: 17px;
-      height: 17px;
-
-      stroke-width: 2;
-    }
-
-    .hero-side {
-      min-height: 330px;
-
-      padding: 28px;
-
-      border-radius:
-        var(--radius-lg);
-
-      background:
-        var(--navy);
-
-      color:
-        var(--surface);
-
-      box-shadow:
-        0 18px 50px
-        rgba(21, 43, 70, 0.14);
-
-      display: flex;
-      flex-direction: column;
-
-      justify-content:
-        space-between;
-    }
-
-    .side-label {
-      font-size: 11px;
-
-      font-weight: 700;
-
-      letter-spacing:
-        0.08em;
-
-      text-transform:
-        uppercase;
-
-      color:
-        rgba(
-          255,
-          255,
-          255,
-          0.62
-        );
-    }
-
-    .side-heading {
-      margin-top: 22px;
-
-      font-size: 27px;
-
-      line-height: 1.12;
-
-      letter-spacing:
-        -0.025em;
-    }
-
-    .side-copy {
-      margin-top: 12px;
-
-      color:
-        rgba(
-          255,
-          255,
-          255,
-          0.70
-        );
-
-      font-size: 14px;
-
-      line-height: 1.65;
-    }
-
-    .side-user {
-      padding-top: 24px;
-
-      border-top:
-        1px solid
-        rgba(
-          255,
-          255,
-          255,
-          0.12
-        );
-    }
-
-    .side-user-label {
-      font-size: 11px;
-
-      color:
-        rgba(
-          255,
-          255,
-          255,
-          0.54
-        );
-
-      text-transform:
-        uppercase;
-
-      letter-spacing:
-        0.08em;
-    }
-
-    .side-user-name {
-      margin-top: 6px;
-
-      font-size: 18px;
-
-      font-weight: 700;
-    }
-
-    /* ==========================================
-       SECTION HEADER
-    ========================================== */
-
-    .section-header {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-
-      gap: 16px;
-
-      margin:
-        34px
-        2px
-        14px;
-    }
-
-    .section-title {
-      color: var(--navy);
-
-      font-size: 21px;
-
-      font-weight: 800;
-
-      letter-spacing:
-        -0.02em;
-    }
-
-    .section-subtitle {
-      margin-top: 3px;
-
-      color: var(--muted);
-
-      font-size: 13px;
-    }
-
-    .section-link {
-      color: var(--navy);
-
-      font-size: 13px;
-
-      font-weight: 700;
-
-      cursor: pointer;
-
-      background: transparent;
-
-      padding: 4px;
-    }
-
-    /* ==========================================
-       CONVERSATION CARD
-    ========================================== */
-
-    .conversation-card {
-      overflow: hidden;
+      padding: 44px;
 
       border-radius:
         var(--radius-lg);
@@ -603,232 +241,227 @@
 
       box-shadow:
         var(--shadow);
-    }
 
-    .conversation-top {
+      position: relative;
+
+      overflow: hidden;
+
       display: flex;
-      align-items: center;
+
+      flex-direction: column;
+
       justify-content: space-between;
-
-      gap: 14px;
-
-      padding:
-        22px
-        22px
-        18px;
-
-      border-bottom:
-        1px solid
-        var(--border);
     }
 
-    .conversation-title-wrap {
-      display: flex;
+    .hero::after {
+      content: "";
+
+      position: absolute;
+
+      width: 320px;
+      height: 320px;
+
+      border-radius: 50%;
+
+      right: -110px;
+      top: -120px;
+
+      background:
+        var(--peach);
+
+      opacity:
+        0.18;
+
+      pointer-events:
+        none;
+    }
+
+    .hero-content {
+      position: relative;
+
+      z-index: 1;
+
+      max-width: 700px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
       align-items: center;
 
-      gap: 12px;
-    }
-
-    .conversation-icon {
-      width: 43px;
-      height: 43px;
-
-      border-radius: 14px;
-
-      display: grid;
-      place-items: center;
-
-      background:
-        var(--blue);
-
-      color:
-        var(--navy);
-    }
-
-    .conversation-icon svg {
-      width: 20px;
-      height: 20px;
-
-      stroke-width: 1.9;
-    }
-
-    .conversation-title {
-      color: var(--navy);
-
-      font-size: 16px;
-
-      font-weight: 800;
-    }
-
-    .conversation-meta {
-      margin-top: 2px;
-
-      color: var(--muted);
-
-      font-size: 12px;
-    }
-
-    .conversation-open {
       padding:
-        10px
-        14px;
+        8px
+        12px;
 
-      border-radius: 12px;
+      border-radius:
+        999px;
 
       background:
-        var(--navy);
+        var(--soft-surface);
 
       color:
-        var(--surface);
+        var(--navy);
 
-      font-size: 12px;
+      font-size: 11px;
 
       font-weight: 700;
-
-      cursor: pointer;
-
-      transition:
-        transform 0.18s ease,
-        background 0.18s ease;
-    }
-
-    .conversation-open:hover {
-      transform:
-        translateY(-1px);
-
-      background:
-        #1C3553;
-    }
-
-    .messages-preview {
-      min-height: 170px;
-
-      padding:
-        18px
-        22px
-        22px;
-    }
-
-    .preview-message {
-      display: flex;
-
-      margin-bottom: 12px;
-    }
-
-    .preview-message:last-child {
-      margin-bottom: 0;
-    }
-
-    .preview-message.mine {
-      justify-content:
-        flex-end;
-    }
-
-    .preview-bubble {
-      max-width:
-        min(76%, 560px);
-
-      padding:
-        11px
-        14px;
-
-      border-radius: 16px;
-
-      background:
-        var(--blue);
-
-      color:
-        var(--text);
-
-      font-size: 13px;
-
-      line-height: 1.45;
-    }
-
-    .preview-message.mine
-      .preview-bubble {
-      background:
-        var(--navy);
-
-      color:
-        var(--surface);
-
-      border-bottom-right-radius:
-        6px;
-    }
-
-    .preview-message.theirs
-      .preview-bubble {
-      border-bottom-left-radius:
-        6px;
-    }
-
-    .preview-name {
-      margin-bottom: 4px;
-
-      font-size: 10px;
-
-      font-weight: 700;
-
-      color:
-        var(--muted);
 
       letter-spacing:
-        0.03em;
+        0.08em;
 
       text-transform:
         uppercase;
     }
 
-    .preview-message.mine
-      .preview-name {
+    .hero-title {
+      margin-top: 24px;
+
       color:
-        rgba(
-          255,
-          255,
-          255,
-          0.64
+        var(--navy);
+
+      font-size:
+        clamp(
+          42px,
+          7vw,
+          72px
         );
+
+      line-height:
+        0.98;
+
+      letter-spacing:
+        -0.05em;
+
+      font-weight:
+        800;
     }
 
-    .empty-conversation {
-      min-height: 130px;
+    .hero-description {
+      max-width: 590px;
+
+      margin-top: 22px;
+
+      color:
+        var(--muted);
+
+      font-size: 16px;
+
+      line-height: 1.7;
+    }
+
+    .hero-bottom {
+      position: relative;
+
+      z-index: 1;
 
       display: flex;
 
-      align-items: center;
-      justify-content: center;
+      align-items: flex-end;
 
-      text-align: center;
+      justify-content: space-between;
 
-      padding: 24px;
+      gap: 24px;
 
+      margin-top: 50px;
+    }
+
+    .welcome-user {
       color:
         var(--muted);
 
       font-size: 13px;
     }
 
+    .welcome-user strong {
+      display: block;
+
+      margin-top: 5px;
+
+      color:
+        var(--navy);
+
+      font-size: 18px;
+
+      font-weight: 800;
+    }
+
+    .open-chat-button {
+      min-height: 54px;
+
+      padding:
+        0
+        22px;
+
+      border-radius: 15px;
+
+      background:
+        var(--navy);
+
+      color:
+        var(--surface);
+
+      display: inline-flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      gap: 10px;
+
+      cursor: pointer;
+
+      font-size: 14px;
+
+      font-weight: 700;
+
+      box-shadow:
+        0 12px 25px
+        rgba(21, 43, 70, 0.16);
+
+      transition:
+        background 0.18s ease,
+        transform 0.18s ease,
+        box-shadow 0.18s ease;
+    }
+
+    .open-chat-button:hover {
+      background:
+        #1C3553;
+
+      transform:
+        translateY(-1px);
+
+      box-shadow:
+        0 15px 30px
+        rgba(21, 43, 70, 0.20);
+    }
+
+    .open-chat-button svg {
+      width: 18px;
+      height: 18px;
+
+      stroke-width: 1.9;
+    }
+
     /* ==========================================
-       QUICK ACCESS
+       SIMPLE SECOND PANEL
     ========================================== */
 
-    .quick-grid {
+    .bottom-panel {
       display: grid;
 
       grid-template-columns:
-        repeat(
-          4,
-          1fr
-        );
+        1fr
+        1fr;
 
-      gap: 14px;
+      gap: 18px;
+
+      margin-top: 18px;
     }
 
-    .quick-card {
-      width: 100%;
+    .info-card {
+      min-height: 160px;
 
-      padding: 22px;
+      padding: 26px;
 
       border-radius:
         var(--radius-md);
@@ -843,84 +476,81 @@
       box-shadow:
         0 12px 34px
         rgba(21, 43, 70, 0.055);
-
-      cursor: pointer;
-
-      text-align: left;
-
-      transition:
-        transform 0.18s ease,
-        box-shadow 0.18s ease;
     }
 
-    .quick-card:hover {
-      transform:
-        translateY(-2px);
-
-      box-shadow:
-        0 16px 36px
-        rgba(21, 43, 70, 0.09);
-    }
-
-    .quick-icon {
-      width: 42px;
-      height: 42px;
-
-      border-radius: 13px;
-
-      display: grid;
-      place-items: center;
-
-      margin-bottom: 17px;
-    }
-
-    .quick-icon.navy {
-      background:
-        var(--navy);
-
-      color:
-        var(--surface);
-    }
-
-    .quick-icon.peach {
+    .info-card.peach {
       background:
         var(--peach);
-
-      color:
-        var(--navy);
     }
 
-    .quick-icon.blue {
+    .info-card.blue {
       background:
         var(--blue);
+    }
+
+    .info-label {
+      color:
+        var(--navy);
+
+      font-size: 11px;
+
+      font-weight: 700;
+
+      letter-spacing:
+        0.08em;
+
+      text-transform:
+        uppercase;
+    }
+
+    .info-title {
+      margin-top: 12px;
 
       color:
         var(--navy);
-    }
 
-    .quick-icon svg {
-      width: 19px;
-      height: 19px;
-
-      stroke-width: 1.8;
-    }
-
-    .quick-title {
-      color: var(--navy);
-
-      font-size: 15px;
+      font-size: 22px;
 
       font-weight: 800;
+
+      letter-spacing:
+        -0.02em;
     }
 
-    .quick-description {
-      margin-top: 5px;
+    .info-text {
+      max-width: 430px;
 
-      color: var(--muted);
+      margin-top: 7px;
 
-      font-size: 12px;
+      color:
+        rgba(
+          38,
+          49,
+          61,
+          0.70
+        );
 
-      line-height: 1.5;
+      font-size: 13px;
+
+      line-height: 1.6;
+    }
+
+    /* ==========================================
+       FOOTER
+    ========================================== */
+
+    .footer {
+      padding:
+        28px
+        2px
+        14px;
+
+      text-align: center;
+
+      color:
+        var(--muted);
+
+      font-size: 11px;
     }
 
     /* ==========================================
@@ -936,6 +566,14 @@
 
       display: none;
 
+      align-items:
+        flex-end;
+
+      justify-content:
+        center;
+
+      padding: 16px;
+
       background:
         rgba(
           21,
@@ -946,30 +584,20 @@
 
       backdrop-filter:
         blur(7px);
-
-      padding: 16px;
     }
 
     .modal-layer.open {
       display: flex;
-
-      align-items: flex-end;
-      justify-content: center;
     }
 
     .modal {
       width: 100%;
-      max-width: 620px;
-
-      max-height:
-        min(
-          86vh,
-          760px
-        );
+      max-width: 500px;
 
       overflow: hidden;
 
-      border-radius: 28px;
+      border-radius:
+        28px;
 
       background:
         var(--surface);
@@ -977,18 +605,16 @@
       box-shadow:
         0 30px 80px
         rgba(21, 43, 70, 0.20);
-
-      display: flex;
-
-      flex-direction: column;
     }
 
     .modal-header {
       display: flex;
 
-      align-items: center;
+      align-items:
+        center;
 
-      justify-content: space-between;
+      justify-content:
+        space-between;
 
       gap: 12px;
 
@@ -1032,7 +658,8 @@
 
       display: grid;
 
-      place-items: center;
+      place-items:
+        center;
 
       cursor: pointer;
     }
@@ -1086,9 +713,9 @@
     .logout-button {
       width: 100%;
 
-      margin-top: 14px;
-
       min-height: 48px;
+
+      margin-top: 14px;
 
       border-radius: 14px;
 
@@ -1106,92 +733,45 @@
     }
 
     /* ==========================================
-       TOAST
-    ========================================== */
-
-    .toast {
-      position: fixed;
-
-      left: 50%;
-      bottom: 22px;
-
-      z-index: 200;
-
-      max-width:
-        calc(
-          100vw - 32px
-        );
-
-      padding:
-        11px
-        15px;
-
-      border-radius: 13px;
-
-      background:
-        var(--navy);
-
-      color:
-        var(--surface);
-
-      font-size: 12px;
-
-      font-weight: 600;
-
-      opacity: 0;
-
-      pointer-events:
-        none;
-
-      transform:
-        translate(
-          -50%,
-          12px
-        );
-
-      transition:
-        opacity 0.2s ease,
-        transform 0.2s ease;
-    }
-
-    .toast.show {
-      opacity: 1;
-
-      transform:
-        translate(
-          -50%,
-          0
-        );
-    }
-
-    /* ==========================================
        RESPONSIVE
     ========================================== */
 
-    @media (max-width: 900px) {
-      .hero {
-        grid-template-columns: 1fr;
-      }
-
-      .hero-main,
-      .hero-side {
-        min-height: 0;
-      }
-
-      .quick-grid {
-        grid-template-columns:
-          repeat(
-            2,
-            1fr
-          );
-      }
-    }
-
-    @media (max-width: 620px) {
+    @media (max-width: 760px) {
       .app {
         padding: 12px;
       }
 
+      .hero {
+        min-height: 510px;
+
+        padding:
+          30px
+          24px;
+      }
+
+      .hero-title {
+        font-size: 45px;
+      }
+
+      .hero-bottom {
+        align-items:
+          stretch;
+
+        flex-direction:
+          column;
+      }
+
+      .open-chat-button {
+        width: 100%;
+      }
+
+      .bottom-panel {
+        grid-template-columns:
+          1fr;
+      }
+    }
+
+    @media (max-width: 480px) {
       .topbar {
         padding-bottom: 20px;
       }
@@ -1201,106 +781,24 @@
         height: 42px;
       }
 
-      .hero-main {
-        padding:
-          27px
-          23px
-          23px;
-      }
+      .hero {
+        min-height: 500px;
 
-      .hero-side {
-        padding: 23px;
+        padding:
+          26px
+          20px;
       }
 
       .hero-title {
-        font-size: 36px;
+        font-size: 40px;
       }
 
       .hero-description {
         font-size: 14px;
       }
 
-      .hero-actions {
-        flex-direction: column;
-      }
-
-      .primary-button,
-      .secondary-button {
-        width: 100%;
-      }
-
-      .section-header {
-        align-items:
-          flex-start;
-      }
-
-      .conversation-top {
-        align-items:
-          flex-start;
-      }
-
-      .conversation-open {
-        padding:
-          9px
-          12px;
-      }
-
-      .quick-grid {
-        grid-template-columns:
-          1fr 1fr;
-
-        gap: 10px;
-      }
-
-      .quick-card {
-        padding: 17px;
-      }
-
-      .quick-title {
-        font-size: 14px;
-      }
-
-      .quick-description {
-        font-size: 11px;
-      }
-
-      .modal-layer {
-        padding: 0;
-      }
-
-      .modal {
-        max-height: 92vh;
-
-        border-radius:
-          24px
-          24px
-          0
-          0;
-      }
-    }
-
-    @media (max-width: 420px) {
-      .quick-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .quick-card {
-        display: flex;
-
-        align-items: center;
-
-        gap: 14px;
-      }
-
-      .quick-icon {
-        flex:
-          0 0 42px;
-
-        margin-bottom: 0;
-      }
-
-      .quick-description {
-        margin-top: 3px;
+      .bottom-panel {
+        gap: 12px;
       }
     }
   </style>
@@ -1312,9 +810,7 @@
 
     <div class="shell">
 
-      <!-- ======================================
-           HEADER
-      ======================================= -->
+      <!-- HEADER -->
 
       <header class="topbar">
 
@@ -1377,8 +873,8 @@
             class="icon-button"
             id="settingsButton"
             type="button"
-            title="Settings"
             aria-label="Settings"
+            title="Settings"
           >
             <svg
               viewBox="0 0 24 24"
@@ -1462,523 +958,123 @@
 
       </header>
 
-      <!-- ======================================
-           HERO
-      ======================================= -->
+      <!-- MAIN -->
 
       <section class="hero">
 
-        <div class="hero-main">
+        <div class="hero-content">
 
-          <div>
-
-            <div class="hero-eyebrow">
-              Your private space
-            </div>
-
-            <h1 class="hero-title">
-              Welcome back,
-              <span id="heroName">
-                there
-              </span>.
-            </h1>
-
-            <p class="hero-description">
-              A calm place for conversations,
-              memories, plans, and everything
-              that belongs to the two of you.
-            </p>
-
+          <div class="eyebrow">
+            Your private space
           </div>
 
-          <div class="hero-actions">
+          <h1 class="hero-title">
+            Welcome back,
+            <span id="heroName">
+              there
+            </span>.
+          </h1>
 
-            <button
-              class="primary-button"
-              id="openChatHero"
-              type="button"
-            >
-
-              <svg
-                class="button-icon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M7 9h10" />
-                <path d="M7 13h6" />
-                <path
-                  d="
-                    M4 5.5
-                    A2.5 2.5 0 0 1
-                    6.5 3
-                    H17.5
-                    A2.5 2.5 0 0 1
-                    20 5.5
-                    V13.5
-                    A2.5 2.5 0 0 1
-                    17.5 16
-                    H11
-                    L6.5 20
-                    V16
-                    H6.5
-                    A2.5 2.5 0 0 1
-                    4 13.5
-                    Z
-                  "
-                />
-              </svg>
-
-              Open conversation
-
-            </button>
-
-            <button
-              class="secondary-button"
-              id="memoriesHero"
-              type="button"
-            >
-
-              <svg
-                class="button-icon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <rect
-                  x="4"
-                  y="4"
-                  width="16"
-                  height="16"
-                  rx="2"
-                />
-
-                <circle
-                  cx="9"
-                  cy="9"
-                  r="1.5"
-                />
-
-                <path
-                  d="
-                    m20 15
-                    -4.2-4.2
-                    L9 17.5
-                  "
-                />
-              </svg>
-
-              Memories
-
-            </button>
-
-          </div>
+          <p class="hero-description">
+            A private place built for the two of you.
+            Keep it simple, personal, and yours.
+          </p>
 
         </div>
 
-        <aside class="hero-side">
+        <div class="hero-bottom">
 
-          <div>
+          <div class="welcome-user">
 
-            <div class="side-label">
-              Our Space
-            </div>
+            Signed in as
 
-            <div class="side-heading">
-              Simple.
-              Private.
-              Yours.
-            </div>
-
-            <p class="side-copy">
-              Everything here is designed
-              around one private space,
-              shared by just the two of you.
-            </p>
-
-          </div>
-
-          <div class="side-user">
-
-            <div class="side-user-label">
-              Signed in as
-            </div>
-
-            <div
-              class="side-user-name"
-              id="sideUserName"
-            >
+            <strong id="userName">
               Loading...
-            </div>
-
-          </div>
-
-        </aside>
-
-      </section>
-
-      <!-- ======================================
-           CONVERSATION
-      ======================================= -->
-
-      <section>
-
-        <div class="section-header">
-
-          <div>
-
-            <div class="section-title">
-              Conversation
-            </div>
-
-            <div class="section-subtitle">
-              Your latest messages
-            </div>
+            </strong>
 
           </div>
 
           <button
-            class="section-link"
-            id="openChatSection"
+            class="open-chat-button"
+            id="openChatButton"
             type="button"
           >
-            Open all
-          </button>
 
-        </div>
-
-        <div class="conversation-card">
-
-          <div class="conversation-top">
-
-            <div class="conversation-title-wrap">
-
-              <div
-                class="conversation-icon"
-                aria-hidden="true"
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M7 9h10" />
-                  <path d="M7 13h6" />
-                  <path
-                    d="
-                      M4 5.5
-                      A2.5 2.5 0 0 1
-                      6.5 3
-                      H17.5
-                      A2.5 2.5 0 0 1
-                      20 5.5
-                      V13.5
-                      A2.5 2.5 0 0 1
-                      17.5 16
-                      H11
-                      L6.5 20
-                      V16
-                      H6.5
-                      A2.5 2.5 0 0 1
-                      4 13.5
-                      Z
-                    "
-                  />
-                </svg>
-              </div>
-
-              <div>
-
-                <div class="conversation-title">
-                  Our conversation
-                </div>
-
-                <div class="conversation-meta">
-                  Private chat
-                </div>
-
-              </div>
-
-            </div>
-
-            <button
-              class="conversation-open"
-              id="openChatCard"
-              type="button"
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
             >
-              Open
-            </button>
+              <path d="M7 9h10" />
+              <path d="M7 13h6" />
 
-          </div>
+              <path
+                d="
+                  M4 5.5
+                  A2.5 2.5 0 0 1
+                  6.5 3
+                  H17.5
+                  A2.5 2.5 0 0 1
+                  20 5.5
+                  V13.5
+                  A2.5 2.5 0 0 1
+                  17.5 16
+                  H11
+                  L6.5 20
+                  V16
+                  H6.5
+                  A2.5 2.5 0 0 1
+                  4 13.5
+                  Z
+                "
+              />
+            </svg>
 
-          <div
-            class="messages-preview"
-            id="messagesPreview"
-          >
+            Open chat
 
-            <div class="empty-conversation">
-              Loading conversation...
-            </div>
-
-          </div>
+          </button>
 
         </div>
 
       </section>
 
-      <!-- ======================================
-           QUICK ACCESS
-      ======================================= -->
+      <!-- SIMPLE SUPPORTING CARDS -->
 
-      <section>
+      <section class="bottom-panel">
 
-        <div class="section-header">
+        <div class="info-card peach">
 
-          <div>
+          <div class="info-label">
+            Our Space
+          </div>
 
-            <div class="section-title">
-              Your space
-            </div>
+          <div class="info-title">
+            One private place.
+          </div>
 
-            <div class="section-subtitle">
-              Everything important in one place
-            </div>
-
+          <div class="info-text">
+            Your conversations stay inside
+            your shared space.
           </div>
 
         </div>
 
-        <div class="quick-grid">
+        <div class="info-card blue">
 
-          <!-- CHAT -->
+          <div class="info-label">
+            Account
+          </div>
 
-          <button
-            class="quick-card"
-            id="quickChat"
-            type="button"
-          >
+          <div class="info-title">
+            Private access.
+          </div>
 
-            <div class="quick-icon navy">
-
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M7 9h10" />
-                <path d="M7 13h6" />
-                <path
-                  d="
-                    M4 5.5
-                    A2.5 2.5 0 0 1
-                    6.5 3
-                    H17.5
-                    A2.5 2.5 0 0 1
-                    20 5.5
-                    V13.5
-                    A2.5 2.5 0 0 1
-                    17.5 16
-                    H11
-                    L6.5 20
-                    V16
-                    H6.5
-                    A2.5 2.5 0 0 1
-                    4 13.5
-                    Z
-                  "
-                />
-              </svg>
-
-            </div>
-
-            <div>
-
-              <div class="quick-title">
-                Chat
-              </div>
-
-              <div class="quick-description">
-                Talk privately in your space.
-              </div>
-
-            </div>
-
-          </button>
-
-          <!-- MEMORIES -->
-
-          <button
-            class="quick-card"
-            id="quickMemories"
-            type="button"
-          >
-
-            <div class="quick-icon peach">
-
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <rect
-                  x="4"
-                  y="4"
-                  width="16"
-                  height="16"
-                  rx="2"
-                />
-
-                <circle
-                  cx="9"
-                  cy="9"
-                  r="1.5"
-                />
-
-                <path
-                  d="
-                    m20 15
-                    -4.2-4.2
-                    L9 17.5
-                  "
-                />
-              </svg>
-
-            </div>
-
-            <div>
-
-              <div class="quick-title">
-                Memories
-              </div>
-
-              <div class="quick-description">
-                Keep the moments worth remembering.
-              </div>
-
-            </div>
-
-          </button>
-
-          <!-- NOTES -->
-
-          <button
-            class="quick-card"
-            id="quickNotes"
-            type="button"
-          >
-
-            <div class="quick-icon blue">
-
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path
-                  d="
-                    M6 4
-                    H18
-                    A2 2 0 0 1
-                    20 6
-                    V18
-                    A2 2 0 0 1
-                    18 20
-                    H6
-                    A2 2 0 0 1
-                    4 18
-                    V6
-                    A2 2 0 0 1
-                    6 4
-                    Z
-                  "
-                />
-
-                <path d="M8 8h8" />
-                <path d="M8 12h8" />
-                <path d="M8 16h5" />
-              </svg>
-
-            </div>
-
-            <div>
-
-              <div class="quick-title">
-                Notes
-              </div>
-
-              <div class="quick-description">
-                Save small things you want to keep.
-              </div>
-
-            </div>
-
-          </button>
-
-          <!-- PLANS -->
-
-          <button
-            class="quick-card"
-            id="quickPlans"
-            type="button"
-          >
-
-            <div class="quick-icon navy">
-
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <rect
-                  x="4"
-                  y="5"
-                  width="16"
-                  height="15"
-                  rx="2"
-                />
-
-                <path d="M8 3v4" />
-                <path d="M16 3v4" />
-                <path d="M4 9h16" />
-
-                <path
-                  d="
-                    m8 14
-                    2 2
-                    5-5
-                  "
-                />
-              </svg>
-
-            </div>
-
-            <div>
-
-              <div class="quick-title">
-                Plans
-              </div>
-
-              <div class="quick-description">
-                Keep your next things together.
-              </div>
-
-            </div>
-
-          </button>
+          <div class="info-text">
+            Your account is protected by
+            your personal login.
+          </div>
 
         </div>
 
@@ -1992,9 +1088,7 @@
 
   </main>
 
-  <!-- ==========================================
-       SETTINGS
-  =========================================== -->
+  <!-- SETTINGS -->
 
   <div
     class="modal-layer"
@@ -2040,7 +1134,7 @@
             stroke-linecap="round"
           >
             <path d="M6 6l12 12" />
-            <path d="M18 6 6 18" />
+            <path d="M18 6L6 18" />
           </svg>
         </button>
 
@@ -2077,13 +1171,6 @@
 
   </div>
 
-  <div
-    class="toast"
-    id="toast"
-    role="status"
-    aria-live="polite"
-  ></div>
-
   <script>
     /* ==========================================
        SUPABASE
@@ -2094,9 +1181,6 @@
 
     const SUPABASE_PUBLISHABLE_KEY =
       "sb_publishable_qTMUO8KxerEQBDQ-A7Huyg_8N2Tqpmr";
-
-    const SPACE_ID =
-      "6547fe99-ed80-421c-8572-50ae3fb6fbe4";
 
     const { createClient } = supabase;
 
@@ -2117,8 +1201,6 @@
     ========================================== */
 
     let currentUser = null;
-    let currentUsername = "You";
-    let toastTimer = null;
 
     /* ==========================================
        ELEMENTS
@@ -2129,9 +1211,9 @@
         "heroName"
       );
 
-    const sideUserName =
+    const userName =
       document.getElementById(
-        "sideUserName"
+        "userName"
       );
 
     const settingsUsername =
@@ -2139,56 +1221,22 @@
         "settingsUsername"
       );
 
-    const messagesPreview =
-      document.getElementById(
-        "messagesPreview"
-      );
-
     const settingsModal =
       document.getElementById(
         "settingsModal"
       );
 
-    const toast =
+    const openChatButton =
       document.getElementById(
-        "toast"
+        "openChatButton"
       );
 
     /* ==========================================
-       HELPERS
-    ========================================== */
-
-    function showToast(text) {
-      clearTimeout(toastTimer);
-
-      toast.textContent = text;
-
-      toast.classList.add("show");
-
-      toastTimer =
-        setTimeout(() => {
-          toast.classList.remove(
-            "show"
-          );
-        }, 2200);
-    }
-
-    function escapeHtml(value) {
-      const div =
-        document.createElement(
-          "div"
-        );
-
-      div.textContent = value;
-
-      return div.innerHTML;
-    }
-
-    /* ==========================================
-       AUTH
+       AUTHENTICATION
     ========================================== */
 
     async function checkAuthentication() {
+
       const {
         data: { user },
         error
@@ -2204,16 +1252,18 @@
         return false;
       }
 
-      currentUser = user;
+      currentUser =
+        user;
 
       return true;
     }
 
     /* ==========================================
-       PROFILE
+       LOAD USER PROFILE
     ========================================== */
 
     async function loadProfile() {
+
       const {
         data,
         error
@@ -2227,221 +1277,56 @@
         .maybeSingle();
 
       if (
-        !error &&
-        data?.username
+        error ||
+        !data?.username
       ) {
-        currentUsername =
-          data.username;
+
+        heroName.textContent =
+          "there";
+
+        userName.textContent =
+          "Account";
+
+        settingsUsername.textContent =
+          "Account";
+
+        return;
       }
 
+      const username =
+        data.username;
+
       const displayName =
-        currentUsername
+        username
           .charAt(0)
           .toUpperCase() +
-        currentUsername.slice(1);
+        username.slice(1);
 
       heroName.textContent =
         displayName;
 
-      sideUserName.textContent =
+      userName.textContent =
         displayName;
 
       settingsUsername.textContent =
-        currentUsername;
-    }
-
-    /* ==========================================
-       LOAD MESSAGE PREVIEW
-    ========================================== */
-
-    async function loadPreview() {
-      const {
-        data,
-        error
-      } = await client
-        .from("messages")
-        .select(
-          "id, sender_id, content, created_at"
-        )
-        .eq(
-          "space_id",
-          SPACE_ID
-        )
-        .order(
-          "created_at",
-          {
-            ascending: false
-          }
-        )
-        .limit(4);
-
-      if (error) {
-        console.error(
-          "Preview loading error:",
-          error
-        );
-
-        messagesPreview.innerHTML = `
-          <div class="empty-conversation">
-            Conversation unavailable right now.
-          </div>
-        `;
-
-        return;
-      }
-
-      const messages =
-        [...(data || [])].reverse();
-
-      if (
-        !messages.length
-      ) {
-        messagesPreview.innerHTML = `
-          <div class="empty-conversation">
-            Your conversation is empty.<br />
-            Open Chat to send the first message.
-          </div>
-        `;
-
-        return;
-      }
-
-      messagesPreview.innerHTML =
-        messages
-          .map(
-            (message) => {
-              const isMine =
-                message.sender_id ===
-                currentUser.id;
-
-              const sender =
-                isMine
-                  ? currentUsername
-                  : (
-                      currentUsername
-                        .toLowerCase() ===
-                      "mohammad"
-                        ? "Salma"
-                        : "Mohammad"
-                    );
-
-              return `
-                <div
-                  class="
-                    preview-message
-                    ${
-                      isMine
-                        ? "mine"
-                        : "theirs"
-                    }
-                  "
-                >
-
-                  <div class="preview-bubble">
-
-                    <div class="preview-name">
-                      ${escapeHtml(
-                        sender
-                      )}
-                    </div>
-
-                    ${escapeHtml(
-                      message.content
-                    )}
-
-                  </div>
-
-                </div>
-              `;
-            }
-          )
-          .join("");
+        username;
     }
 
     /* ==========================================
        OPEN CHAT
     ========================================== */
 
-    function openChat() {
-      window.location.href =
-        "chat.html";
-    }
+    openChatButton.addEventListener(
+      "click",
+      () => {
+        window.location.href =
+          "chat.html";
+      }
+    );
 
     /* ==========================================
        SETTINGS
     ========================================== */
-
-    function openSettings() {
-      settingsModal.classList.add(
-        "open"
-      );
-
-      settingsModal.setAttribute(
-        "aria-hidden",
-        "false"
-      );
-    }
-
-    function closeSettings() {
-      settingsModal.classList.remove(
-        "open"
-      );
-
-      settingsModal.setAttribute(
-        "aria-hidden",
-        "true"
-      );
-    }
-
-    /* ==========================================
-       COMING SOON
-    ========================================== */
-
-    function comingSoon(feature) {
-      showToast(
-        `${feature} is coming next.`
-      );
-    }
-
-    /* ==========================================
-       EVENTS
-    ========================================== */
-
-    document
-      .getElementById(
-        "openChatHero"
-      )
-      .addEventListener(
-        "click",
-        openChat
-      );
-
-    document
-      .getElementById(
-        "openChatSection"
-      )
-      .addEventListener(
-        "click",
-        openChat
-      );
-
-    document
-      .getElementById(
-        "openChatCard"
-      )
-      .addEventListener(
-        "click",
-        openChat
-      );
-
-    document
-      .getElementById(
-        "quickChat"
-      )
-      .addEventListener(
-        "click",
-        openChat
-      );
 
     document
       .getElementById(
@@ -2449,7 +1334,17 @@
       )
       .addEventListener(
         "click",
-        openSettings
+        () => {
+
+          settingsModal.classList.add(
+            "open"
+          );
+
+          settingsModal.setAttribute(
+            "aria-hidden",
+            "false"
+          );
+        }
       );
 
     document
@@ -2458,8 +1353,43 @@
       )
       .addEventListener(
         "click",
-        closeSettings
+        () => {
+
+          settingsModal.classList.remove(
+            "open"
+          );
+
+          settingsModal.setAttribute(
+            "aria-hidden",
+            "true"
+          );
+        }
       );
+
+    settingsModal.addEventListener(
+      "click",
+      (event) => {
+
+        if (
+          event.target ===
+          settingsModal
+        ) {
+
+          settingsModal.classList.remove(
+            "open"
+          );
+
+          settingsModal.setAttribute(
+            "aria-hidden",
+            "true"
+          );
+        }
+      }
+    );
+
+    /* ==========================================
+       LOGOUT
+    ========================================== */
 
     document
       .getElementById(
@@ -2474,7 +1404,8 @@
           } =
             await client.auth.signOut(
               {
-                scope: "local"
+                scope:
+                  "local"
               }
             );
 
@@ -2484,10 +1415,6 @@
               error
             );
 
-            showToast(
-              "Unable to log out."
-            );
-
             return;
           }
 
@@ -2495,86 +1422,6 @@
             "login.html";
         }
       );
-
-    document
-      .getElementById(
-        "memoriesHero"
-      )
-      .addEventListener(
-        "click",
-        () => {
-          comingSoon(
-            "Memories"
-          );
-        }
-      );
-
-    document
-      .getElementById(
-        "quickMemories"
-      )
-      .addEventListener(
-        "click",
-        () => {
-          comingSoon(
-            "Memories"
-          );
-        }
-      );
-
-    document
-      .getElementById(
-        "quickNotes"
-      )
-      .addEventListener(
-        "click",
-        () => {
-          comingSoon(
-            "Notes"
-          );
-        }
-      );
-
-    document
-      .getElementById(
-        "quickPlans"
-      )
-      .addEventListener(
-        "click",
-        () => {
-          comingSoon(
-            "Plans"
-          );
-        }
-      );
-
-    settingsModal.addEventListener(
-      "click",
-      (event) => {
-
-        if (
-          event.target ===
-          settingsModal
-        ) {
-          closeSettings();
-        }
-
-      }
-    );
-
-    document.addEventListener(
-      "keydown",
-      (event) => {
-
-        if (
-          event.key ===
-          "Escape"
-        ) {
-          closeSettings();
-        }
-
-      }
-    );
 
     /* ==========================================
        AUTH STATE
@@ -2612,8 +1459,6 @@
       }
 
       await loadProfile();
-
-      await loadPreview();
     }
 
     initializeApp();
