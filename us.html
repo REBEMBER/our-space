@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111111">
+
+  <title>Our Space ❤️</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      color: #111;
+      min-height: 100vh;
+    }
+
+    .app {
+      max-width: 500px;
+      margin: auto;
+      min-height: 100vh;
+      background: white;
+      padding: 30px 22px;
+    }
+
+    .header {
+      text-align: center;
+      padding: 30px 0;
+    }
+
+    .heart {
+      font-size: 55px;
+      margin-bottom: 15px;
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: #777;
+      font-size: 15px;
+    }
+
+    .counter {
+      margin: 25px 0;
+      padding: 25px;
+      border-radius: 20px;
+      background: #111;
+      color: white;
+      text-align: center;
+    }
+
+    .counter-title {
+      font-size: 14px;
+      opacity: 0.7;
+      margin-bottom: 10px;
+    }
+
+    .days {
+      font-size: 42px;
+      font-weight: bold;
+    }
+
+    .menu {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 25px;
+    }
+
+    .card {
+      padding: 25px 15px;
+      border: none;
+      border-radius: 18px;
+      background: #f3f3f3;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+    }
+
+    .icon {
+      display: block;
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+
+    .footer {
+      text-align: center;
+      color: #999;
+      margin-top: 40px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="app">
+
+    <section class="header">
+      <div class="heart">❤️</div>
+      <h1>Our Space</h1>
+      <p class="subtitle">Just for us.</p>
+    </section>
+
+    <section class="counter">
+      <div class="counter-title">TOGETHER FOR</div>
+      <div class="days" id="days">0</div>
+      <div>days ❤️</div>
+    </section>
+
+    <section class="menu">
+
+      <button class="card" onclick="comingSoon('Chat')">
+        <span class="icon">💬</span>
+        Chat
+      </button>
+
+      <button class="card" onclick="comingSoon('Memories')">
+        <span class="icon">📸</span>
+        Memories
+      </button>
+
+      <button class="card" onclick="comingSoon('Love Notes')">
+        <span class="icon">💌</span>
+        Love Notes
+      </button>
+
+      <button class="card" onclick="comingSoon('Games')">
+        <span class="icon">🎮</span>
+        Games
+      </button>
+
+      <button class="card" onclick="comingSoon('Our Plans')">
+        <span class="icon">📅</span>
+        Our Plans
+      </button>
+
+      <button class="card" onclick="comingSoon('Our Story')">
+        <span class="icon">✨</span>
+        Our Story
+      </button>
+
+    </section>
+
+    <div class="footer">
+      Made for two ❤️
+    </div>
+
+  </main>
+
+  <script>
+    function comingSoon(feature) {
+      alert(feature + " is coming soon ❤️");
+    }
+  </script>
+
+</body>
+</html>
