@@ -2,8 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#F7F9FC" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+  <meta
+    name="theme-color"
+    content="#F7F9FC"
+  />
+
   <title>Our Space — Login</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -32,7 +39,8 @@
       background: #ffffff;
       border-radius: 24px;
       padding: 38px 30px 32px;
-      box-shadow: 0 12px 40px rgba(21, 43, 70, 0.10);
+      box-shadow:
+        0 12px 40px rgba(21, 43, 70, 0.10);
       border: 1px solid #e7edf3;
     }
 
@@ -95,7 +103,8 @@
 
     input:focus {
       border-color: #5c9bb2;
-      box-shadow: 0 0 0 3px rgba(92, 155, 178, 0.12);
+      box-shadow:
+        0 0 0 3px rgba(92, 155, 178, 0.12);
       background: #ffffff;
     }
 
@@ -190,7 +199,10 @@
     <form id="loginForm">
 
       <div class="field">
-        <label for="username">Username</label>
+        <label for="username">
+          Username
+        </label>
+
         <input
           id="username"
           type="text"
@@ -201,9 +213,12 @@
       </div>
 
       <div class="field">
-        <label for="password">Password</label>
+        <label for="password">
+          Password
+        </label>
 
         <div class="password-wrapper">
+
           <input
             id="password"
             type="password"
@@ -219,6 +234,7 @@
           >
             Show
           </button>
+
         </div>
       </div>
 
@@ -268,134 +284,174 @@
       }
     );
 
-    const loginForm = document.getElementById("loginForm");
-    const usernameInput = document.getElementById("username");
-    const passwordInput = document.getElementById("password");
-    const loginButton = document.getElementById("loginButton");
-    const showPasswordButton = document.getElementById("showPassword");
-    const message = document.getElementById("message");
+    const loginForm =
+      document.getElementById("loginForm");
 
-    function showMessage(text, type = "error") {
+    const usernameInput =
+      document.getElementById("username");
+
+    const passwordInput =
+      document.getElementById("password");
+
+    const loginButton =
+      document.getElementById("loginButton");
+
+    const showPasswordButton =
+      document.getElementById("showPassword");
+
+    const message =
+      document.getElementById("message");
+
+    function showMessage(
+      text,
+      type = "error"
+    ) {
       message.textContent = text;
-      message.className = `message ${type}`;
+      message.className =
+        `message ${type}`;
     }
 
-    showPasswordButton.addEventListener("click", () => {
-      const isPassword =
-        passwordInput.type === "password";
+    showPasswordButton.addEventListener(
+      "click",
+      () => {
+        const isPassword =
+          passwordInput.type === "password";
 
-      passwordInput.type =
-        isPassword ? "text" : "password";
+        passwordInput.type =
+          isPassword
+            ? "text"
+            : "password";
 
-      showPasswordButton.textContent =
-        isPassword ? "Hide" : "Show";
-    });
-
-    loginForm.addEventListener("submit", async (event) => {
-      event.preventDefault();
-
-      const username =
-        usernameInput.value.trim().toLowerCase();
-
-      const password =
-        passwordInput.value;
-
-      if (!username || !password) {
-        showMessage("Please enter your username and password.");
-        return;
+        showPasswordButton.textContent =
+          isPassword
+            ? "Hide"
+            : "Show";
       }
+    );
 
-      loginButton.disabled = true;
-      loginButton.textContent = "Logging in...";
-      showMessage("", "");
+    loginForm.addEventListener(
+      "submit",
+      async (event) => {
+        event.preventDefault();
 
-      try {
-        const response = await fetch(
-          USERNAME_LOGIN_FUNCTION,
-          {
-            method: "POST",
+        const username =
+          usernameInput.value
+            .trim()
+            .toLowerCase();
 
-            headers: {
-              "Content-Type": "application/json",
+        const password =
+          passwordInput.value;
 
-              "apikey":
-                SUPABASE_PUBLISHABLE_KEY,
+        if (!username || !password) {
+          showMessage(
+            "Please enter your username and password."
+          );
+          return;
+        }
 
-              "Authorization":
-                `Bearer ${SUPABASE_PUBLISHABLE_KEY}`
-            },
+        loginButton.disabled = true;
+        loginButton.textContent =
+          "Logging in...";
 
-            body: JSON.stringify({
-              username,
-              password
-            })
-          }
-        );
-
-        let result = {};
+        showMessage("", "");
 
         try {
-          result = await response.json();
-        } catch {
-          result = {};
-        }
+          const response =
+            await fetch(
+              USERNAME_LOGIN_FUNCTION,
+              {
+                method: "POST",
 
-        if (!response.ok) {
-          throw new Error(
-            result.error ||
-            `Login failed (${response.status}).`
+                headers: {
+                  "Content-Type":
+                    "application/json",
+
+                  "apikey":
+                    SUPABASE_PUBLISHABLE_KEY
+                },
+
+                body: JSON.stringify({
+                  username,
+                  password
+                })
+              }
+            );
+
+          let result = {};
+
+          try {
+            result =
+              await response.json();
+          } catch {
+            result = {};
+          }
+
+          if (!response.ok) {
+            throw new Error(
+              result.error ||
+              `Login failed (${response.status}).`
+            );
+          }
+
+          if (
+            !result.access_token ||
+            !result.refresh_token
+          ) {
+            throw new Error(
+              "Login succeeded but no session was returned."
+            );
+          }
+
+          const {
+            data: sessionData,
+            error: sessionError
+          } =
+            await client.auth.setSession({
+              access_token:
+                result.access_token,
+
+              refresh_token:
+                result.refresh_token
+            });
+
+          if (sessionError) {
+            throw sessionError;
+          }
+
+          if (!sessionData.session) {
+            throw new Error(
+              "Unable to create your session."
+            );
+          }
+
+          showMessage(
+            "Login successful. Entering Our Space...",
+            "success"
           );
-        }
 
-        if (
-          !result.access_token ||
-          !result.refresh_token
-        ) {
-          throw new Error(
-            "Login succeeded but no session was returned."
+          setTimeout(() => {
+            window.location.href =
+              "index.html";
+          }, 300);
+
+        } catch (error) {
+          console.error(
+            "Login error:",
+            error
           );
-        }
 
-        const {
-          data: sessionData,
-          error: sessionError
-        } = await client.auth.setSession({
-          access_token: result.access_token,
-          refresh_token: result.refresh_token
-        });
-
-        if (sessionError) {
-          throw sessionError;
-        }
-
-        if (!sessionData.session) {
-          throw new Error(
-            "Unable to create your session."
+          showMessage(
+            error.message ||
+            "Unable to log in. Please try again."
           );
+
+        } finally {
+          loginButton.disabled = false;
+          loginButton.textContent =
+            "Login";
         }
-
-        showMessage(
-          "Login successful. Entering Our Space...",
-          "success"
-        );
-
-        setTimeout(() => {
-          window.location.href = "index.html";
-        }, 300);
-
-      } catch (error) {
-        console.error("Login error:", error);
-
-        showMessage(
-          error.message ||
-          "Unable to log in. Please try again."
-        );
-
-      } finally {
-        loginButton.disabled = false;
-        loginButton.textContent = "Login";
       }
-    });
+    );
 
     usernameInput.focus();
   </script>
