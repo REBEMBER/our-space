@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Our Space — Confirm Email</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --green: #173f3b;
+      --green-light: #edf5f3;
+      --text: #202525;
+      --muted: #7c8583;
+      --line: #e7ebe9;
+      --bg: #fafbfa;
+      --white: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      width: min(100% - 30px, 470px);
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 25px;
+      padding: 35px;
+      text-align: center;
+    }
+
+    .icon {
+      width: 76px;
+      height: 76px;
+      border-radius: 25px;
+      background: var(--green-light);
+      color: var(--green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+      margin: 0 auto 25px;
+    }
+
+    h1 {
+      font-size: 30px;
+      letter-spacing: -1px;
+      margin-bottom: 12px;
+    }
+
+    .description {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+      margin-bottom: 18px;
+    }
+
+    .email {
+      display: inline-block;
+      max-width: 100%;
+      word-break: break-word;
+      background: #f4f6f5;
+      color: var(--green);
+      border-radius: 9px;
+      padding: 9px 12px;
+      font-size: 12px;
+      margin-bottom: 27px;
+    }
+
+    .buttons {
+      display: grid;
+      gap: 10px;
+    }
+
+    button {
+      width: 100%;
+      height: 49px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .primary {
+      background: var(--green);
+      color: white;
+    }
+
+    .primary:hover {
+      background: #10332f;
+    }
+
+    .secondary {
+      background: #f1f4f3;
+      color: var(--green);
+    }
+
+    .secondary:hover {
+      background: #e8edeb;
+    }
+
+    .back {
+      background: transparent;
+      color: var(--muted);
+    }
+
+    .back:hover {
+      color: var(--green);
+    }
+
+    .status {
+      min-height: 20px;
+      margin-top: 17px;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .success {
+      color: #28704e;
+    }
+
+    .error {
+      color: #a23c3c;
+    }
+
+    .help {
+      margin-top: 27px;
+      color: #a2aaa8;
+      font-size: 11px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="card">
+
+    <div class="icon">♡</div>
+
+    <h1>Check your email</h1>
+
+    <p class="description">
+      Your Our Space account has been created.
+      We sent you a confirmation link.
+      Open the email and click the link to activate your account.
+    </p>
+
+    <div class="email" id="email">
+      your email
+    </div>
+
+    <div class="buttons">
+
+      <button
+        class="primary"
+        id="continueButton"
+        onclick="continueToSpace()"
+      >
+        I've confirmed my email
+      </button>
+
+      <button
+        class="secondary"
+        id="resendButton"
+        onclick="resendEmail()"
+      >
+        Resend email
+      </button>
+
+      <button
+        class="back"
+        onclick="goLogin()"
+      >
+        Back to login
+      </button>
+
+    </div>
+
+    <div
+      class="status"
+      id="status"
+    ></div>
+
+    <p class="help">
+      Once you've clicked the confirmation link,
+      you can return here and continue to Our Space.
+    </p>
+
+  </main>
+
+  <script>
+    const SUPABASE_URL =
+      "https://ywflohxufmfydkpkkqly.supabase.co";
+
+    const SUPABASE_PUBLISHABLE_KEY =
+      "sb_publishable_qTMUO8KxerEQBDQ-A7Huyg_8N2Tqpmr";
+
+    const APP_URL =
+      "https://our-space-topaz.vercel.app/";
+
+    const { createClient } = supabase;
+
+    const db = createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY,
+      {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true
+        }
+      }
+    );
+
+    const email =
+      sessionStorage.getItem("confirmationEmail") || "";
+
+    document.getElementById("email").textContent =
+      email || "your email address";
+
+    async function continueToSpace() {
+
+      const button =
+        document.getElementById("continueButton");
+
+      button.disabled = true;
+      button.textContent = "Checking...";
+
+      const { data, error } =
+        await db.auth.getSession();
+
+      if (error) {
+
+        showStatus(
+          "Something went wrong. Please try logging in.",
+          "error"
+        );
+
+        resetContinueButton();
+        return;
+      }
+
+      if (data.session) {
+
+        sessionStorage.removeItem(
+          "confirmationEmail"
+        );
+
+        window.location.href =
+          "index.html";
+
+        return;
+      }
+
+      showStatus(
+        "Email confirmation hasn't created a session yet. If you already confirmed it, log in to continue.",
+        "error"
+      );
+
+      resetContinueButton();
+
+      setTimeout(() => {
+        window.location.href =
+          "login.html?mode=login";
+      }, 2200);
+    }
+
+    async function resendEmail() {
+
+      if (!email) {
+
+        showStatus(
+          "No email address was found. Please return to login.",
+          "error"
+        );
+
+        return;
+      }
+
+      const button =
+        document.getElementById("resendButton");
+
+      button.disabled = true;
+      button.textContent = "Sending...";
+
+      const { error } =
+        await db.auth.resend({
+          type: "signup",
+          email,
+          options: {
+            emailRedirectTo: APP_URL
+          }
+        });
+
+      button.disabled = false;
+      button.textContent = "Resend email";
+
+      if (error) {
+
+        showStatus(
+          error.message,
+          "error"
+        );
+
+        return;
+      }
+
+      showStatus(
+        "A new confirmation email has been sent.",
+        "success"
+      );
+    }
+
+    function resetContinueButton() {
+
+      const button =
+        document.getElementById("continueButton");
+
+      button.disabled = false;
+      button.textContent =
+        "I've confirmed my email";
+    }
+
+    function showStatus(text, type) {
+
+      const status =
+        document.getElementById("status");
+
+      status.textContent = text;
+      status.className =
+        "status " + type;
+    }
+
+    function goLogin() {
+      window.location.href =
+        "login.html?mode=login";
+    }
+
+    /*
+      When Supabase redirects the user back after
+      clicking the email confirmation link, detect
+      the newly-created session automatically.
+    */
+
+    async function checkSession() {
+
+      const { data } =
+        await db.auth.getSession();
+
+      if (data.session) {
+
+        sessionStorage.removeItem(
+          "confirmationEmail"
+        );
+
+        window.location.href =
+          "index.html";
+      }
+    }
+
+    checkSession();
+  </script>
+
+</body>
+</html>
