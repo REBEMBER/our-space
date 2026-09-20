@@ -5,146 +5,269 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Our Space ❤️</title>
 
-  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
+      min-height: 100vh;
       font-family: Arial, sans-serif;
-      background: #f5f5f5;
+      background: #f7f7f7;
       display: flex;
       justify-content: center;
+      align-items: center;
     }
 
     .app {
       width: 100%;
-      max-width: 500px;
-      min-height: 100vh;
+      max-width: 420px;
+      padding: 25px;
+    }
+
+    .card {
       background: white;
-      padding: 30px;
-      box-sizing: border-box;
+      padding: 35px 28px;
+      border-radius: 24px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
       text-align: center;
     }
 
-    h1 {
-      margin-top: 50px;
-      font-size: 36px;
+    .heart {
+      font-size: 50px;
+      margin-bottom: 10px;
     }
 
-    p {
-      color: #777;
+    h1 {
+      margin: 0;
+      font-size: 32px;
+    }
+
+    .subtitle {
+      color: #888;
+      margin: 8px 0 30px;
     }
 
     input {
       width: 100%;
       padding: 15px;
-      margin: 8px 0;
-      box-sizing: border-box;
+      margin-bottom: 12px;
       border: 1px solid #ddd;
-      border-radius: 10px;
+      border-radius: 12px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #111;
     }
 
     button {
       width: 100%;
       padding: 15px;
-      margin-top: 10px;
-      border: 0;
-      border-radius: 10px;
-      background: #111;
-      color: white;
+      border: none;
+      border-radius: 12px;
       font-size: 16px;
       cursor: pointer;
+      margin-top: 5px;
+    }
+
+    .login-btn {
+      background: #111;
+      color: white;
+    }
+
+    .create-btn {
+      background: #eeeeee;
+      color: #111;
+      margin-top: 12px;
+    }
+
+    button:active {
+      transform: scale(0.98);
     }
 
     #message {
-      margin-top: 15px;
+      margin-top: 18px;
       font-size: 14px;
+      min-height: 20px;
+      color: #555;
     }
   </style>
 </head>
 
 <body>
 
-<div class="app">
+  <div class="app">
 
-  <h1>❤️ Our Space</h1>
-  <p>Just for us.</p>
+    <div class="card">
 
-  <h2>Login</h2>
+      <div class="heart">❤️</div>
 
-  <input
-    type="email"
-    id="email"
-    placeholder="Email"
-  >
+      <h1>Our Space</h1>
 
-  <input
-    type="password"
-    id="password"
-    placeholder="Password"
-  >
+      <p class="subtitle">Just for us.</p>
 
-  <button onclick="login()">Login</button>
+      <input
+        type="email"
+        id="email"
+        placeholder="Email"
+        autocomplete="email"
+      >
 
-  <div id="message"></div>
+      <input
+        type="password"
+        id="password"
+        placeholder="Password"
+        autocomplete="current-password"
+      >
 
-</div>
+      <button class="login-btn" onclick="login()">
+        Log In
+      </button>
 
-<script>
+      <button class="create-btn" onclick="createAccount()">
+        Create Account
+      </button>
 
-  // ==========================
-  // SUPABASE CONNECTION
-  // ==========================
+      <div id="message"></div>
 
-  const SUPABASE_URL = "https://ywflohxufmfydkpkkqly.supabase.co";
+    </div>
 
-  const SUPABASE_KEY = "sb_publishable_qTMUO8KxerEQBDQ-A7Huyg_8N2Tqpmr";
+  </div>
 
-  const supabaseClient =
-    window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_KEY
-    );
+  <script>
+
+    // ==========================================
+    // SUPABASE CONNECTION
+    // ==========================================
+
+    const SUPABASE_URL =
+      "https://ywflohxufmfydkpkkqly.supabase.co";
+
+    const SUPABASE_KEY =
+      "sb_publishable_qTMUO8KxerEQBDQ-A7Huyg_8N2Tqpmr";
+
+    const supabaseClient =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+      );
 
 
-  // ==========================
-  // LOGIN
-  // ==========================
+    // ==========================================
+    // MESSAGE
+    // ==========================================
 
-  async function login() {
-
-    const email =
-      document.getElementById("email").value;
-
-    const password =
-      document.getElementById("password").value;
-
-    const message =
-      document.getElementById("message");
-
-    message.textContent = "Logging in...";
-
-    const { data, error } =
-      await supabaseClient.auth.signInWithPassword({
-        email: email,
-        password: password
-      });
-
-    if (error) {
-
-      message.textContent =
-        "Login failed: " + error.message;
-
-      return;
+    function showMessage(text) {
+      document.getElementById("message").textContent = text;
     }
 
-    message.textContent =
-      "❤️ Welcome to Our Space!";
 
-  }
+    // ==========================================
+    // LOG IN
+    // ==========================================
 
-</script>
+    async function login() {
+
+      const email =
+        document.getElementById("email").value.trim();
+
+      const password =
+        document.getElementById("password").value;
+
+
+      if (!email || !password) {
+        showMessage("Please enter your email and password.");
+        return;
+      }
+
+
+      showMessage("Logging in...");
+
+
+      const { data, error } =
+        await supabaseClient.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
+
+
+      if (error) {
+        showMessage("❌ " + error.message);
+        return;
+      }
+
+
+      showMessage("❤️ Login successful!");
+
+      console.log("Logged in user:", data.user);
+
+    }
+
+
+    // ==========================================
+    // CREATE ACCOUNT
+    // ==========================================
+
+    async function createAccount() {
+
+      const email =
+        document.getElementById("email").value.trim();
+
+      const password =
+        document.getElementById("password").value;
+
+
+      if (!email || !password) {
+        showMessage("Please enter an email and password.");
+        return;
+      }
+
+
+      if (password.length < 6) {
+        showMessage("Password must be at least 6 characters.");
+        return;
+      }
+
+
+      showMessage("Creating your account...");
+
+
+      const { data, error } =
+        await supabaseClient.auth.signUp({
+          email: email,
+          password: password
+        });
+
+
+      if (error) {
+        showMessage("❌ " + error.message);
+        return;
+      }
+
+
+      if (data.session) {
+
+        showMessage("❤️ Account created! You're logged in.");
+
+      } else {
+
+        showMessage(
+          "❤️ Account created! Check your email to confirm your account."
+        );
+
+      }
+
+
+      console.log("Created user:", data.user);
+
+    }
+
+  </script>
 
 </body>
 </html>
