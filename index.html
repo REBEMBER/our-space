@@ -3,169 +3,148 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#111111">
-
   <title>Our Space ❤️</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+  <style>
     body {
+      margin: 0;
       font-family: Arial, sans-serif;
-      background: #f7f7f7;
-      color: #111;
-      min-height: 100vh;
+      background: #f5f5f5;
+      display: flex;
+      justify-content: center;
     }
 
     .app {
+      width: 100%;
       max-width: 500px;
-      margin: auto;
       min-height: 100vh;
       background: white;
-      padding: 30px 22px;
-    }
-
-    .header {
+      padding: 30px;
+      box-sizing: border-box;
       text-align: center;
-      padding: 30px 0;
-    }
-
-    .heart {
-      font-size: 55px;
-      margin-bottom: 15px;
     }
 
     h1 {
-      font-size: 32px;
-      margin-bottom: 8px;
+      margin-top: 50px;
+      font-size: 36px;
     }
 
-    .subtitle {
+    p {
       color: #777;
-      font-size: 15px;
     }
 
-    .counter {
-      margin: 25px 0;
-      padding: 25px;
-      border-radius: 20px;
+    input {
+      width: 100%;
+      padding: 15px;
+      margin: 8px 0;
+      box-sizing: border-box;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      margin-top: 10px;
+      border: 0;
+      border-radius: 10px;
       background: #111;
       color: white;
-      text-align: center;
-    }
-
-    .counter-title {
-      font-size: 14px;
-      opacity: 0.7;
-      margin-bottom: 10px;
-    }
-
-    .days {
-      font-size: 42px;
-      font-weight: bold;
-    }
-
-    .menu {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-top: 25px;
-    }
-
-    .card {
-      padding: 25px 15px;
-      border: none;
-      border-radius: 18px;
-      background: #f3f3f3;
       font-size: 16px;
       cursor: pointer;
-      transition: 0.2s;
     }
 
-    .card:hover {
-      transform: translateY(-3px);
-    }
-
-    .icon {
-      display: block;
-      font-size: 30px;
-      margin-bottom: 10px;
-    }
-
-    .footer {
-      text-align: center;
-      color: #999;
-      margin-top: 40px;
-      font-size: 13px;
+    #message {
+      margin-top: 15px;
+      font-size: 14px;
     }
   </style>
 </head>
 
 <body>
 
-  <main class="app">
+<div class="app">
 
-    <section class="header">
-      <div class="heart">❤️</div>
-      <h1>Our Space</h1>
-      <p class="subtitle">Just for us.</p>
-    </section>
+  <h1>❤️ Our Space</h1>
+  <p>Just for us.</p>
 
-    <section class="counter">
-      <div class="counter-title">TOGETHER FOR</div>
-      <div class="days" id="days">0</div>
-      <div>days ❤️</div>
-    </section>
+  <h2>Login</h2>
 
-    <section class="menu">
+  <input
+    type="email"
+    id="email"
+    placeholder="Email"
+  >
 
-      <button class="card" onclick="comingSoon('Chat')">
-        <span class="icon">💬</span>
-        Chat
-      </button>
+  <input
+    type="password"
+    id="password"
+    placeholder="Password"
+  >
 
-      <button class="card" onclick="comingSoon('Memories')">
-        <span class="icon">📸</span>
-        Memories
-      </button>
+  <button onclick="login()">Login</button>
 
-      <button class="card" onclick="comingSoon('Love Notes')">
-        <span class="icon">💌</span>
-        Love Notes
-      </button>
+  <div id="message"></div>
 
-      <button class="card" onclick="comingSoon('Games')">
-        <span class="icon">🎮</span>
-        Games
-      </button>
+</div>
 
-      <button class="card" onclick="comingSoon('Our Plans')">
-        <span class="icon">📅</span>
-        Our Plans
-      </button>
+<script>
 
-      <button class="card" onclick="comingSoon('Our Story')">
-        <span class="icon">✨</span>
-        Our Story
-      </button>
+  // ==========================
+  // SUPABASE CONNECTION
+  // ==========================
 
-    </section>
+  const SUPABASE_URL = "https://ywflohxufmfydkpkkqly.supabase.co";
 
-    <div class="footer">
-      Made for two ❤️
-    </div>
+  const SUPABASE_KEY = "sb_publishable_qTMUO8KxerEQBDQ-A7Huyg_8N2Tqpmr";
 
-  </main>
+  const supabaseClient =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
 
-  <script>
-    function comingSoon(feature) {
-      alert(feature + " is coming soon ❤️");
+
+  // ==========================
+  // LOGIN
+  // ==========================
+
+  async function login() {
+
+    const email =
+      document.getElementById("email").value;
+
+    const password =
+      document.getElementById("password").value;
+
+    const message =
+      document.getElementById("message");
+
+    message.textContent = "Logging in...";
+
+    const { data, error } =
+      await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+    if (error) {
+
+      message.textContent =
+        "Login failed: " + error.message;
+
+      return;
     }
-  </script>
+
+    message.textContent =
+      "❤️ Welcome to Our Space!";
+
+  }
+
+</script>
 
 </body>
 </html>
