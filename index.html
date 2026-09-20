@@ -2,116 +2,329 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>Our Space ❤️</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
+
     * {
       box-sizing: border-box;
     }
 
+    html,
     body {
       margin: 0;
+      padding: 0;
+      min-height: 100%;
+    }
+
+    body {
       min-height: 100vh;
-      font-family: Arial, sans-serif;
-      background: #f7f7f7;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+      background: #f6f6f6;
+
       display: flex;
       justify-content: center;
       align-items: center;
+
+      color: #111;
+    }
+
+    button,
+    input {
+      font: inherit;
     }
 
     .app {
       width: 100%;
-      max-width: 420px;
-      padding: 25px;
+      max-width: 430px;
+      padding: 20px;
     }
 
     .card {
       background: white;
-      padding: 35px 28px;
-      border-radius: 24px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+
+      border-radius: 26px;
+
+      padding: 32px 26px;
+
+      box-shadow:
+        0 15px 50px rgba(0, 0, 0, 0.08);
+
       text-align: center;
     }
 
     .heart {
-      font-size: 50px;
+      font-size: 48px;
       margin-bottom: 10px;
     }
 
     h1 {
       margin: 0;
+
       font-size: 32px;
+      font-weight: 700;
+    }
+
+    h2 {
+      margin: 0 0 8px;
+
+      font-size: 25px;
     }
 
     .subtitle {
-      color: #888;
       margin: 8px 0 30px;
+
+      color: #888;
+
+      font-size: 15px;
+    }
+
+    .welcome-text {
+      color: #777;
+
+      font-size: 14px;
+
+      margin-bottom: 25px;
+
+      word-break: break-word;
+    }
+
+    .input-container {
+      position: relative;
+
+      margin-bottom: 12px;
     }
 
     input {
       width: 100%;
+
       padding: 15px;
-      margin-bottom: 12px;
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      font-size: 16px;
+
+      border:
+        1px solid #dedede;
+
+      border-radius: 13px;
+
       outline: none;
+
+      background: white;
+
+      color: #111;
+
+      font-size: 16px;
+
+      transition: border 0.2s;
     }
 
     input:focus {
       border-color: #111;
     }
 
+    .password-input {
+      padding-right: 60px;
+    }
+
+    .show-password {
+      position: absolute;
+
+      right: 12px;
+      top: 50%;
+
+      transform: translateY(-50%);
+
+      width: auto;
+
+      margin: 0;
+      padding: 6px 8px;
+
+      background: transparent;
+
+      color: #777;
+
+      font-size: 13px;
+    }
+
     button {
       width: 100%;
-      padding: 15px;
+
       border: none;
-      border-radius: 12px;
-      font-size: 16px;
-      cursor: pointer;
+
+      border-radius: 13px;
+
+      padding: 15px;
+
       margin-top: 5px;
-    }
 
-    .login-btn {
-      background: #111;
-      color: white;
-    }
+      cursor: pointer;
 
-    .create-btn {
-      background: #eeeeee;
-      color: #111;
-      margin-top: 12px;
+      font-size: 16px;
+
+      font-weight: 600;
+
+      transition:
+        transform 0.1s,
+        opacity 0.2s;
     }
 
     button:active {
       transform: scale(0.98);
     }
 
-    #message {
-      margin-top: 18px;
-      font-size: 14px;
-      min-height: 20px;
+    button:disabled {
+      opacity: 0.55;
+
+      cursor: not-allowed;
+    }
+
+    .primary {
+      background: #111;
+
+      color: white;
+    }
+
+    .secondary {
+      background: #eeeeee;
+
+      color: #111;
+
+      margin-top: 12px;
+    }
+
+    .danger {
+      background: #eeeeee;
+
+      color: #b00020;
+
+      margin-top: 12px;
+    }
+
+    .link-button {
+      background: transparent;
+
       color: #555;
+
+      padding: 8px;
+
+      margin-top: 10px;
+
+      font-size: 14px;
+    }
+
+    .message {
+      min-height: 24px;
+
+      margin-top: 18px;
+
+      font-size: 14px;
+
       line-height: 1.5;
     }
+
+    .message.success {
+      color: #167c3a;
+    }
+
+    .message.error {
+      color: #c62828;
+    }
+
+    .message.info {
+      color: #555;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .home-icon {
+      font-size: 55px;
+
+      margin-bottom: 15px;
+    }
+
+    .home-title {
+      margin-bottom: 10px;
+    }
+
+    .home-card {
+      padding-bottom: 28px;
+    }
+
+    .divider {
+      height: 1px;
+
+      background: #eeeeee;
+
+      margin: 24px 0;
+    }
+
+    .small {
+      color: #999;
+
+      font-size: 13px;
+
+      line-height: 1.5;
+    }
+
+    @media (max-width: 450px) {
+
+      .app {
+        padding: 15px;
+      }
+
+      .card {
+        padding: 30px 22px;
+      }
+
+      h1 {
+        font-size: 29px;
+      }
+
+    }
+
   </style>
 </head>
 
 <body>
 
-  <div class="app">
+  <main class="app">
 
-    <div class="card">
+    <!-- ======================================
+         AUTH SCREEN
+    ======================================= -->
 
-      <div class="heart">❤️</div>
+    <section
+      id="authScreen"
+      class="card"
+    >
 
-      <h1>Our Space</h1>
+      <div class="heart">
+        ❤️
+      </div>
 
-      <p class="subtitle">Just for us.</p>
+      <h1>
+        Our Space
+      </h1>
+
+      <p class="subtitle">
+        Just for us.
+      </p>
+
+
+      <!-- EMAIL -->
 
       <input
         type="email"
@@ -120,38 +333,166 @@
         autocomplete="email"
       >
 
-      <input
-        type="password"
-        id="password"
-        placeholder="Password"
-        autocomplete="current-password"
-      >
+
+      <!-- PASSWORD -->
+
+      <div class="input-container">
+
+        <input
+          type="password"
+          id="password"
+          class="password-input"
+          placeholder="Password"
+          autocomplete="current-password"
+        >
+
+        <button
+          type="button"
+          id="showPasswordButton"
+          class="show-password"
+          onclick="togglePassword()"
+        >
+          Show
+        </button>
+
+      </div>
+
+
+      <!-- LOGIN -->
 
       <button
-        class="login-btn"
+        id="loginButton"
+        class="primary"
         onclick="login()"
       >
         Log In
       </button>
 
+
+      <!-- CREATE -->
+
       <button
-        class="create-btn"
+        id="createButton"
+        class="secondary"
         onclick="createAccount()"
       >
         Create Account
       </button>
 
-      <div id="message"></div>
 
-    </div>
+      <!-- FORGOT PASSWORD -->
 
-  </div>
+      <button
+        id="forgotButton"
+        class="link-button"
+        onclick="forgotPassword()"
+      >
+        Forgot password?
+      </button>
+
+
+      <!-- MESSAGE -->
+
+      <div
+        id="message"
+        class="message"
+      ></div>
+
+
+      <!-- RESEND CONFIRMATION -->
+
+      <button
+        id="resendButton"
+        class="link-button hidden"
+        onclick="resendConfirmation()"
+      >
+        Resend confirmation email
+      </button>
+
+    </section>
+
+
+
+    <!-- ======================================
+         HOME SCREEN
+    ======================================= -->
+
+    <section
+      id="homeScreen"
+      class="card home-card hidden"
+    >
+
+      <div class="home-icon">
+        ❤️
+      </div>
+
+      <h2 class="home-title">
+        Our Space
+      </h2>
+
+      <p
+        id="welcomeText"
+        class="welcome-text"
+      >
+        Welcome.
+      </p>
+
+      <div class="divider"></div>
+
+      <p class="small">
+        Your private space is ready.
+      </p>
+
+      <button
+        class="primary"
+        onclick="openChat()"
+      >
+        💬 Chat
+      </button>
+
+      <button
+        class="secondary"
+        onclick="comingSoon()"
+      >
+        📸 Memories
+      </button>
+
+      <button
+        class="secondary"
+        onclick="comingSoon()"
+      >
+        💌 Love Notes
+      </button>
+
+      <button
+        class="secondary"
+        onclick="comingSoon()"
+      >
+        📅 Plans
+      </button>
+
+      <button
+        class="danger"
+        onclick="logout()"
+      >
+        Log Out
+      </button>
+
+      <div
+        id="homeMessage"
+        class="message"
+      ></div>
+
+    </section>
+
+  </main>
+
 
   <script>
 
-    // ==========================================
-    // SUPABASE
-    // ==========================================
+    // ==================================================
+    // SUPABASE CONFIGURATION
+    // ==================================================
 
     const SUPABASE_URL =
       "https://ywflohxufmfydkpkkqly.supabase.co";
@@ -162,6 +503,7 @@
     const APP_URL =
       "https://our-space-topaz.vercel.app/";
 
+
     const supabaseClient =
       window.supabase.createClient(
         SUPABASE_URL,
@@ -169,183 +511,1009 @@
       );
 
 
-    // ==========================================
-    // MESSAGE
-    // ==========================================
+    // ==================================================
+    // ELEMENTS
+    // ==================================================
 
-    function showMessage(text) {
-      document.getElementById("message").textContent = text;
-    }
+    const authScreen =
+      document.getElementById("authScreen");
 
+    const homeScreen =
+      document.getElementById("homeScreen");
 
-    // ==========================================
-    // LOG IN
-    // ==========================================
+    const emailInput =
+      document.getElementById("email");
 
-    async function login() {
+    const passwordInput =
+      document.getElementById("password");
 
-      const email =
-        document.getElementById("email").value.trim();
+    const messageElement =
+      document.getElementById("message");
 
-      const password =
-        document.getElementById("password").value;
+    const welcomeText =
+      document.getElementById("welcomeText");
 
+    const homeMessage =
+      document.getElementById("homeMessage");
 
-      if (!email || !password) {
+    const loginButton =
+      document.getElementById("loginButton");
 
-        showMessage(
-          "Please enter your email and password."
-        );
+    const createButton =
+      document.getElementById("createButton");
 
-        return;
-      }
+    const forgotButton =
+      document.getElementById("forgotButton");
 
-
-      showMessage("Logging in...");
-
-
-      const { data, error } =
-        await supabaseClient.auth.signInWithPassword({
-
-          email: email,
-
-          password: password
-
-        });
+    const resendButton =
+      document.getElementById("resendButton");
 
 
-      if (error) {
+    // ==================================================
+    // MESSAGE HELPERS
+    // ==================================================
 
-        showMessage(
-          "❌ " + error.message
-        );
+    function showMessage(
+      text,
+      type = "info"
+    ) {
 
-        return;
-      }
+      messageElement.textContent = text;
 
-
-      showMessage(
-        "❤️ Login successful!"
-      );
-
-
-      console.log(
-        "Logged in user:",
-        data.user
-      );
+      messageElement.className =
+        "message " + type;
 
     }
 
 
-    // ==========================================
-    // CREATE ACCOUNT
-    // ==========================================
+    function showHomeMessage(
+      text,
+      type = "info"
+    ) {
 
-    async function createAccount() {
+      homeMessage.textContent = text;
 
-      const email =
-        document.getElementById("email").value.trim();
+      homeMessage.className =
+        "message " + type;
 
-      const password =
-        document.getElementById("password").value;
+    }
 
 
-      if (!email || !password) {
+    function clearMessage() {
 
-        showMessage(
-          "Please enter an email and password."
+      messageElement.textContent = "";
+
+      messageElement.className =
+        "message";
+
+    }
+
+
+    // ==================================================
+    // BUTTON LOADING
+    // ==================================================
+
+    function setAuthLoading(
+      loading
+    ) {
+
+      loginButton.disabled =
+        loading;
+
+      createButton.disabled =
+        loading;
+
+      forgotButton.disabled =
+        loading;
+
+    }
+
+
+    // ==================================================
+    // PASSWORD VISIBILITY
+    // ==================================================
+
+    function togglePassword() {
+
+      const button =
+        document.getElementById(
+          "showPasswordButton"
         );
 
-        return;
+
+      if (
+        passwordInput.type ===
+        "password"
+      ) {
+
+        passwordInput.type =
+          "text";
+
+        button.textContent =
+          "Hide";
+
+      } else {
+
+        passwordInput.type =
+          "password";
+
+        button.textContent =
+          "Show";
+
+      }
+
+    }
+
+
+    // ==================================================
+    // VALIDATE INPUT
+    // ==================================================
+
+    function validateFields() {
+
+      const email =
+        emailInput.value.trim();
+
+      const password =
+        passwordInput.value;
+
+
+      if (!email) {
+
+        showMessage(
+          "Please enter your email.",
+          "error"
+        );
+
+        emailInput.focus();
+
+        return false;
+
+      }
+
+
+      if (!password) {
+
+        showMessage(
+          "Please enter your password.",
+          "error"
+        );
+
+        passwordInput.focus();
+
+        return false;
+
       }
 
 
       if (password.length < 6) {
 
         showMessage(
-          "Password must be at least 6 characters."
+          "Password must be at least 6 characters.",
+          "error"
         );
 
-        return;
+        passwordInput.focus();
+
+        return false;
+
       }
 
 
-      showMessage(
-        "Creating your account..."
+      return true;
+
+    }
+
+
+    // ==================================================
+    // LOG IN
+    // ==================================================
+
+    async function login() {
+
+      clearMessage();
+
+      resendButton.classList.add(
+        "hidden"
       );
 
 
-      const { data, error } =
-        await supabaseClient.auth.signUp({
+      if (!validateFields()) {
 
-          email: email,
+        return;
 
-          password: password,
+      }
 
-          options: {
 
-            emailRedirectTo: APP_URL
+      setAuthLoading(true);
 
-          }
+      showMessage(
+        "Logging in...",
+        "info"
+      );
 
-        });
+
+      try {
+
+        const {
+          data,
+          error
+        } =
+          await supabaseClient.auth.signInWithPassword({
+
+            email:
+              emailInput.value.trim(),
+
+            password:
+              passwordInput.value
+
+          });
+
+
+        if (error) {
+
+          showMessage(
+            getFriendlyLoginError(
+              error
+            ),
+            "error"
+          );
+
+          return;
+
+        }
+
+
+        if (
+          !data ||
+          !data.user
+        ) {
+
+          showMessage(
+            "Login could not be completed.",
+            "error"
+          );
+
+          return;
+
+        }
+
+
+        showHome(
+          data.user
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Login error:",
+          error
+        );
+
+        showMessage(
+          "Something went wrong. Please try again.",
+          "error"
+        );
+
+      } finally {
+
+        setAuthLoading(false);
+
+      }
+
+    }
+
+
+    // ==================================================
+    // FRIENDLY LOGIN ERRORS
+    // ==================================================
+
+    function getFriendlyLoginError(
+      error
+    ) {
+
+      const message =
+        (
+          error.message ||
+          ""
+        ).toLowerCase();
+
+
+      if (
+        message.includes(
+          "email not confirmed"
+        )
+      ) {
+
+        resendButton.classList.remove(
+          "hidden"
+        );
+
+        return (
+          "Please confirm your email first."
+        );
+
+      }
+
+
+      if (
+        message.includes(
+          "invalid login credentials"
+        )
+      ) {
+
+        return (
+          "Incorrect email or password."
+        );
+
+      }
+
+
+      if (
+        message.includes(
+          "too many requests"
+        )
+      ) {
+
+        return (
+          "Too many attempts. Please wait a little and try again."
+        );
+
+      }
+
+
+      return (
+        "❌ " +
+        (
+          error.message ||
+          "Login failed."
+        )
+      );
+
+    }
+
+
+    // ==================================================
+    // CREATE ACCOUNT
+    // ==================================================
+
+    async function createAccount() {
+
+      clearMessage();
+
+      resendButton.classList.add(
+        "hidden"
+      );
+
+
+      if (!validateFields()) {
+
+        return;
+
+      }
+
+
+      setAuthLoading(true);
+
+      showMessage(
+        "Creating your account...",
+        "info"
+      );
+
+
+      try {
+
+        const {
+          data,
+          error
+        } =
+          await supabaseClient.auth.signUp({
+
+            email:
+              emailInput.value.trim(),
+
+            password:
+              passwordInput.value,
+
+            options: {
+
+              emailRedirectTo:
+                APP_URL
+
+            }
+
+          });
+
+
+        if (error) {
+
+          showMessage(
+            getFriendlySignupError(
+              error
+            ),
+            "error"
+          );
+
+          return;
+
+        }
+
+
+        // ==========================================
+        // EXISTING ACCOUNT DETECTION
+        //
+        // Supabase can return an obfuscated
+        // user when email confirmation is enabled.
+        // An empty identities array indicates that
+        // no new identity was created.
+        // ==========================================
+
+        if (
+          data &&
+          data.user &&
+          Array.isArray(
+            data.user.identities
+          ) &&
+          data.user.identities.length === 0
+        ) {
+
+          showMessage(
+            "An account may already exist with this email. Try Log In instead.",
+            "error"
+          );
+
+          return;
+
+        }
+
+
+        // ==========================================
+        // ACCOUNT CREATED
+        // ==========================================
+
+        if (
+          data &&
+          data.session
+        ) {
+
+          showHome(
+            data.user
+          );
+
+          return;
+
+        }
+
+
+        // ==========================================
+        // EMAIL CONFIRMATION REQUIRED
+        // ==========================================
+
+        resendButton.classList.remove(
+          "hidden"
+        );
+
+
+        showMessage(
+          "❤️ Account created! Check your email and confirm your account.",
+          "success"
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Signup error:",
+          error
+        );
+
+        showMessage(
+          "Something went wrong. Please try again.",
+          "error"
+        );
+
+      } finally {
+
+        setAuthLoading(false);
+
+      }
+
+    }
+
+
+    // ==================================================
+    // SIGNUP ERRORS
+    // ==================================================
+
+    function getFriendlySignupError(
+      error
+    ) {
+
+      const message =
+        (
+          error.message ||
+          ""
+        ).toLowerCase();
+
+
+      if (
+        message.includes(
+          "already registered"
+        )
+      ) {
+
+        return (
+          "This email is already registered. Please use Log In."
+        );
+
+      }
+
+
+      if (
+        message.includes(
+          "password"
+        )
+      ) {
+
+        return (
+          "Please check your password and try again."
+        );
+
+      }
+
+
+      if (
+        message.includes(
+          "email"
+        )
+      ) {
+
+        return (
+          "Please enter a valid email address."
+        );
+
+      }
+
+
+      return (
+        "❌ " +
+        (
+          error.message ||
+          "Account creation failed."
+        )
+      );
+
+    }
+
+
+    // ==================================================
+    // RESEND CONFIRMATION
+    // ==================================================
+
+    async function resendConfirmation() {
+
+      const email =
+        emailInput.value.trim();
+
+
+      if (!email) {
+
+        showMessage(
+          "Enter your email first.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      resendButton.disabled =
+        true;
+
+
+      showMessage(
+        "Sending confirmation email...",
+        "info"
+      );
+
+
+      try {
+
+        const {
+          error
+        } =
+          await supabaseClient.auth.resend({
+
+            type:
+              "signup",
+
+            email:
+              email,
+
+            options: {
+
+              emailRedirectTo:
+                APP_URL
+
+            }
+
+          });
+
+
+        if (error) {
+
+          showMessage(
+            "❌ " +
+            error.message,
+            "error"
+          );
+
+          return;
+
+        }
+
+
+        showMessage(
+          "❤️ A new confirmation email has been sent.",
+          "success"
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Resend error:",
+          error
+        );
+
+        showMessage(
+          "Could not send the email. Please try again later.",
+          "error"
+        );
+
+      } finally {
+
+        resendButton.disabled =
+          false;
+
+      }
+
+    }
+
+
+    // ==================================================
+    // FORGOT PASSWORD
+    // ==================================================
+
+    async function forgotPassword() {
+
+      const email =
+        emailInput.value.trim();
+
+
+      if (!email) {
+
+        showMessage(
+          "Enter your email first.",
+          "error"
+        );
+
+        emailInput.focus();
+
+        return;
+
+      }
+
+
+      forgotButton.disabled =
+        true;
+
+
+      showMessage(
+        "Sending password reset email...",
+        "info"
+      );
+
+
+      try {
+
+        const {
+          error
+        } =
+          await supabaseClient.auth.resetPasswordForEmail(
+
+            email,
+
+            {
+              redirectTo:
+                APP_URL
+            }
+
+          );
+
+
+        if (error) {
+
+          showMessage(
+            "❌ " +
+            error.message,
+            "error"
+          );
+
+          return;
+
+        }
+
+
+        showMessage(
+          "❤️ Check your email for the password reset link.",
+          "success"
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Password reset error:",
+          error
+        );
+
+        showMessage(
+          "Could not send the reset email.",
+          "error"
+        );
+
+      } finally {
+
+        forgotButton.disabled =
+          false;
+
+      }
+
+    }
+
+
+    // ==================================================
+    // SHOW HOME
+    // ==================================================
+
+    function showHome(
+      user
+    ) {
+
+      authScreen.classList.add(
+        "hidden"
+      );
+
+      homeScreen.classList.remove(
+        "hidden"
+      );
+
+
+      const email =
+        user.email ||
+        "there";
+
+
+      welcomeText.textContent =
+        "Welcome back, " +
+        email +
+        " ❤️";
+
+
+      clearMessage();
+
+    }
+
+
+    // ==================================================
+    // SHOW LOGIN
+    // ==================================================
+
+    function showLogin() {
+
+      homeScreen.classList.add(
+        "hidden"
+      );
+
+      authScreen.classList.remove(
+        "hidden"
+      );
+
+
+      passwordInput.value =
+        "";
+
+      clearMessage();
+
+    }
+
+
+    // ==================================================
+    // LOG OUT
+    // ==================================================
+
+    async function logout() {
+
+      showHomeMessage(
+        "Logging out...",
+        "info"
+      );
+
+
+      const {
+        error
+      } =
+        await supabaseClient.auth.signOut();
 
 
       if (error) {
 
-        showMessage(
-          "❌ " + error.message
+        showHomeMessage(
+          "❌ " +
+          error.message,
+          "error"
         );
 
         return;
-      }
-
-
-      if (data.session) {
-
-        showMessage(
-          "❤️ Account created! You're logged in."
-        );
-
-      } else {
-
-        showMessage(
-          "❤️ Account created! Check your email to confirm your account."
-        );
 
       }
 
 
-      console.log(
-        "Created user:",
-        data.user
+      showLogin();
+
+    }
+
+
+    // ==================================================
+    // AUTH STATE
+    // ==================================================
+
+    supabaseClient.auth.onAuthStateChange(
+
+      (event, session) => {
+
+        console.log(
+          "Auth event:",
+          event
+        );
+
+
+        if (
+          session &&
+          session.user
+        ) {
+
+          showHome(
+            session.user
+          );
+
+        } else {
+
+          showLogin();
+
+        }
+
+      }
+
+    );
+
+
+    // ==================================================
+    // CHECK EXISTING SESSION
+    // ==================================================
+
+    async function checkSession() {
+
+      try {
+
+        const {
+          data,
+          error
+        } =
+          await supabaseClient.auth.getSession();
+
+
+        if (error) {
+
+          console.error(
+            "Session error:",
+            error
+          );
+
+          return;
+
+        }
+
+
+        if (
+          data &&
+          data.session &&
+          data.session.user
+        ) {
+
+          showHome(
+            data.session.user
+          );
+
+        }
+
+      } catch (error) {
+
+        console.error(
+          "Session check error:",
+          error
+        );
+
+      }
+
+    }
+
+
+    // ==================================================
+    // FUTURE FEATURES
+    // ==================================================
+
+    function openChat() {
+
+      showHomeMessage(
+        "💬 Chat is the next feature we're building.",
+        "info"
       );
 
     }
 
 
-    // ==========================================
-    // CHECK EXISTING SESSION
-    // ==========================================
+    function comingSoon() {
 
-    async function checkSession() {
-
-      const {
-        data: { session }
-      } = await supabaseClient.auth.getSession();
-
-
-      if (session) {
-
-        console.log(
-          "Already logged in:",
-          session.user
-        );
-
-      }
+      showHomeMessage(
+        "This feature is coming soon ❤️",
+        "info"
+      );
 
     }
 
+
+    // ==================================================
+    // ENTER KEY
+    // ==================================================
+
+    emailInput.addEventListener(
+      "keydown",
+      function(event) {
+
+        if (
+          event.key === "Enter"
+        ) {
+
+          login();
+
+        }
+
+      }
+    );
+
+
+    passwordInput.addEventListener(
+      "keydown",
+      function(event) {
+
+        if (
+          event.key === "Enter"
+        ) {
+
+          login();
+
+        }
+
+      }
+    );
+
+
+    // ==================================================
+    // START
+    // ==================================================
 
     checkSession();
 
