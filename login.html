@@ -2,116 +2,171 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-  <title>Our Space — Login</title>
+  <title>Login — Our Space</title>
+
+  <meta
+    name="description"
+    content="Sign in to your private Our Space."
+  >
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    :root {
-      --green: #173f3b;
-      --green-light: #edf5f3;
-      --text: #202525;
-      --muted: #7c8583;
-      --line: #e0e5e3;
-      --bg: #fafbfa;
-      --white: #ffffff;
-    }
-
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
 
+    :root {
+      --bg: #f7f8fa;
+      --white: #ffffff;
+      --text: #17181c;
+      --muted: #777a84;
+      --border: #e5e6ea;
+      --accent: #6c63ff;
+      --accent-dark: #5750df;
+      --danger: #d94b5b;
+      --success: #278a61;
+    }
+
     body {
       min-height: 100vh;
-      background: var(--bg);
+
+      font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+
+      background:
+        radial-gradient(
+          circle at 10% 10%,
+          rgba(108,99,255,.08),
+          transparent 30%
+        ),
+        radial-gradient(
+          circle at 90% 90%,
+          rgba(108,99,255,.07),
+          transparent 30%
+        ),
+        var(--bg);
+
       color: var(--text);
-      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      padding: 24px;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
     }
 
     .page {
-      width: min(100%, 450px);
-      min-height: 100vh;
-      margin: auto;
-      padding: 25px;
-      display: flex;
-      align-items: center;
+      width: 100%;
+      max-width: 460px;
+    }
+
+    .brand {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .brand-icon {
+      width: 55px;
+      height: 55px;
+      border-radius: 17px;
+      background: var(--text);
+      color: white;
+
+      display: grid;
+      place-items: center;
+
+      font-weight: 800;
+      margin: 0 auto 15px;
+    }
+
+    .brand h1 {
+      font-size: 24px;
+      letter-spacing: -.03em;
+    }
+
+    .brand p {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 7px;
     }
 
     .box {
-      width: 100%;
-      background: var(--white);
-      border: 1px solid #e9edeb;
+      background: rgba(255,255,255,.94);
+      border: 1px solid var(--border);
       border-radius: 25px;
-      padding: 32px;
-    }
 
-    .back {
-      border: none;
-      background: transparent;
-      color: var(--muted);
-      cursor: pointer;
-      font-size: 13px;
-      margin-bottom: 30px;
-    }
+      padding: 30px;
 
-    .back:hover {
-      color: var(--green);
-    }
-
-    .logo {
-      width: 52px;
-      height: 52px;
-      border-radius: 17px;
-      background: var(--green-light);
-      color: var(--green);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 25px;
-      margin-bottom: 22px;
-    }
-
-    h1 {
-      font-size: 30px;
-      letter-spacing: -1px;
-      margin-bottom: 8px;
-    }
-
-    .subtitle {
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.5;
-      margin-bottom: 25px;
+      box-shadow:
+        0 25px 70px rgba(0,0,0,.07);
     }
 
     .tabs {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      background: #f2f5f4;
-      padding: 4px;
+
+      background: #f1f1f4;
       border-radius: 12px;
-      margin-bottom: 25px;
+      padding: 4px;
+
+      margin-bottom: 28px;
     }
 
     .tab {
-      border: none;
+      border: 0;
       background: transparent;
-      color: var(--muted);
       border-radius: 9px;
-      padding: 10px;
-      cursor: pointer;
+
+      padding: 11px;
+
+      color: var(--muted);
+      font-weight: 700;
       font-size: 13px;
-      font-weight: 600;
     }
 
     .tab.active {
       background: white;
-      color: var(--green);
-      box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+      color: var(--text);
+      box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    }
+
+    .intro {
+      margin-bottom: 24px;
+    }
+
+    .intro h2 {
+      font-size: 25px;
+      letter-spacing: -.03em;
+      margin-bottom: 7px;
+    }
+
+    .intro p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
     }
 
     .field {
@@ -121,128 +176,243 @@
     label {
       display: block;
       font-size: 12px;
-      font-weight: 700;
+      font-weight: 800;
       margin-bottom: 7px;
-      color: #4d5654;
+    }
+
+    .input-wrap {
+      position: relative;
     }
 
     input {
       width: 100%;
-      height: 50px;
-      border: 1px solid var(--line);
+
+      border: 1px solid var(--border);
+      background: #fafafd;
+
       border-radius: 12px;
-      background: white;
-      padding: 0 14px;
-      outline: none;
-      font-size: 14px;
+
+      padding: 13px 14px;
+
       color: var(--text);
-      transition: 0.2s;
+      outline: none;
+
+      transition:
+        border-color .2s,
+        box-shadow .2s,
+        background .2s;
     }
 
     input:focus {
-      border-color: var(--green);
-      box-shadow: 0 0 0 3px rgba(23,63,59,0.07);
+      background: white;
+      border-color: var(--accent);
+
+      box-shadow:
+        0 0 0 4px rgba(108,99,255,.09);
     }
 
-    .password {
-      position: relative;
+    input.password-input {
+      padding-right: 52px;
     }
 
-    .password input {
-      padding-right: 60px;
-    }
-
-    .show {
+    .show-password {
       position: absolute;
-      right: 12px;
+      right: 8px;
       top: 50%;
       transform: translateY(-50%);
-      border: none;
+
+      border: 0;
       background: transparent;
+
+      color: var(--muted);
+
+      padding: 7px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .strength {
+      display: none;
+      height: 4px;
+      background: #ededf0;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .strength-bar {
+      width: 0%;
+      height: 100%;
+      transition: width .2s;
+    }
+
+    .password-hint {
+      display: none;
+      margin-top: 7px;
       color: var(--muted);
       font-size: 11px;
-      cursor: pointer;
     }
 
-    .submit {
-      width: 100%;
-      height: 50px;
-      border: none;
-      border-radius: 12px;
-      background: var(--green);
-      color: white;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      margin-top: 4px;
+    .forgot-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: -7px;
+      margin-bottom: 18px;
     }
 
-    .submit:hover {
-      background: #10332f;
-    }
-
-    .submit:disabled {
-      opacity: .6;
-      cursor: not-allowed;
-    }
-
-    .forgot,
-    .resend {
-      display: block;
-      margin: 16px auto 0;
-      border: none;
+    .link-btn {
+      border: 0;
       background: transparent;
-      color: var(--green);
+      color: var(--accent);
       font-size: 12px;
-      cursor: pointer;
+      font-weight: 700;
+      padding: 0;
     }
 
-    .resend {
-      display: none;
-    }
-
-    .forgot:hover,
-    .resend:hover {
+    .link-btn:hover {
       text-decoration: underline;
+    }
+
+    .primary {
+      width: 100%;
+
+      border: 0;
+      border-radius: 13px;
+
+      padding: 14px;
+
+      background: var(--text);
+      color: white;
+
+      font-size: 14px;
+      font-weight: 800;
+
+      transition:
+        transform .15s,
+        background .2s;
+    }
+
+    .primary:hover {
+      background: #2b2c31;
+      transform: translateY(-1px);
+    }
+
+    .primary:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+      transform: none;
     }
 
     .message {
       display: none;
-      padding: 11px 13px;
-      border-radius: 10px;
-      font-size: 12px;
-      line-height: 1.5;
-      margin-bottom: 15px;
+
+      border-radius: 11px;
+      padding: 12px 13px;
+
+      margin-bottom: 17px;
+
+      font-size: 13px;
+      line-height: 1.45;
     }
 
     .message.error {
       display: block;
-      background: #fff1f1;
-      color: #a23c3c;
+      background: #fff1f3;
+      color: var(--danger);
+      border: 1px solid #ffd8de;
     }
 
     .message.success {
       display: block;
-      background: #eff9f4;
-      color: #28704e;
+      background: #eefaf4;
+      color: var(--success);
+      border: 1px solid #d0efdf;
     }
 
-    .footer {
+    .bottom-note {
       text-align: center;
-      color: #a2aaa8;
-      font-size: 10px;
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 20px;
       line-height: 1.5;
-      margin-top: 25px;
+    }
+
+    /* Modal */
+
+    .modal {
+      position: fixed;
+      inset: 0;
+
+      background: rgba(10,10,15,.45);
+      backdrop-filter: blur(5px);
+
+      display: none;
+      align-items: center;
+      justify-content: center;
+
+      padding: 20px;
+      z-index: 100;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 390px;
+
+      background: white;
+      border-radius: 22px;
+      padding: 28px;
+
+      box-shadow: 0 30px 90px rgba(0,0,0,.2);
+    }
+
+    .modal-box h3 {
+      font-size: 21px;
+      margin-bottom: 8px;
+    }
+
+    .modal-box p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 9px;
+      margin-top: 15px;
+    }
+
+    .secondary {
+      flex: 1;
+      border: 1px solid var(--border);
+      background: white;
+      border-radius: 11px;
+      padding: 11px;
+      font-weight: 700;
+    }
+
+    .modal-primary {
+      flex: 1;
+      border: 0;
+      background: var(--text);
+      color: white;
+      border-radius: 11px;
+      padding: 11px;
+      font-weight: 700;
     }
 
     @media (max-width: 500px) {
-      .page {
+      body {
         padding: 14px;
       }
 
       .box {
-        padding: 25px;
-        border-radius: 21px;
+        padding: 23px;
       }
     }
   </style>
@@ -250,122 +420,263 @@
 
 <body>
 
-  <main class="page">
+  <div class="page">
 
-    <section class="box">
+    <div class="brand">
+      <div class="brand-icon">OS</div>
+      <h1>Our Space</h1>
+      <p>Your private place for two.</p>
+    </div>
 
-      <button class="back" onclick="goHome()">
-        ← Our Space
-      </button>
-
-      <div class="logo">♡</div>
-
-      <h1 id="title">Welcome back</h1>
-
-      <p class="subtitle" id="subtitle">
-        Log in to enter your private space.
-      </p>
+    <div class="box">
 
       <div class="tabs">
-
         <button
-          class="tab active"
           id="loginTab"
-          onclick="setMode('login')"
+          class="tab active"
+          type="button"
         >
-          Log In
+          Log in
         </button>
 
         <button
-          class="tab"
           id="signupTab"
-          onclick="setMode('signup')"
+          class="tab"
+          type="button"
         >
-          Create Account
+          Create account
         </button>
-
       </div>
 
-      <div id="message" class="message"></div>
+      <div id="loginForm">
 
-      <form onsubmit="submitForm(event)">
-
-        <div class="field">
-          <label for="email">
-            EMAIL
-          </label>
-
-          <input
-            id="email"
-            type="email"
-            autocomplete="email"
-            placeholder="you@example.com"
-            required
-          >
+        <div class="intro">
+          <h2>Welcome back.</h2>
+          <p>
+            Sign in to continue to your space.
+          </p>
         </div>
 
-        <div class="field">
-          <label for="password">
-            PASSWORD
-          </label>
+        <div id="loginMessage" class="message"></div>
 
-          <div class="password">
+        <form id="loginFormElement">
+
+          <div class="field">
+            <label for="loginEmail">
+              Email
+            </label>
 
             <input
-              id="password"
-              type="password"
-              autocomplete="current-password"
-              minlength="6"
-              placeholder="Your password"
+              id="loginEmail"
+              type="email"
+              autocomplete="email"
+              placeholder="you@example.com"
               required
             >
+          </div>
 
-            <button
-              type="button"
-              class="show"
-              onclick="togglePassword()"
-            >
-              Show
-            </button>
+          <div class="field">
+
+            <label for="loginPassword">
+              Password
+            </label>
+
+            <div class="input-wrap">
+
+              <input
+                id="loginPassword"
+                class="password-input"
+                type="password"
+                autocomplete="current-password"
+                placeholder="Your password"
+                required
+              >
+
+              <button
+                class="show-password"
+                type="button"
+                data-target="loginPassword"
+              >
+                Show
+              </button>
+
+            </div>
 
           </div>
-        </div>
 
-        <button
-          type="submit"
-          class="submit"
-          id="submitButton"
-        >
-          Log In
-        </button>
+          <div class="forgot-row">
+            <button
+              id="forgotBtn"
+              class="link-btn"
+              type="button"
+            >
+              Forgot password?
+            </button>
+          </div>
 
-      </form>
+          <button
+            id="loginBtn"
+            class="primary"
+            type="submit"
+          >
+            Log in
+          </button>
 
-      <button
-        class="forgot"
-        id="forgotButton"
-        onclick="forgotPassword()"
-      >
-        Forgot your password?
-      </button>
+        </form>
 
-      <button
-        class="resend"
-        id="resendButton"
-        onclick="resendConfirmation()"
-      >
-        Resend confirmation email
-      </button>
-
-      <div class="footer">
-        Our Space is private to its registered users.
       </div>
 
-    </section>
+      <div
+        id="signupForm"
+        style="display:none;"
+      >
 
-  </main>
+        <div class="intro">
+          <h2>Create your space.</h2>
+          <p>
+            Make an account and we'll send you a confirmation email.
+          </p>
+        </div>
+
+        <div id="signupMessage" class="message"></div>
+
+        <form id="signupFormElement">
+
+          <div class="field">
+            <label for="signupEmail">
+              Email
+            </label>
+
+            <input
+              id="signupEmail"
+              type="email"
+              autocomplete="email"
+              placeholder="you@example.com"
+              required
+            >
+          </div>
+
+          <div class="field">
+
+            <label for="signupPassword">
+              Password
+            </label>
+
+            <div class="input-wrap">
+
+              <input
+                id="signupPassword"
+                class="password-input"
+                type="password"
+                autocomplete="new-password"
+                placeholder="At least 6 characters"
+                minlength="6"
+                required
+              >
+
+              <button
+                class="show-password"
+                type="button"
+                data-target="signupPassword"
+              >
+                Show
+              </button>
+
+            </div>
+
+            <div
+              id="strength"
+              class="strength"
+            >
+              <div
+                id="strengthBar"
+                class="strength-bar"
+              ></div>
+            </div>
+
+            <div
+              id="passwordHint"
+              class="password-hint"
+            ></div>
+
+          </div>
+
+          <button
+            id="signupBtn"
+            class="primary"
+            type="submit"
+          >
+            Create account
+          </button>
+
+        </form>
+
+      </div>
+
+    </div>
+
+    <div class="bottom-note">
+      Your account is protected by Supabase Authentication.
+    </div>
+
+  </div>
+
+
+  <!-- Forgot password modal -->
+
+  <div
+    id="resetModal"
+    class="modal"
+  >
+
+    <div class="modal-box">
+
+      <h3>Reset your password</h3>
+
+      <p>
+        Enter your email and we'll send you a password
+        reset link.
+      </p>
+
+      <div
+        id="resetMessage"
+        class="message"
+      ></div>
+
+      <input
+        id="resetEmail"
+        type="email"
+        autocomplete="email"
+        placeholder="you@example.com"
+      >
+
+      <div class="modal-actions">
+
+        <button
+          id="cancelReset"
+          class="secondary"
+          type="button"
+        >
+          Cancel
+        </button>
+
+        <button
+          id="sendReset"
+          class="modal-primary"
+          type="button"
+        >
+          Send link
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
 
   <script>
+
     const SUPABASE_URL =
       "https://ywflohxufmfydkpkkqly.supabase.co";
 
@@ -377,7 +688,7 @@
 
     const { createClient } = supabase;
 
-    const db = createClient(
+    const client = createClient(
       SUPABASE_URL,
       SUPABASE_PUBLISHABLE_KEY,
       {
@@ -389,368 +700,649 @@
       }
     );
 
-    let mode = "login";
 
-    function setMode(value) {
+    /* ---------------------------
+       Elements
+    --------------------------- */
 
-      mode = value;
+    const loginTab =
+      document.getElementById("loginTab");
 
-      clearMessage();
+    const signupTab =
+      document.getElementById("signupTab");
 
-      const loginTab =
-        document.getElementById("loginTab");
+    const loginForm =
+      document.getElementById("loginForm");
 
-      const signupTab =
-        document.getElementById("signupTab");
+    const signupForm =
+      document.getElementById("signupForm");
 
-      const title =
-        document.getElementById("title");
+    const loginFormElement =
+      document.getElementById("loginFormElement");
 
-      const subtitle =
-        document.getElementById("subtitle");
+    const signupFormElement =
+      document.getElementById("signupFormElement");
 
-      const button =
-        document.getElementById("submitButton");
+    const loginBtn =
+      document.getElementById("loginBtn");
 
-      const forgot =
-        document.getElementById("forgotButton");
+    const signupBtn =
+      document.getElementById("signupBtn");
 
-      if (mode === "login") {
+    const loginMessage =
+      document.getElementById("loginMessage");
+
+    const signupMessage =
+      document.getElementById("signupMessage");
+
+
+    /* ---------------------------
+       Helpers
+    --------------------------- */
+
+    function showMessage(element, message, type) {
+      element.textContent = message;
+      element.className = "message " + type;
+    }
+
+    function clearMessage(element) {
+      element.textContent = "";
+      element.className = "message";
+    }
+
+    function goHome() {
+      window.location.replace("index.html");
+    }
+
+    function goConfirmation(email) {
+      try {
+        sessionStorage.setItem(
+          "confirmationEmail",
+          email
+        );
+      } catch (error) {}
+
+      window.location.replace(
+        "confirmation.html"
+      );
+    }
+
+    function friendlyAuthError(error) {
+
+      const message =
+        String(error?.message || "")
+          .toLowerCase();
+
+      if (
+        message.includes("invalid login credentials")
+      ) {
+        return "The email or password is incorrect.";
+      }
+
+      if (
+        message.includes("email not confirmed")
+      ) {
+        return "Please confirm your email before logging in.";
+      }
+
+      if (
+        message.includes("rate limit") ||
+        message.includes("rate exceeded") ||
+        message.includes("too many requests")
+      ) {
+        return "Too many requests. Please wait a little before trying again.";
+      }
+
+      if (
+        message.includes("password should be at least")
+      ) {
+        return "Your password must contain at least 6 characters.";
+      }
+
+      if (
+        message.includes("invalid email")
+      ) {
+        return "Please enter a valid email address.";
+      }
+
+      if (
+        message.includes("user already registered")
+      ) {
+        return "This account may already exist. Try logging in instead.";
+      }
+
+      return error?.message ||
+        "Something went wrong. Please try again.";
+    }
+
+
+    /* ---------------------------
+       Check existing session
+    --------------------------- */
+
+    async function checkExistingUser() {
+
+      try {
+
+        const {
+          data,
+          error
+        } = await client.auth.getUser();
+
+        if (
+          !error &&
+          data &&
+          data.user
+        ) {
+          goHome();
+          return;
+        }
+
+      } catch (error) {
+        console.log(
+          "No active account:",
+          error
+        );
+      }
+    }
+
+    checkExistingUser();
+
+
+    /* ---------------------------
+       Tabs
+    --------------------------- */
+
+    loginTab.addEventListener(
+      "click",
+      () => {
 
         loginTab.classList.add("active");
         signupTab.classList.remove("active");
 
-        title.textContent = "Welcome back";
+        loginForm.style.display = "block";
+        signupForm.style.display = "none";
 
-        subtitle.textContent =
-          "Log in to enter your private space.";
-
-        button.textContent = "Log In";
-
-        forgot.style.display = "block";
-
-      } else {
-
-        loginTab.classList.remove("active");
-        signupTab.classList.add("active");
-
-        title.textContent = "Create your space";
-
-        subtitle.textContent =
-          "Create your account and start building Our Space.";
-
-        button.textContent = "Create Account";
-
-        forgot.style.display = "none";
+        clearMessage(loginMessage);
+        clearMessage(signupMessage);
       }
-    }
+    );
 
-    async function submitForm(event) {
 
-      event.preventDefault();
+    signupTab.addEventListener(
+      "click",
+      () => {
 
-      const email =
-        document.getElementById("email").value.trim();
+        signupTab.classList.add("active");
+        loginTab.classList.remove("active");
 
-      const password =
-        document.getElementById("password").value;
+        signupForm.style.display = "block";
+        loginForm.style.display = "none";
 
-      const button =
-        document.getElementById("submitButton");
+        clearMessage(loginMessage);
+        clearMessage(signupMessage);
+      }
+    );
 
-      clearMessage();
 
-      button.disabled = true;
+    /* ---------------------------
+       Show / hide password
+    --------------------------- */
 
-      button.textContent =
-        mode === "login"
-          ? "Logging in..."
-          : "Creating account...";
+    document
+      .querySelectorAll(".show-password")
+      .forEach(button => {
 
-      try {
+        button.addEventListener(
+          "click",
+          () => {
 
-        if (mode === "login") {
-          await login(email, password);
-        } else {
-          await createAccount(email, password);
+            const target =
+              document.getElementById(
+                button.dataset.target
+              );
+
+            if (target.type === "password") {
+
+              target.type = "text";
+              button.textContent = "Hide";
+
+            } else {
+
+              target.type = "password";
+              button.textContent = "Show";
+            }
+          }
+        );
+      });
+
+
+    /* ---------------------------
+       Password strength
+    --------------------------- */
+
+    const signupPassword =
+      document.getElementById(
+        "signupPassword"
+      );
+
+    const strength =
+      document.getElementById(
+        "strength"
+      );
+
+    const strengthBar =
+      document.getElementById(
+        "strengthBar"
+      );
+
+    const passwordHint =
+      document.getElementById(
+        "passwordHint"
+      );
+
+
+    signupPassword.addEventListener(
+      "input",
+      () => {
+
+        const value =
+          signupPassword.value;
+
+        if (!value) {
+          strength.style.display = "none";
+          passwordHint.style.display = "none";
+          return;
         }
 
-      } finally {
+        strength.style.display = "block";
+        passwordHint.style.display = "block";
 
-        button.disabled = false;
+        let score = 0;
 
-        button.textContent =
-          mode === "login"
-            ? "Log In"
-            : "Create Account";
+        if (value.length >= 6) score++;
+        if (value.length >= 10) score++;
+        if (/[A-Z]/.test(value)) score++;
+        if (/[0-9]/.test(value)) score++;
+        if (/[^A-Za-z0-9]/.test(value)) score++;
+
+        const percentage =
+          Math.min(score, 5) * 20;
+
+        strengthBar.style.width =
+          percentage + "%";
+
+        if (score <= 1) {
+          passwordHint.textContent =
+            "Weak password";
+        } else if (score <= 3) {
+          passwordHint.textContent =
+            "Decent password";
+        } else {
+          passwordHint.textContent =
+            "Strong password";
+        }
       }
-    }
+    );
 
-    async function login(email, password) {
 
-      const { data, error } =
-        await db.auth.signInWithPassword({
-          email,
-          password
-        });
+    /* ---------------------------
+       Login
+    --------------------------- */
 
-      if (error) {
+    loginFormElement.addEventListener(
+      "submit",
+      async event => {
 
-        if (
-          error.message.toLowerCase().includes(
-            "email not confirmed"
-          )
-        ) {
+        event.preventDefault();
+
+        clearMessage(loginMessage);
+
+        const email =
+          document
+            .getElementById("loginEmail")
+            .value
+            .trim()
+            .toLowerCase();
+
+        const password =
+          document
+            .getElementById("loginPassword")
+            .value;
+
+        if (!email || !password) {
+          showMessage(
+            loginMessage,
+            "Please enter your email and password.",
+            "error"
+          );
+          return;
+        }
+
+        loginBtn.disabled = true;
+        loginBtn.textContent = "Logging in...";
+
+        const {
+          data,
+          error
+        } =
+          await client.auth.signInWithPassword({
+            email,
+            password
+          });
+
+        if (error) {
 
           showMessage(
-            "Your email hasn't been confirmed yet. Check your inbox.",
+            loginMessage,
+            friendlyAuthError(error),
             "error"
           );
 
-          document.getElementById(
-            "resendButton"
-          ).style.display = "block";
+          loginBtn.disabled = false;
+          loginBtn.textContent = "Log in";
+
+          return;
+        }
+
+        if (
+          !data ||
+          !data.user
+        ) {
+
+          showMessage(
+            loginMessage,
+            "We couldn't complete the login. Please try again.",
+            "error"
+          );
+
+          loginBtn.disabled = false;
+          loginBtn.textContent = "Log in";
+
+          return;
+        }
+
+        goHome();
+      }
+    );
+
+
+    /* ---------------------------
+       Create account
+    --------------------------- */
+
+    signupFormElement.addEventListener(
+      "submit",
+      async event => {
+
+        event.preventDefault();
+
+        clearMessage(signupMessage);
+
+        const email =
+          document
+            .getElementById("signupEmail")
+            .value
+            .trim()
+            .toLowerCase();
+
+        const password =
+          signupPassword.value;
+
+        if (!email || !password) {
+          showMessage(
+            signupMessage,
+            "Please complete all fields.",
+            "error"
+          );
+          return;
+        }
+
+        if (password.length < 6) {
+          showMessage(
+            signupMessage,
+            "Your password must contain at least 6 characters.",
+            "error"
+          );
+          return;
+        }
+
+        signupBtn.disabled = true;
+        signupBtn.textContent =
+          "Creating account...";
+
+        const {
+          data,
+          error
+        } =
+          await client.auth.signUp({
+            email,
+            password,
+            options: {
+              emailRedirectTo: APP_URL
+            }
+          });
+
+        if (error) {
+
+          showMessage(
+            signupMessage,
+            friendlyAuthError(error),
+            "error"
+          );
+
+          signupBtn.disabled = false;
+          signupBtn.textContent =
+            "Create account";
+
+          return;
+        }
+
+
+        /*
+          If a session exists, the project is configured
+          for automatic confirmation.
+
+          Otherwise, email confirmation is required.
+        */
+
+        if (data?.session) {
+          goHome();
+          return;
+        }
+
+
+        /*
+          Supabase may intentionally return an obfuscated
+          result for an existing account when email
+          confirmation is enabled.
+
+          We don't claim with certainty that the account
+          doesn't exist. We simply send the user to the
+          confirmation screen.
+        */
+
+        goConfirmation(email);
+      }
+    );
+
+
+    /* ---------------------------
+       Forgot password
+    --------------------------- */
+
+    const resetModal =
+      document.getElementById(
+        "resetModal"
+      );
+
+    const resetEmail =
+      document.getElementById(
+        "resetEmail"
+      );
+
+    const resetMessage =
+      document.getElementById(
+        "resetMessage"
+      );
+
+    const forgotBtn =
+      document.getElementById(
+        "forgotBtn"
+      );
+
+    const cancelReset =
+      document.getElementById(
+        "cancelReset"
+      );
+
+    const sendReset =
+      document.getElementById(
+        "sendReset"
+      );
+
+
+    forgotBtn.addEventListener(
+      "click",
+      () => {
+
+        const currentEmail =
+          document
+            .getElementById(
+              "loginEmail"
+            )
+            .value
+            .trim();
+
+        resetEmail.value =
+          currentEmail;
+
+        clearMessage(resetMessage);
+
+        resetModal.classList.add(
+          "show"
+        );
+
+        setTimeout(
+          () => resetEmail.focus(),
+          50
+        );
+      }
+    );
+
+
+    cancelReset.addEventListener(
+      "click",
+      () => {
+
+        resetModal.classList.remove(
+          "show"
+        );
+      }
+    );
+
+
+    resetModal.addEventListener(
+      "click",
+      event => {
+
+        if (
+          event.target === resetModal
+        ) {
+          resetModal.classList.remove(
+            "show"
+          );
+        }
+      }
+    );
+
+
+    sendReset.addEventListener(
+      "click",
+      async () => {
+
+        const email =
+          resetEmail.value
+            .trim()
+            .toLowerCase();
+
+        clearMessage(resetMessage);
+
+        if (!email) {
+
+          showMessage(
+            resetMessage,
+            "Enter your email address.",
+            "error"
+          );
+
+          return;
+        }
+
+        sendReset.disabled = true;
+        sendReset.textContent =
+          "Sending...";
+
+        const {
+          error
+        } =
+          await client.auth.resetPasswordForEmail(
+            email,
+            {
+              redirectTo: APP_URL
+            }
+          );
+
+        if (error) {
+
+          showMessage(
+            resetMessage,
+            friendlyAuthError(error),
+            "error"
+          );
+
+          sendReset.disabled = false;
+          sendReset.textContent =
+            "Send link";
 
           return;
         }
 
         showMessage(
-          error.message,
-          "error"
+          resetMessage,
+          "If this email is associated with an account, a reset link has been sent.",
+          "success"
         );
 
-        return;
+        sendReset.disabled = false;
+        sendReset.textContent =
+          "Send link";
       }
+    );
 
-      if (data.session) {
-        window.location.href = "index.html";
+
+    /* ---------------------------
+       Auth state listener
+    --------------------------- */
+
+    client.auth.onAuthStateChange(
+      (event, session) => {
+
+        if (
+          event === "SIGNED_IN" &&
+          session
+        ) {
+          goHome();
+        }
+
+        if (
+          event === "SIGNED_OUT"
+        ) {
+          // Stay on login page.
+        }
       }
-    }
+    );
 
-    async function createAccount(email, password) {
-
-      const { data, error } =
-        await db.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: APP_URL
-          }
-        });
-
-      if (error) {
-
-        showMessage(
-          error.message,
-          "error"
-        );
-
-        return;
-      }
-
-      /*
-        Supabase may hide whether an email already exists.
-        An empty identities array indicates that
-        no new identity was created.
-      */
-
-      if (
-        data.user &&
-        Array.isArray(data.user.identities) &&
-        data.user.identities.length === 0
-      ) {
-
-        showMessage(
-          "An account may already exist with this email. Try Log In instead.",
-          "error"
-        );
-
-        setTimeout(() => {
-          setMode("login");
-        }, 1200);
-
-        return;
-      }
-
-      sessionStorage.setItem(
-        "confirmationEmail",
-        email
-      );
-
-      /*
-        If email confirmation is required,
-        there won't be an active session.
-      */
-
-      if (!data.session) {
-
-        window.location.href =
-          "confirmation.html";
-
-        return;
-      }
-
-      window.location.href =
-        "index.html";
-    }
-
-    async function resendConfirmation() {
-
-      const email =
-        document.getElementById("email").value.trim();
-
-      if (!email) {
-
-        showMessage(
-          "Enter your email first.",
-          "error"
-        );
-
-        return;
-      }
-
-      const button =
-        document.getElementById("resendButton");
-
-      button.disabled = true;
-      button.textContent = "Sending...";
-
-      const { error } =
-        await db.auth.resend({
-          type: "signup",
-          email,
-          options: {
-            emailRedirectTo: APP_URL
-          }
-        });
-
-      button.disabled = false;
-      button.textContent =
-        "Resend confirmation email";
-
-      if (error) {
-
-        showMessage(
-          error.message,
-          "error"
-        );
-
-        return;
-      }
-
-      showMessage(
-        "A new confirmation email has been sent.",
-        "success"
-      );
-    }
-
-    async function forgotPassword() {
-
-      const email =
-        document.getElementById("email").value.trim();
-
-      if (!email) {
-
-        showMessage(
-          "Enter your email first.",
-          "error"
-        );
-
-        return;
-      }
-
-      const { error } =
-        await db.auth.resetPasswordForEmail(
-          email,
-          {
-            redirectTo: APP_URL
-          }
-        );
-
-      if (error) {
-
-        showMessage(
-          error.message,
-          "error"
-        );
-
-        return;
-      }
-
-      showMessage(
-        "If an account exists for this email, a password reset email has been sent.",
-        "success"
-      );
-    }
-
-    function togglePassword() {
-
-      const input =
-        document.getElementById("password");
-
-      const button =
-        document.querySelector(".show");
-
-      if (input.type === "password") {
-
-        input.type = "text";
-        button.textContent = "Hide";
-
-      } else {
-
-        input.type = "password";
-        button.textContent = "Show";
-      }
-    }
-
-    function showMessage(text, type) {
-
-      const message =
-        document.getElementById("message");
-
-      message.textContent = text;
-
-      message.className =
-        "message " + type;
-    }
-
-    function clearMessage() {
-
-      const message =
-        document.getElementById("message");
-
-      message.textContent = "";
-      message.className = "message";
-
-      document.getElementById(
-        "resendButton"
-      ).style.display = "none";
-    }
-
-    function goHome() {
-      window.location.href = "index.html";
-    }
-
-    async function checkSession() {
-
-      const { data } =
-        await db.auth.getSession();
-
-      if (data.session) {
-        window.location.href = "index.html";
-      }
-    }
-
-    const params =
-      new URLSearchParams(window.location.search);
-
-    if (params.get("mode") === "signup") {
-      setMode("signup");
-    } else {
-      setMode("login");
-    }
-
-    checkSession();
   </script>
 
 </body>
