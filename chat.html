@@ -90,8 +90,7 @@
       width: 100%;
       height: 100dvh;
 
-      padding:
-        14px;
+      padding: 14px;
 
       padding-top:
         calc(
@@ -113,8 +112,7 @@
 
       margin: 0 auto;
 
-      background:
-        var(--surface);
+      background: var(--surface);
 
       border:
         1px solid
@@ -159,28 +157,25 @@
 
       display: flex;
 
-      align-items:
-        center;
+      align-items: center;
 
-      justify-content:
-        space-between;
+      justify-content: space-between;
 
-      position:
-        relative;
+      gap: 12px;
 
-      z-index: 5;
+      position: relative;
+
+      z-index: 10;
     }
 
     .header-left {
       display: flex;
 
-      align-items:
-        center;
+      align-items: center;
 
       gap: 10px;
 
-      min-width:
-        0;
+      min-width: 0;
     }
 
     .back-button,
@@ -191,8 +186,7 @@
       flex:
         0 0 44px;
 
-      border-radius:
-        14px;
+      border-radius: 14px;
 
       background:
         var(--soft-surface);
@@ -202,11 +196,9 @@
 
       display: grid;
 
-      place-items:
-        center;
+      place-items: center;
 
-      cursor:
-        pointer;
+      cursor: pointer;
 
       transition:
         background 0.18s ease,
@@ -227,8 +219,7 @@
       width: 19px;
       height: 19px;
 
-      stroke-width:
-        1.9;
+      stroke-width: 1.9;
     }
 
     .conversation-identity {
@@ -261,7 +252,131 @@
     }
 
     /* ==========================================
-       MESSAGES
+       SELECTION TOOLBAR
+    ========================================== */
+
+    .selection-toolbar {
+      position: absolute;
+
+      inset: 0;
+
+      display: none;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      gap: 12px;
+
+      padding:
+        12px
+        16px;
+
+      background:
+        var(--surface);
+
+      z-index: 20;
+
+      border-bottom:
+        1px solid
+        var(--border);
+    }
+
+    .selection-toolbar.active {
+      display: flex;
+    }
+
+    .selection-left {
+      display: flex;
+
+      align-items: center;
+
+      gap: 10px;
+
+      min-width: 0;
+    }
+
+    .selection-count {
+      color:
+        var(--navy);
+
+      font-size:
+        15px;
+
+      font-weight:
+        800;
+    }
+
+    .selection-cancel {
+      height: 38px;
+
+      padding:
+        0
+        12px;
+
+      border-radius:
+        11px;
+
+      background:
+        var(--soft-surface);
+
+      color:
+        var(--navy);
+
+      font-size:
+        12px;
+
+      font-weight:
+        700;
+
+      cursor:
+        pointer;
+    }
+
+    .selection-delete {
+      width: 40px;
+      height: 40px;
+
+      border-radius:
+        12px;
+
+      background:
+        var(--navy);
+
+      color:
+        var(--surface);
+
+      display:
+        grid;
+
+      place-items:
+        center;
+
+      cursor:
+        pointer;
+    }
+
+    .selection-delete:disabled {
+      opacity:
+        0.45;
+
+      cursor:
+        not-allowed;
+    }
+
+    .selection-delete svg {
+      width:
+        17px;
+
+      height:
+        17px;
+
+      stroke-width:
+        1.9;
+    }
+
+    /* ==========================================
+       MESSAGE AREA
     ========================================== */
 
     .messages-area {
@@ -312,8 +427,7 @@
     }
 
     .messages-area::-webkit-scrollbar {
-      width:
-        7px;
+      width: 7px;
     }
 
     .messages-area::-webkit-scrollbar-track {
@@ -350,7 +464,8 @@
     ========================================== */
 
     .date-separator {
-      display: flex;
+      display:
+        flex;
 
       align-items:
         center;
@@ -467,6 +582,11 @@
         right;
     }
 
+    .message-bubble-wrap {
+      position:
+        relative;
+    }
+
     .message-bubble {
       position:
         relative;
@@ -533,31 +653,47 @@
 
     /* ==========================================
        DELETED MESSAGE
+       Same normal bubble appearance.
     ========================================== */
 
     .message-bubble.deleted {
-      background:
-        rgba(
-          255,
-          255,
-          255,
-          0.70
-        );
+      /* No gray, faded, or dashed styling. */
+      opacity:
+        1;
 
-      border:
-        1px dashed
+      box-shadow:
+        0 6px 18px
         rgba(
           21,
           43,
           70,
-          0.16
+          0.035
         );
+    }
+
+    .message-row.mine
+      .message-bubble.deleted {
+      background:
+        var(--navy);
+
+      border-color:
+        var(--navy);
+
+      color:
+        var(--surface);
+    }
+
+    .message-row.theirs
+      .message-bubble.deleted {
+      background:
+        var(--surface);
+
+      border:
+        1px solid
+        var(--border);
 
       color:
         var(--text);
-
-      box-shadow:
-        none;
     }
 
     .deleted-label {
@@ -565,13 +701,16 @@
         block;
 
       margin-bottom:
-        5px;
+        4px;
 
       color:
-        var(--muted);
+        inherit;
+
+      opacity:
+        0.58;
 
       font-size:
-        9px;
+        8px;
 
       font-weight:
         800;
@@ -585,36 +724,34 @@
 
     .deleted-content {
       color:
-        var(--text);
+        inherit;
 
       font-style:
-        italic;
+        normal;
     }
 
     /* ==========================================
-       DELETE
+       MESSAGE ACTION
     ========================================== */
 
-    .message-bubble.can-delete {
-      padding-right:
-        43px;
-    }
-
-    .delete-message-button {
+    .message-action {
       position:
         absolute;
-
-      top:
-        7px;
 
       right:
         7px;
 
+      top:
+        50%;
+
       width:
-        27px;
+        26px;
 
       height:
-        27px;
+        26px;
+
+      transform:
+        translateY(-50%);
 
       border-radius:
         9px;
@@ -632,7 +769,7 @@
           255,
           255,
           255,
-          0.66
+          0.72
         );
 
       display:
@@ -649,12 +786,16 @@
 
       pointer-events:
         none;
+
+      transition:
+        opacity 0.15s ease,
+        background 0.15s ease;
     }
 
     .message-row.mine:hover
-      .delete-message-button,
+      .message-action,
     .message-row.mine:focus-within
-      .delete-message-button {
+      .message-action {
       opacity:
         1;
 
@@ -662,7 +803,17 @@
         auto;
     }
 
-    .delete-message-button svg {
+    .message-action:hover {
+      background:
+        rgba(
+          255,
+          255,
+          255,
+          0.18
+        );
+    }
+
+    .message-action svg {
       width:
         15px;
 
@@ -670,11 +821,117 @@
         15px;
 
       stroke-width:
-        1.8;
+        2;
     }
 
     /* ==========================================
-       META + STATUS
+       ACTION MENU
+    ========================================== */
+
+    .message-menu {
+      position:
+        absolute;
+
+      top:
+        calc(
+          100% +
+          7px
+        );
+
+      right:
+        0;
+
+      z-index:
+        30;
+
+      min-width:
+        110px;
+
+      padding:
+        5px;
+
+      border-radius:
+        13px;
+
+      background:
+        var(--surface);
+
+      border:
+        1px solid
+        var(--border);
+
+      box-shadow:
+        0 12px 35px
+        rgba(
+          21,
+          43,
+          70,
+          0.14
+        );
+
+      display:
+        none;
+    }
+
+    .message-menu.open {
+      display:
+        block;
+    }
+
+    .message-menu button {
+      width:
+        100%;
+
+      min-height:
+        38px;
+
+      padding:
+        0
+        10px;
+
+      border-radius:
+        9px;
+
+      background:
+        transparent;
+
+      color:
+        var(--navy);
+
+      text-align:
+        left;
+
+      font-size:
+        12px;
+
+      font-weight:
+        700;
+
+      cursor:
+        pointer;
+    }
+
+    .message-menu button:hover {
+      background:
+        var(--soft-surface);
+    }
+
+    /* ==========================================
+       SELECTED
+    ========================================== */
+
+    .message-row.selected
+      .message-bubble {
+      outline:
+        2px solid
+        var(--peach);
+
+      outline-offset:
+        3px;
+    }
+
+    /* ==========================================
+       META
     ========================================== */
 
     .message-meta {
@@ -720,7 +977,7 @@
     }
 
     /* ==========================================
-       EMPTY STATE
+       EMPTY
     ========================================== */
 
     .empty-state {
@@ -1006,6 +1263,15 @@
 
       cursor:
         pointer;
+
+      box-shadow:
+        0 10px 22px
+        rgba(
+          21,
+          43,
+          70,
+          0.15
+        );
     }
 
     .send-button:disabled {
@@ -1199,8 +1465,7 @@
           13px;
       }
 
-      .message-row.mine
-        .delete-message-button {
+      .message-action {
         opacity:
           1;
 
@@ -1230,11 +1495,6 @@
 
         border-radius:
           13px;
-      }
-
-      .header-left {
-        gap:
-          8px;
       }
 
       .message-input {
@@ -1357,6 +1617,72 @@
           </svg>
         </button>
 
+        <!-- SELECTION TOOLBAR -->
+
+        <div
+          class="selection-toolbar"
+          id="selectionToolbar"
+        >
+
+          <div class="selection-left">
+
+            <button
+              class="selection-cancel"
+              id="selectionCancel"
+              type="button"
+            >
+              Cancel
+            </button>
+
+            <div
+              class="selection-count"
+              id="selectionCount"
+            >
+              0 selected
+            </div>
+
+          </div>
+
+          <button
+            class="selection-delete"
+            id="selectionDelete"
+            type="button"
+            aria-label="Delete selected message"
+            title="Delete selected message"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M4 7h16" />
+              <path d="M10 11v6" />
+              <path d="M14 11v6" />
+
+              <path
+                d="
+                  M6 7
+                  l1 14
+                  h10
+                  l1-14
+                "
+              />
+
+              <path
+                d="
+                  M9 7
+                  V4
+                  H15
+                  V7
+                "
+              />
+            </svg>
+          </button>
+
+        </div>
+
       </header>
 
       <!-- MESSAGES -->
@@ -1467,9 +1793,6 @@
     const SPACE_ID =
       "6547fe99-ed80-421c-8572-50ae3fb6fbe4";
 
-    const MOHAMMAD_ID =
-      "28c4929b-ed2c-4eec-a850-88d50bce8e91";
-
     const {
       createClient
     } = supabase;
@@ -1498,6 +1821,9 @@
     let realtimeChannel = null;
     let toastTimer = null;
     let isSending = false;
+
+    let selectedMessageIds =
+      new Set();
 
     /* ==========================================
        ELEMENTS
@@ -1543,6 +1869,26 @@
         "toast"
       );
 
+    const selectionToolbar =
+      document.getElementById(
+        "selectionToolbar"
+      );
+
+    const selectionCount =
+      document.getElementById(
+        "selectionCount"
+      );
+
+    const selectionCancel =
+      document.getElementById(
+        "selectionCancel"
+      );
+
+    const selectionDelete =
+      document.getElementById(
+        "selectionDelete"
+      );
+
     /* ==========================================
        HELPERS
     ========================================== */
@@ -1586,8 +1932,11 @@
       return date.toLocaleTimeString(
         [],
         {
-          hour: "2-digit",
-          minute: "2-digit"
+          hour:
+            "2-digit",
+
+          minute:
+            "2-digit"
         }
       );
     }
@@ -1642,15 +1991,19 @@
       return date.toLocaleDateString(
         [],
         {
-          day: "numeric",
-          month: "long",
-          year: "numeric"
+          day:
+            "numeric",
+
+          month:
+            "long",
+
+          year:
+            "numeric"
         }
       );
     }
 
     function autoResizeInput() {
-
       messageInput.style.height =
         "48px";
 
@@ -1664,10 +2017,8 @@
     function scrollToBottom(
       smooth = true
     ) {
-
       requestAnimationFrame(
         () => {
-
           messagesArea.scrollTo({
             top:
               messagesArea.scrollHeight,
@@ -1677,10 +2028,146 @@
                 ? "smooth"
                 : "auto"
           });
-
         }
       );
     }
+
+    /* ==========================================
+       SELECTION
+    ========================================== */
+
+    function updateSelectionUI() {
+
+      const count =
+        selectedMessageIds.size;
+
+      if (
+        count === 0
+      ) {
+
+        selectionToolbar.classList.remove(
+          "active"
+        );
+
+        selectionCount.textContent =
+          "0 selected";
+
+        selectionDelete.disabled =
+          true;
+
+        return;
+      }
+
+      selectionToolbar.classList.add(
+        "active"
+      );
+
+      selectionCount.textContent =
+        `${count} selected`;
+
+      selectionDelete.disabled =
+        false;
+    }
+
+    function enterSelection(
+      messageId,
+      row
+    ) {
+
+      const numericId =
+        Number(
+          messageId
+        );
+
+      selectedMessageIds.add(
+        numericId
+      );
+
+      row.classList.add(
+        "selected"
+      );
+
+      closeAllMessageMenus();
+
+      updateSelectionUI();
+    }
+
+    function exitSelection() {
+
+      selectedMessageIds.clear();
+
+      messageList
+        .querySelectorAll(
+          ".message-row.selected"
+        )
+        .forEach(
+          row => {
+            row.classList.remove(
+              "selected"
+            );
+          }
+        );
+
+      updateSelectionUI();
+    }
+
+    /* ==========================================
+       MESSAGE MENUS
+    ========================================== */
+
+    function closeAllMessageMenus() {
+
+      messageList
+        .querySelectorAll(
+          ".message-menu.open"
+        )
+        .forEach(
+          menu => {
+            menu.classList.remove(
+              "open"
+            );
+          }
+        );
+    }
+
+    function toggleMessageMenu(
+      menu
+    ) {
+
+      const wasOpen =
+        menu.classList.contains(
+          "open"
+        );
+
+      closeAllMessageMenus();
+
+      if (
+        !wasOpen
+      ) {
+        menu.classList.add(
+          "open"
+        );
+      }
+    }
+
+    document.addEventListener(
+      "click",
+      event => {
+
+        if (
+          !event.target.closest(
+            ".message-action"
+          ) &&
+          !event.target.closest(
+            ".message-menu"
+          )
+        ) {
+
+          closeAllMessageMenus();
+        }
+
+      }
+    );
 
     /* ==========================================
        AUTH
@@ -1774,7 +2261,7 @@
     }
 
     /* ==========================================
-       MESSAGE STATUS
+       STATUS
     ========================================== */
 
     function getMessageStatus(
@@ -1786,7 +2273,9 @@
       ) {
 
         return {
-          text: "Seen",
+          text:
+            "Seen",
+
           className:
             "seen"
         };
@@ -1797,14 +2286,18 @@
       ) {
 
         return {
-          text: "Delivered",
+          text:
+            "Delivered",
+
           className:
             ""
         };
       }
 
       return {
-        text: "Sent",
+        text:
+          "Sent",
+
         className:
           ""
       };
@@ -1840,12 +2333,21 @@
     }
 
     /* ==========================================
-       DELETE BUTTON
+       MESSAGE ACTION
     ========================================== */
 
-    function createDeleteButton(
-      messageId
+    function createMessageAction(
+      messageId,
+      row
     ) {
+
+      const wrapper =
+        document.createElement(
+          "div"
+        );
+
+      wrapper.style.position =
+        "relative";
 
       const button =
         document.createElement(
@@ -1856,10 +2358,15 @@
         "button";
 
       button.className =
-        "delete-message-button";
+        "message-action";
 
       button.title =
-        "Delete message";
+        "Message actions";
+
+      button.setAttribute(
+        "aria-label",
+        "Message actions"
+      );
 
       button.innerHTML = `
         <svg
@@ -1867,41 +2374,88 @@
           fill="none"
           stroke="currentColor"
           stroke-linecap="round"
-          stroke-linejoin="round"
         >
-          <path d="M4 7h16" />
-          <path d="M10 11v6" />
-          <path d="M14 11v6" />
-          <path d="
-            M6 7
-            l1 14
-            h10
-            l1-14
-          " />
-          <path d="
-            M9 7
-            V4
-            H15
-            V7
-          " />
+          <circle
+            cx="5"
+            cy="12"
+            r="1"
+          />
+
+          <circle
+            cx="12"
+            cy="12"
+            r="1"
+          />
+
+          <circle
+            cx="19"
+            cy="12"
+            r="1"
+          />
         </svg>
       `;
 
-      button.addEventListener(
+      const menu =
+        document.createElement(
+          "div"
+        );
+
+      menu.className =
+        "message-menu";
+
+      const selectButton =
+        document.createElement(
+          "button"
+        );
+
+      selectButton.type =
+        "button";
+
+      selectButton.textContent =
+        "Select";
+
+      selectButton.addEventListener(
         "click",
-        async event => {
+        event => {
 
           event.preventDefault();
 
           event.stopPropagation();
 
-          await deleteMessage(
-            messageId
+          enterSelection(
+            messageId,
+            row
           );
         }
       );
 
-      return button;
+      menu.appendChild(
+        selectButton
+      );
+
+      button.addEventListener(
+        "click",
+        event => {
+
+          event.preventDefault();
+
+          event.stopPropagation();
+
+          toggleMessageMenu(
+            menu
+          );
+        }
+      );
+
+      wrapper.appendChild(
+        button
+      );
+
+      wrapper.appendChild(
+        menu
+      );
+
+      return wrapper;
     }
 
     /* ==========================================
@@ -1954,6 +2508,14 @@
           ? "You"
           : partnerName;
 
+      const bubbleWrap =
+        document.createElement(
+          "div"
+        );
+
+      bubbleWrap.className =
+        "message-bubble-wrap";
+
       const bubble =
         document.createElement(
           "div"
@@ -2004,19 +2566,23 @@
 
         bubble.textContent =
           message.content;
+      }
 
-        if (isMine) {
+      bubbleWrap.appendChild(
+        bubble
+      );
 
-          bubble.classList.add(
-            "can-delete"
-          );
+      if (
+        isMine &&
+        !message.deleted_at
+      ) {
 
-          bubble.appendChild(
-            createDeleteButton(
-              message.id
-            )
-          );
-        }
+        bubbleWrap.appendChild(
+          createMessageAction(
+            message.id,
+            row
+          )
+        );
       }
 
       const meta =
@@ -2041,7 +2607,9 @@
         time
       );
 
-      if (isMine) {
+      if (
+        isMine
+      ) {
 
         const status =
           getMessageStatus(
@@ -2071,7 +2639,7 @@
       );
 
       content.appendChild(
-        bubble
+        bubbleWrap
       );
 
       content.appendChild(
@@ -2086,7 +2654,7 @@
     }
 
     /* ==========================================
-       EMPTY STATE
+       EMPTY
     ========================================== */
 
     function renderEmptyState() {
@@ -2137,7 +2705,7 @@
             </div>
 
             <div class="empty-description">
-              Send the first message.
+              Send your first message.
             </div>
 
           </div>
@@ -2147,7 +2715,63 @@
     }
 
     /* ==========================================
-       LOAD MESSAGES
+       RENDER
+    ========================================== */
+
+    function renderMessages(
+      messages
+    ) {
+
+      messageList.innerHTML =
+        "";
+
+      exitSelection();
+
+      if (
+        !messages.length
+      ) {
+
+        renderEmptyState();
+
+        return;
+      }
+
+      let previousDate =
+        null;
+
+      messages.forEach(
+        message => {
+
+          const date =
+            getDateKey(
+              message.created_at
+            );
+
+          if (
+            date !==
+            previousDate
+          ) {
+
+            messageList.appendChild(
+              createDateSeparator(
+                message.created_at
+              )
+            );
+
+            previousDate =
+              date;
+          }
+
+          messageList.appendChild(
+            createMessageElement(
+              message
+            );
+        }
+      );
+    }
+
+    /* ==========================================
+       LOAD
     ========================================== */
 
     async function loadMessages(
@@ -2190,24 +2814,25 @@
             500
           );
 
-      if (error) {
+      if (
+        error
+      ) {
 
         console.error(
           "Message loading error:",
           error
         );
 
-        messageList.innerHTML =
-          "";
+        showToast(
+          error.message,
+          true
+        );
 
         return;
       }
 
-      const messages =
-        data || [];
-
       renderMessages(
-        messages
+        data || []
       );
 
       if (
@@ -2221,71 +2846,27 @@
     }
 
     /* ==========================================
-       RENDER MESSAGES
+       DELETE SELECTED
     ========================================== */
 
-    function renderMessages(
-      messages
-    ) {
+    async function deleteSelectedMessages() {
 
-      messageList.innerHTML =
-        "";
+      const ids =
+        [
+          ...selectedMessageIds
+        ];
 
       if (
-        !messages.length
+        !ids.length
       ) {
-
-        renderEmptyState();
-
         return;
       }
 
-      let previousDate =
-        null;
-
-      messages.forEach(
-        message => {
-
-          const date =
-            getDateKey(
-              message.created_at
-            );
-
-          if (
-            date !==
-            previousDate
-          ) {
-
-            messageList.appendChild(
-              createDateSeparator(
-                message.created_at
-              )
-            );
-
-            previousDate =
-              date;
-          }
-
-          messageList.appendChild(
-            createMessageElement(
-              message
-            )
-          );
-        }
-      );
-    }
-
-    /* ==========================================
-       DELETE
-    ========================================== */
-
-    async function deleteMessage(
-      messageId
-    ) {
-
       const confirmed =
         window.confirm(
-          "Delete this message?"
+          ids.length === 1
+            ? "Delete this message?"
+            : `Delete ${ids.length} messages?`
         );
 
       if (
@@ -2294,151 +2875,83 @@
         return;
       }
 
-      const {
-        data,
-        error
-      } =
-        await client.rpc(
-          "soft_delete_message",
-          {
-            p_message_id:
-              Number(
-                messageId
-              )
-          }
-        );
+      for (
+        const id of ids
+      ) {
 
-      if (error) {
-
-        console.error(
-          "Delete error:",
+        const {
+          data,
           error
-        );
+        } =
+          await client.rpc(
+            "soft_delete_message",
+            {
+              p_message_id:
+                Number(id)
+            }
+          );
 
-        showToast(
-          error.message ||
-          "Message could not be deleted.",
-          true
-        );
+        if (
+          error
+        ) {
 
-        return;
+          console.error(
+            "Delete error:",
+            error
+          );
+
+          showToast(
+            error.message ||
+            "A message could not be deleted.",
+            true
+          );
+
+          return;
+        }
+
+        if (
+          !data
+        ) {
+
+          showToast(
+            "A selected message could not be deleted.",
+            true
+          );
+
+          return;
+        }
       }
 
-      if (!data) {
-
-        showToast(
-          "You can only delete your own messages."
-        );
-
-        return;
-      }
+      exitSelection();
 
       await loadMessages(
         false
       );
 
       showToast(
-        "Message deleted."
+        ids.length === 1
+          ? "Message deleted."
+          : "Messages deleted."
       );
     }
 
     /* ==========================================
-       MARK DELIVERED
+       SELECTION
     ========================================== */
 
-    async function markDelivered(
-      messages
-    ) {
-
-      const ids =
-        messages
-          .filter(
-            message =>
-              message.sender_id !==
-                currentUser.id &&
-              !message.delivered_at
-          )
-          .map(
-            message =>
-              Number(
-                message.id
-              )
-          );
-
-      if (
-        !ids.length
-      ) {
-        return;
+    selectionCancel.addEventListener(
+      "click",
+      () => {
+        exitSelection();
       }
+    );
 
-      const {
-        error
-      } =
-        await client.rpc(
-          "mark_messages_delivered",
-          {
-            p_message_ids:
-              ids
-          }
-        );
-
-      if (error) {
-
-        console.error(
-          "Delivered error:",
-          error
-        );
+    selectionDelete.addEventListener(
+      "click",
+      async () => {
+        await deleteSelectedMessages();
       }
-    }
-
-    /* ==========================================
-       MARK SEEN
-    ========================================== */
-
-    async function markSeen(
-      messages
-    ) {
-
-      const ids =
-        messages
-          .filter(
-            message =>
-              message.sender_id !==
-                currentUser.id &&
-              !message.seen_at
-          )
-          .map(
-            message =>
-              Number(
-                message.id
-              )
-          );
-
-      if (
-        !ids.length
-      ) {
-        return;
-      }
-
-      const {
-        error
-      } =
-        await client.rpc(
-          "mark_messages_seen",
-          {
-            p_message_ids:
-              ids
-          }
-        );
-
-      if (error) {
-
-        console.error(
-          "Seen error:",
-          error
-        );
-      }
-    }
+    );
 
     /* ==========================================
        SEND
@@ -2486,7 +2999,9 @@
             content
           });
 
-      if (error) {
+      if (
+        error
+      ) {
 
         console.error(
           "Send error:",
@@ -2567,7 +3082,6 @@
     ========================================== */
 
     function goHome() {
-
       window.location.href =
         "index.html";
     }
@@ -2663,6 +3177,120 @@
     }
 
     /* ==========================================
+       DELIVERED / SEEN
+    ========================================== */
+
+    async function updateIncomingStatus() {
+
+      const {
+        data,
+        error
+      } =
+        await client
+          .from(
+            "messages"
+          )
+          .select(
+            `
+              id,
+              sender_id,
+              delivered_at,
+              seen_at
+            `
+          )
+          .eq(
+            "space_id",
+            SPACE_ID
+          )
+          .order(
+            "created_at",
+            {
+              ascending:
+                false
+            }
+          )
+          .limit(
+            100
+          );
+
+      if (
+        error ||
+        !data
+      ) {
+        return;
+      }
+
+      const incoming =
+        data.filter(
+          message =>
+            message.sender_id !==
+            currentUser.id
+        );
+
+      if (
+        !incoming.length
+      ) {
+        return;
+      }
+
+      const deliveredIds =
+        incoming
+          .filter(
+            message =>
+              !message.delivered_at
+          )
+          .map(
+            message =>
+              Number(
+                message.id
+              )
+          );
+
+      if (
+        deliveredIds.length
+      ) {
+
+        await client.rpc(
+          "mark_messages_delivered",
+          {
+            p_message_ids:
+              deliveredIds
+          }
+        );
+      }
+
+      const seenIds =
+        incoming
+          .filter(
+            message =>
+              !message.seen_at
+          )
+          .map(
+            message =>
+              Number(
+                message.id
+              )
+          );
+
+      if (
+        seenIds.length
+      ) {
+
+        await client.rpc(
+          "mark_messages_seen",
+          {
+            p_message_ids:
+              seenIds
+          }
+        );
+      }
+
+      await loadMessages(
+        false
+      );
+    }
+
+    /* ==========================================
        AUTH
     ========================================== */
 
@@ -2707,62 +3335,7 @@
 
       subscribeToMessages();
 
-      /*
-       * Delivered:
-       * receiving the messages means they
-       * reached this chat.
-       */
-      const {
-        data: currentMessages
-      } =
-        await client
-          .from(
-            "messages"
-          )
-          .select(
-            `
-              id,
-              sender_id,
-              delivered_at,
-              seen_at
-            `
-          )
-          .eq(
-            "space_id",
-            SPACE_ID
-          )
-          .order(
-            "created_at",
-            {
-              ascending:
-                false
-            }
-          )
-          .limit(
-            100
-          );
-
-      if (
-        currentMessages
-      ) {
-
-        await markDelivered(
-          currentMessages
-        );
-
-        /*
-         * Since the chat opens directly at the
-         * newest messages, messages currently
-         * visible are considered seen.
-         */
-        await markSeen(
-          currentMessages
-        );
-
-        await loadMessages(
-          false
-        );
-      }
+      await updateIncomingStatus();
 
       scrollToBottom(
         false
