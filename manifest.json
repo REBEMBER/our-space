@@ -2,12 +2,12 @@
   "name": "Calculator",
   "short_name": "Calculator",
   "description": "Calculator",
-  "start_url": "/",
+  "start_url": "/calculator.html",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "background_color": "#F7F9FC",
+  "theme_color": "#F7F9FC",
   "icons": [
     {
       "src": "/calculator.png",
