@@ -3,202 +3,281 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#173f3b">
 
   <title>Our Space</title>
+
+  <meta name="theme-color" content="#ffffff">
+  <meta name="description" content="A private space for two.">
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    :root {
-      --green: #173f3b;
-      --green-light: #edf5f3;
-      --text: #202525;
-      --muted: #7c8583;
-      --line: #e9eceb;
-      --bg: #fafbfa;
-      --white: #ffffff;
-    }
-
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
 
-    body {
-      min-height: 100vh;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    :root {
+      --bg: #f7f8fa;
+      --white: #ffffff;
+      --text: #17181c;
+      --muted: #747782;
+      --border: #e8e9ed;
+      --accent: #6c63ff;
+      --accent-dark: #5750df;
+      --danger: #d94b5b;
+      --shadow: 0 20px 60px rgba(0,0,0,.07);
     }
 
-    .app {
-      width: min(100%, 1100px);
-      margin: auto;
+    body {
+      font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+
+      background: var(--bg);
+      color: var(--text);
       min-height: 100vh;
-      padding: 22px;
+    }
+
+    button {
+      font: inherit;
+      cursor: pointer;
+    }
+
+    /* Loading */
+
+    #loadingScreen {
+      position: fixed;
+      inset: 0;
+      background: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .loader-box {
+      text-align: center;
+    }
+
+    .logo-small {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: var(--text);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 20px;
+      margin: 0 auto 18px;
+    }
+
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid #e7e7eb;
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+      margin: auto;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* App */
+
+    #app {
+      display: none;
+      min-height: 100vh;
     }
 
     header {
+      height: 72px;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(15px);
+      border-bottom: 1px solid var(--border);
+
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 10px 0 30px;
+
+      padding: 0 28px;
+
+      position: sticky;
+      top: 0;
+      z-index: 50;
     }
 
     .brand {
       display: flex;
       align-items: center;
+      gap: 11px;
+      font-weight: 800;
+      font-size: 18px;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: var(--text);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: 14px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
       gap: 12px;
     }
 
-    .logo {
-      width: 44px;
-      height: 44px;
-      border-radius: 14px;
-      background: var(--green-light);
-      color: var(--green);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 23px;
-    }
-
-    .brand-name {
-      font-size: 21px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-    }
-
-    .logout {
-      border: none;
-      background: transparent;
-      color: var(--muted);
-      cursor: pointer;
+    .user-email {
       font-size: 13px;
+      color: var(--muted);
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .logout:hover {
-      color: var(--green);
+    .logout-btn {
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--text);
+      border-radius: 10px;
+      padding: 9px 14px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .logout-btn:hover {
+      background: #f4f4f6;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: auto;
+      padding: 55px 24px 80px;
     }
 
     .hero {
       background: var(--white);
-      border: 1px solid var(--line);
-      border-radius: 25px;
-      padding: 35px;
-      margin-bottom: 20px;
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 55px;
+      box-shadow: var(--shadow);
+      margin-bottom: 28px;
     }
 
     .eyebrow {
-      color: var(--green);
+      display: inline-block;
       font-size: 12px;
-      font-weight: 700;
+      font-weight: 800;
+      letter-spacing: .12em;
       text-transform: uppercase;
-      letter-spacing: 1.2px;
-      margin-bottom: 12px;
+      color: var(--accent);
+      margin-bottom: 14px;
     }
 
     h1 {
-      font-size: clamp(30px, 6vw, 48px);
-      letter-spacing: -2px;
-      line-height: 1.05;
-      margin-bottom: 12px;
+      font-size: clamp(38px, 6vw, 66px);
+      line-height: .98;
+      letter-spacing: -0.045em;
+      margin-bottom: 20px;
+      max-width: 700px;
     }
 
     .hero p {
       color: var(--muted);
-      font-size: 15px;
-      line-height: 1.6;
-      max-width: 550px;
-    }
-
-    .user-email {
-      margin-top: 20px;
-      display: inline-block;
-      background: #f5f7f6;
-      color: #5d6765;
-      padding: 8px 12px;
-      border-radius: 9px;
-      font-size: 12px;
-    }
-
-    .section-title {
       font-size: 17px;
-      font-weight: 700;
-      margin: 30px 0 13px;
+      line-height: 1.65;
+      max-width: 620px;
     }
 
-    .features {
+    .cards {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 14px;
+      gap: 18px;
     }
 
-    .feature {
-      border: 1px solid var(--line);
-      background: var(--white);
-      border-radius: 20px;
-      padding: 23px;
-      min-height: 145px;
-      cursor: pointer;
-      transition: 0.2s ease;
+    .card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 28px;
+      min-height: 180px;
+      transition: transform .2s ease, box-shadow .2s ease;
     }
 
-    .feature:hover {
-      transform: translateY(-2px);
-      border-color: #d8dfdd;
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 35px rgba(0,0,0,.06);
     }
 
-    .feature-icon {
-      font-size: 22px;
+    .card-icon {
+      font-size: 26px;
       margin-bottom: 18px;
     }
 
-    .feature h2 {
-      font-size: 16px;
-      margin-bottom: 6px;
+    .card h2 {
+      font-size: 20px;
+      margin-bottom: 8px;
     }
 
-    .feature p {
+    .card p {
       color: var(--muted);
-      font-size: 13px;
-      line-height: 1.5;
+      font-size: 14px;
+      line-height: 1.55;
     }
 
     .coming {
-      margin-top: 30px;
-      text-align: center;
-      color: #a0a7a5;
-      font-size: 12px;
+      margin-top: 12px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--accent);
+      font-weight: 800;
     }
 
-    #loading {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--muted);
-      font-size: 14px;
-    }
+    /* Mobile */
 
-    @media (max-width: 600px) {
-      .app {
-        padding: 16px;
+    @media (max-width: 700px) {
+      header {
+        padding: 0 16px;
+      }
+
+      .user-email {
+        display: none;
+      }
+
+      main {
+        padding: 25px 15px 50px;
       }
 
       .hero {
-        padding: 26px;
-        border-radius: 21px;
+        padding: 32px 25px;
+        border-radius: 22px;
       }
 
-      .features {
+      .cards {
         grid-template-columns: 1fr;
       }
 
-      .feature {
-        min-height: auto;
+      h1 {
+        font-size: 43px;
       }
     }
   </style>
@@ -206,88 +285,91 @@
 
 <body>
 
-  <div id="loading">
-    Opening Our Space...
+  <!-- Loading screen -->
+  <div id="loadingScreen">
+    <div class="loader-box">
+      <div class="logo-small">OS</div>
+      <div class="spinner"></div>
+    </div>
   </div>
 
-  <main class="app" id="app" style="display:none;">
+  <!-- Main app -->
+  <div id="app">
 
     <header>
       <div class="brand">
-        <div class="logo">♡</div>
-        <div class="brand-name">Our Space</div>
+        <div class="brand-icon">OS</div>
+        <span>Our Space</span>
       </div>
 
-      <button class="logout" onclick="logout()">
-        Log out
-      </button>
+      <div class="header-right">
+        <span id="userEmail" class="user-email"></span>
+        <button id="logoutBtn" class="logout-btn">
+          Log out
+        </button>
+      </div>
     </header>
 
-    <section class="hero">
+    <main>
 
-      <div class="eyebrow">
-        Just for us
-      </div>
+      <section class="hero">
+        <span class="eyebrow">Just us</span>
 
-      <h1>
-        Welcome to<br>Our Space.
-      </h1>
+        <h1>
+          Welcome to<br>
+          Our Space.
+        </h1>
 
-      <p>
-        A private place for the two of us.
-        Chat, save memories, write little things,
-        and build our own space together.
-      </p>
-
-      <div class="user-email" id="userEmail"></div>
-
-    </section>
-
-    <div class="section-title">
-      Our space
-    </div>
-
-    <section class="features">
-
-      <div class="feature" onclick="openChat()">
-        <div class="feature-icon">💬</div>
-        <h2>Chat</h2>
         <p>
-          Your private conversation, built directly into Our Space.
+          A private place for the two of you.
+          Chat, save memories, write little notes,
+          make plans, and build your own space together.
         </p>
-      </div>
+      </section>
 
-      <div class="feature" onclick="comingSoon('Memories')">
-        <div class="feature-icon">📸</div>
-        <h2>Memories</h2>
-        <p>
-          Keep the moments you don't want to forget.
-        </p>
-      </div>
+      <section class="cards">
 
-      <div class="feature" onclick="comingSoon('Love Notes')">
-        <div class="feature-icon">♡</div>
-        <h2>Love Notes</h2>
-        <p>
-          Little messages that can stay here forever.
-        </p>
-      </div>
+        <div class="card">
+          <div class="card-icon">💬</div>
+          <h2>Chat</h2>
+          <p>
+            Your private conversation space.
+          </p>
+          <div class="coming">Coming next</div>
+        </div>
 
-      <div class="feature" onclick="comingSoon('Plans')">
-        <div class="feature-icon">✦</div>
-        <h2>Plans</h2>
-        <p>
-          Things you want to do together.
-        </p>
-      </div>
+        <div class="card">
+          <div class="card-icon">📸</div>
+          <h2>Memories</h2>
+          <p>
+            Keep your favorite moments in one place.
+          </p>
+          <div class="coming">Coming next</div>
+        </div>
 
-    </section>
+        <div class="card">
+          <div class="card-icon">💌</div>
+          <h2>Love Notes</h2>
+          <p>
+            Leave messages for each other to discover.
+          </p>
+          <div class="coming">Coming next</div>
+        </div>
 
-    <p class="coming">
-      More of Our Space is coming.
-    </p>
+        <div class="card">
+          <div class="card-icon">📅</div>
+          <h2>Plans</h2>
+          <p>
+            Keep track of your dates, ideas and plans.
+          </p>
+          <div class="coming">Coming next</div>
+        </div>
 
-  </main>
+      </section>
+
+    </main>
+
+  </div>
 
   <script>
     const SUPABASE_URL =
@@ -298,7 +380,7 @@
 
     const { createClient } = supabase;
 
-    const db = createClient(
+    const client = createClient(
       SUPABASE_URL,
       SUPABASE_PUBLISHABLE_KEY,
       {
@@ -310,47 +392,143 @@
       }
     );
 
-    async function initialize() {
+    const loadingScreen =
+      document.getElementById("loadingScreen");
 
-      const { data, error } = await db.auth.getSession();
+    const app =
+      document.getElementById("app");
 
-      if (error || !data.session) {
-        window.location.href = "login.html";
+    const userEmail =
+      document.getElementById("userEmail");
+
+    const logoutBtn =
+      document.getElementById("logoutBtn");
+
+    let checkingAuth = false;
+
+    function goToLogin() {
+      window.location.replace("login.html");
+    }
+
+    function showApp(user) {
+      if (!user) {
+        goToLogin();
         return;
       }
 
-      document.getElementById("userEmail").textContent =
-        data.session.user.email;
+      userEmail.textContent = user.email || "";
 
-      document.getElementById("loading").style.display = "none";
-      document.getElementById("app").style.display = "block";
+      loadingScreen.style.display = "none";
+      app.style.display = "block";
     }
 
-    async function logout() {
+    async function clearBrokenSession() {
+      try {
+        await client.auth.signOut({ scope: "local" });
+      } catch (error) {
+        console.warn("Session cleanup:", error);
+      }
 
-      const { error } = await db.auth.signOut();
+      try {
+        sessionStorage.removeItem("confirmationEmail");
+      } catch (error) {}
 
-      if (!error) {
-        window.location.href = "login.html";
+      goToLogin();
+    }
+
+    async function verifyUser() {
+      if (checkingAuth) return;
+
+      checkingAuth = true;
+
+      try {
+        /*
+          getUser() is intentionally used here.
+
+          getSession() reads the locally stored session.
+          getUser() validates the authenticated user with Supabase.
+
+          This prevents a deleted/invalid account from appearing
+          logged in simply because an old browser session remains.
+        */
+
+        const {
+          data,
+          error
+        } = await client.auth.getUser();
+
+        if (error || !data || !data.user) {
+          await clearBrokenSession();
+          return;
+        }
+
+        showApp(data.user);
+
+      } catch (error) {
+        console.error("Authentication check failed:", error);
+        await clearBrokenSession();
+
+      } finally {
+        checkingAuth = false;
       }
     }
 
-    function openChat() {
-      alert("Chat is the next feature we're building.");
-    }
+    logoutBtn.addEventListener("click", async () => {
 
-    function comingSoon(name) {
-      alert(name + " is coming soon.");
-    }
+      logoutBtn.disabled = true;
+      logoutBtn.textContent = "Logging out...";
 
-    db.auth.onAuthStateChange((event, session) => {
+      const { error } =
+        await client.auth.signOut({
+          scope: "local"
+        });
 
-      if (event === "SIGNED_OUT" || !session) {
-        window.location.href = "login.html";
+      if (error) {
+        console.error(error);
+
+        logoutBtn.disabled = false;
+        logoutBtn.textContent = "Log out";
+
+        alert(
+          "We couldn't log you out. Please try again."
+        );
+
+        return;
       }
+
+      goToLogin();
     });
 
-    initialize();
+    /*
+      Listen for authentication changes.
+    */
+
+    client.auth.onAuthStateChange(
+      async (event, session) => {
+
+        if (event === "SIGNED_OUT") {
+          goToLogin();
+          return;
+        }
+
+        if (
+          event === "SIGNED_IN" ||
+          event === "TOKEN_REFRESHED" ||
+          event === "USER_UPDATED"
+        ) {
+          if (session) {
+            userEmail.textContent =
+              session.user.email || "";
+          }
+        }
+      }
+    );
+
+    /*
+      Start authentication check.
+    */
+
+    verifyUser();
   </script>
 
 </body>
