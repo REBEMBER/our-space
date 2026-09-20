@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
   <meta charset="UTF-8">
 
   <meta
@@ -9,876 +8,281 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>Email confirmed — Our Space</title>
+  <title>Our Space — Confirmed</title>
 
-  <meta
-    name="description"
-    content="Your Our Space email has been confirmed."
-  >
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <meta name="theme-color" content="#F7F9FC">
 
   <style>
+    :root {
+      --navy: #152B46;
+      --navy-dark: #102238;
+      --peach: #F3B29F;
+      --peach-soft: #F9D5C9;
+      --blue-light: #EEF5FA;
+      --white: #FFFFFF;
+      --off-white: #F7F9FC;
+      --charcoal: #26313D;
+      --muted: #718092;
+      --border: #E2E9F0;
+    }
 
     * {
       box-sizing: border-box;
+    }
+
+    html,
+    body {
       margin: 0;
       padding: 0;
-    }
-
-
-    :root {
-      --bg: #f7f8fa;
-      --white: #ffffff;
-      --text: #17181c;
-      --muted: #777a84;
-      --border: #e5e6ea;
-      --accent: #6c63ff;
-      --success: #278a61;
-      --danger: #d94b5b;
-    }
-
-
-    body {
-
-      min-height: 100vh;
-
-      background:
-        radial-gradient(
-          circle at 15% 15%,
-          rgba(108,99,255,.09),
-          transparent 30%
-        ),
-        radial-gradient(
-          circle at 85% 85%,
-          rgba(108,99,255,.07),
-          transparent 30%
-        ),
-        var(--bg);
-
+      min-height: 100%;
       font-family:
-        Inter,
         -apple-system,
         BlinkMacSystemFont,
         "Segoe UI",
         Roboto,
         Arial,
         sans-serif;
+      background:
+        radial-gradient(
+          circle at 10% 5%,
+          rgba(243,178,159,0.2),
+          transparent 30%
+        ),
+        radial-gradient(
+          circle at 95% 95%,
+          rgba(220,234,245,0.4),
+          transparent 35%
+        ),
+        var(--off-white);
+      color: var(--charcoal);
+    }
 
-      color: var(--text);
-
+    body {
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-
       padding: 20px;
     }
 
-
-    .box {
-
-      width: 100%;
-      max-width: 470px;
-
-      background: white;
-
+    .card {
+      width: min(100%, 450px);
+      background: rgba(255,255,255,0.97);
       border: 1px solid var(--border);
-
-      border-radius: 26px;
-
-      padding: 44px 34px;
-
+      border-radius: 28px;
+      padding: 35px 30px;
       text-align: center;
-
-      box-shadow:
-        0 25px 70px rgba(0,0,0,.07);
+      box-shadow: 0 20px 55px rgba(21,43,70,0.09);
     }
 
-
-    /* Success icon */
-
-    .success-icon {
-
-      width: 82px;
-      height: 82px;
-
+    .check {
+      width: 70px;
+      height: 70px;
       border-radius: 50%;
-
-      background: #eefaf4;
-
-      border: 1px solid #d0efdf;
-
-      color: var(--success);
-
+      background: var(--peach-soft);
+      color: var(--navy);
       display: flex;
-
       align-items: center;
       justify-content: center;
-
-      margin: 0 auto 25px;
-
-      font-size: 37px;
-
-      font-weight: 700;
+      font-size: 32px;
+      font-weight: 800;
+      margin: 0 auto 22px;
     }
-
 
     h1 {
-
-      font-size: 31px;
-
-      letter-spacing: -.045em;
-
-      margin-bottom: 12px;
+      margin: 0;
+      color: var(--navy);
+      font-size: 30px;
+      letter-spacing: -0.8px;
     }
 
+    .main-text {
+      margin: 13px auto 5px;
+      color: var(--charcoal);
+      line-height: 1.55;
+    }
 
-    .description {
-
+    .sub-text {
       color: var(--muted);
-
+      line-height: 1.5;
       font-size: 14px;
-
-      line-height: 1.65;
-
-      max-width: 370px;
-
-      margin: 0 auto 25px;
+      margin-bottom: 22px;
     }
 
-
-    .confirmed-email {
-
+    .email {
       display: inline-block;
-
       max-width: 100%;
-
-      overflow: hidden;
-
-      text-overflow: ellipsis;
-
-      white-space: nowrap;
-
-      background: #f5f5f7;
-
+      padding: 9px 12px;
       border-radius: 10px;
-
-      padding: 9px 14px;
-
+      background: var(--blue-light);
+      color: var(--navy);
       font-size: 13px;
-
-      font-weight: 700;
-
-      margin-bottom: 28px;
+      overflow-wrap: anywhere;
+      margin-bottom: 22px;
     }
 
-
-    .button {
-
+    .primary {
+      display: block;
       width: 100%;
-
       border: 0;
-
-      border-radius: 13px;
-
+      border-radius: 14px;
       padding: 14px;
-
-      background: var(--text);
-
+      background: var(--navy);
       color: white;
-
-      font-size: 14px;
-
-      font-weight: 800;
-
+      font-size: 15px;
+      font-weight: 700;
       cursor: pointer;
-
-      transition:
-        transform .15s,
-        background .2s;
+      text-decoration: none;
     }
-
-
-    .button:hover {
-
-      background: #2b2c31;
-
-      transform: translateY(-1px);
-    }
-
-
-    .button:disabled {
-
-      opacity: .55;
-
-      cursor: not-allowed;
-
-      transform: none;
-    }
-
 
     .secondary {
-
-      margin-top: 10px;
-
-      background: white;
-
-      color: var(--text);
-
-      border: 1px solid var(--border);
-    }
-
-
-    .secondary:hover {
-
-      background: #f7f7f8;
-    }
-
-
-    .message {
-
-      display: none;
-
-      border-radius: 11px;
-
-      padding: 12px 13px;
-
-      margin-bottom: 18px;
-
+      display: block;
+      margin-top: 11px;
+      color: var(--navy);
       font-size: 13px;
-
-      line-height: 1.5;
-
-      text-align: left;
+      text-decoration: none;
     }
-
-
-    .message.error {
-
-      display: block;
-
-      background: #fff1f3;
-
-      color: var(--danger);
-
-      border: 1px solid #ffd8de;
-    }
-
-
-    .message.success {
-
-      display: block;
-
-      background: #eefaf4;
-
-      color: var(--success);
-
-      border: 1px solid #d0efdf;
-    }
-
-
-    .footer {
-
-      margin-top: 21px;
-
-      color: var(--muted);
-
-      font-size: 11px;
-
-      line-height: 1.5;
-    }
-
-
-    /* Loading */
 
     .loading {
-
-      position: fixed;
-
-      inset: 0;
-
-      background: white;
-
-      display: flex;
-
-      justify-content: center;
-
-      align-items: center;
-
-      z-index: 100;
+      color: var(--muted);
+      font-size: 14px;
     }
 
-
-    .loading-content {
-
-      text-align: center;
+    .hidden {
+      display: none !important;
     }
-
-
-    .logo {
-
-      width: 55px;
-      height: 55px;
-
-      border-radius: 17px;
-
-      background: var(--text);
-
-      color: white;
-
-      display: grid;
-
-      place-items: center;
-
-      font-weight: 800;
-
-      margin: 0 auto 18px;
-    }
-
-
-    .spinner {
-
-      width: 27px;
-      height: 27px;
-
-      border: 3px solid #e8e8ec;
-
-      border-top-color: var(--accent);
-
-      border-radius: 50%;
-
-      animation: spin .8s linear infinite;
-
-      margin: auto;
-    }
-
-
-    @keyframes spin {
-
-      to {
-        transform: rotate(360deg);
-      }
-
-    }
-
-
-    @media (max-width: 500px) {
-
-      .box {
-        padding: 35px 23px;
-      }
-
-      h1 {
-        font-size: 27px;
-      }
-
-    }
-
   </style>
-
 </head>
-
 
 <body>
 
+  <main class="card">
 
-  <!-- Temporary loading screen -->
+    <div id="loading" class="loading">
+      Confirming your account...
+    </div>
 
-  <div
-    id="loading"
-    class="loading"
-  >
+    <div id="confirmedContent" class="hidden">
 
-    <div class="loading-content">
+      <div class="check">✓</div>
 
-      <div class="logo">
-        OS
-      </div>
+      <h1>Your email was confirmed.</h1>
 
-      <div class="spinner"></div>
+      <p class="main-text">
+        Your Our Space account is now confirmed.
+      </p>
+
+      <p class="sub-text">
+        You can now enter your private space.
+      </p>
+
+      <div
+        id="email"
+        class="email hidden"
+      ></div>
+
+      <a
+        class="primary"
+        href="index.html"
+      >
+        Enter Our Space
+      </a>
 
     </div>
 
-  </div>
+    <div id="fallbackContent" class="hidden">
 
+      <div class="check">✓</div>
 
-  <!-- Confirmation page -->
+      <h1>Email confirmed</h1>
 
-  <div class="box">
+      <p class="main-text">
+        Your email may have been confirmed successfully.
+      </p>
 
-    <div class="success-icon">
-      ✓
+      <p class="sub-text">
+        If Our Space does not open automatically, log in again.
+      </p>
+
+      <a
+        class="primary"
+        href="login.html"
+      >
+        Go to login
+      </a>
+
     </div>
 
+  </main>
 
-    <h1>
-      Your email was confirmed.
-    </h1>
-
-
-    <p class="description">
-      Your Our Space account is now confirmed.
-      Everything is ready — welcome to your private space.
-    </p>
-
-
-    <div
-      id="confirmedEmail"
-      class="confirmed-email"
-      style="display:none;"
-    ></div>
-
-
-    <div
-      id="message"
-      class="message"
-    ></div>
-
-
-    <button
-      id="enterBtn"
-      class="button"
-      type="button"
-      disabled
-    >
-      Enter Our Space
-    </button>
-
-
-    <button
-      id="loginBtn"
-      class="button secondary"
-      type="button"
-      style="display:none;"
-    >
-      Go to login
-    </button>
-
-
-    <div class="footer">
-      This account is protected by Supabase Authentication.
-    </div>
-
-  </div>
-
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
-
-    /* ============================
-       SUPABASE
-    ============================ */
-
     const SUPABASE_URL =
       "https://ywflohxufmfydkpkkqly.supabase.co";
-
 
     const SUPABASE_PUBLISHABLE_KEY =
       "sb_publishable_qTMUO8KxerEQBDQ-A7Huyg_8N2Tqpmr";
 
-
-    const APP_URL =
-      "https://our-space-topaz.vercel.app/";
-
-
-    const { createClient } = supabase;
-
-
-    const client = createClient(
+    const client = window.supabase.createClient(
       SUPABASE_URL,
       SUPABASE_PUBLISHABLE_KEY,
       {
         auth: {
-
-          /*
-            This is important because Supabase
-            places confirmation tokens in the URL.
-          */
-
-          detectSessionInUrl: true,
-
           persistSession: true,
-
-          autoRefreshToken: true
-
+          autoRefreshToken: true,
+          detectSessionInUrl: true
         }
       }
     );
 
+    const loading = document.getElementById("loading");
+    const confirmedContent =
+      document.getElementById("confirmedContent");
+    const fallbackContent =
+      document.getElementById("fallbackContent");
+    const emailElement =
+      document.getElementById("email");
 
-    /* ============================
-       ELEMENTS
-    ============================ */
+    async function initialize() {
 
-    const loading =
-      document.getElementById(
-        "loading"
-      );
-
-
-    const confirmedEmail =
-      document.getElementById(
-        "confirmedEmail"
-      );
-
-
-    const message =
-      document.getElementById(
-        "message"
-      );
-
-
-    const enterBtn =
-      document.getElementById(
-        "enterBtn"
-      );
-
-
-    const loginBtn =
-      document.getElementById(
-        "loginBtn"
-      );
-
-
-    /* ============================
-       HELPERS
-    ============================ */
-
-    function showMessage(
-      text,
-      type
-    ) {
-
-      message.textContent =
-        text;
-
-      message.className =
-        "message " + type;
-
-    }
-
-
-    function goHome() {
-
-      window.location.replace(
-        "index.html"
-      );
-
-    }
-
-
-    function goLogin() {
-
-      window.location.replace(
-        "login.html"
-      );
-
-    }
-
-
-    /* ============================
-       DISPLAY EMAIL
-    ============================ */
-
-    try {
-
-      const email =
-        sessionStorage.getItem(
-          "confirmationEmail"
-        );
-
-
-      if (email) {
-
-        confirmedEmail.textContent =
-          email;
-
-        confirmedEmail.style.display =
-          "inline-block";
-
-      }
-
-    } catch (error) {}
-
-
-    /* ============================
-       CHECK CONFIRMATION
-    ============================ */
-
-    async function verifyConfirmation() {
+      await new Promise(resolve => {
+        setTimeout(resolve, 1200);
+      });
 
       try {
 
-        /*
-          First give Supabase time to process
-          the confirmation tokens from the URL.
-        */
-
-        await new Promise(
-          resolve =>
-            setTimeout(resolve, 700)
-        );
-
-
         const {
-          data,
+          data: {
+            user
+          },
           error
-        } =
-          await client.auth.getUser();
+        } = await client.auth.getUser();
 
+        loading.classList.add("hidden");
 
-        if (
-          !error &&
-          data?.user
-        ) {
-
-          /*
-            Confirmation succeeded.
-
-            We now have a real authenticated
-            user session.
-          */
-
-          enterBtn.disabled = false;
-
-          enterBtn.textContent =
-            "Enter Our Space";
-
-
-          /*
-            Use the actual confirmed email
-            if available.
-          */
-
-          if (data.user.email) {
-
-            confirmedEmail.textContent =
-              data.user.email;
-
-            confirmedEmail.style.display =
-              "inline-block";
-
-          }
-
-
-          try {
-
-            sessionStorage.removeItem(
-              "confirmationEmail"
-            );
-
-          } catch (error) {}
-
-
-          loading.style.display =
-            "none";
-
-
+        if (error || !user) {
+          fallbackContent.classList.remove("hidden");
           return;
-
         }
 
+        if (user.email) {
+          emailElement.textContent = user.email;
+          emailElement.classList.remove("hidden");
+        }
 
-        /*
-          No valid authenticated user.
-          This normally means the confirmation
-          link was invalid, expired, already used,
-          or the browser did not complete the
-          Supabase auth redirect.
-        */
-
-        loading.style.display =
-          "none";
-
-
-        enterBtn.style.display =
-          "none";
-
-
-        loginBtn.style.display =
-          "block";
-
-
-        showMessage(
-          "We couldn't verify the confirmation session. Please try logging in. If your email was just confirmed, the account should now be available.",
-          "error"
-        );
-
+        confirmedContent.classList.remove("hidden");
 
       } catch (error) {
 
-        console.error(
-          "Confirmation verification:",
-          error
-        );
+        console.error(error);
 
-
-        loading.style.display =
-          "none";
-
-
-        enterBtn.style.display =
-          "none";
-
-
-        loginBtn.style.display =
-          "block";
-
-
-        showMessage(
-          "We couldn't verify your email confirmation. Please try logging in.",
-          "error"
-        );
-
+        loading.classList.add("hidden");
+        fallbackContent.classList.remove("hidden");
       }
-
     }
 
-
-    /* ============================
-       ENTER OUR SPACE
-    ============================ */
-
-    enterBtn.addEventListener(
-      "click",
-      async () => {
-
-        enterBtn.disabled = true;
-
-        enterBtn.textContent =
-          "Opening Our Space...";
-
-
-        /*
-          Verify the user one more time
-          before entering the app.
-        */
-
-        try {
-
-          const {
-            data,
-            error
-          } =
-            await client.auth.getUser();
-
-
-          if (
-            !error &&
-            data?.user
-          ) {
-
-            goHome();
-
-            return;
-
-          }
-
-
-          showMessage(
-            "Your session is no longer active. Please log in again.",
-            "error"
-          );
-
-
-          enterBtn.disabled =
-            false;
-
-          enterBtn.textContent =
-            "Enter Our Space";
-
-
-        } catch (error) {
-
-          showMessage(
-            "Something went wrong. Please try logging in again.",
-            "error"
-          );
-
-
-          enterBtn.disabled =
-            false;
-
-          enterBtn.textContent =
-            "Enter Our Space";
-
-        }
-
-      }
-    );
-
-
-    /* ============================
-       LOGIN BUTTON
-    ============================ */
-
-    loginBtn.addEventListener(
-      "click",
-      () => {
-
-        goLogin();
-
-      }
-    );
-
-
-    /* ============================
-       AUTH EVENTS
-    ============================ */
-
-    client.auth.onAuthStateChange(
-      (event, session) => {
-
-        /*
-          When Supabase processes the
-          confirmation link and signs the
-          user in, this event fires.
-        */
-
-        if (
-          event === "SIGNED_IN" &&
-          session
-        ) {
-
-          enterBtn.style.display =
-            "block";
-
-          enterBtn.disabled =
-            false;
-
-          enterBtn.textContent =
-            "Enter Our Space";
-
-
-          loginBtn.style.display =
-            "none";
-
-
-          loading.style.display =
-            "none";
-
-
-          if (session.user.email) {
-
-            confirmedEmail.textContent =
-              session.user.email;
-
-            confirmedEmail.style.display =
-              "inline-block";
-
-          }
-
-        }
-
-      }
-    );
-
-
-    /* ============================
-       START
-    ============================ */
-
-    verifyConfirmation();
-
+    initialize();
   </script>
 
 </body>
