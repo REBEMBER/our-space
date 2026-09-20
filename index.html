@@ -2,1521 +2,173 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <title>Our Space ❤️</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Space</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-
     * {
       box-sizing: border-box;
-    }
-
-    html,
-    body {
       margin: 0;
       padding: 0;
-      min-height: 100%;
     }
 
     body {
       min-height: 100vh;
-      font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Arial,
-        sans-serif;
-
-      background: #f6f6f6;
-
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #ffffff;
+      color: #202124;
       display: flex;
-      justify-content: center;
       align-items: center;
-
-      color: #111;
+      justify-content: center;
     }
 
-    button,
-    input {
-      font: inherit;
-    }
-
-    .app {
-      width: 100%;
-      max-width: 430px;
-      padding: 20px;
-    }
-
-    .card {
-      background: white;
-
-      border-radius: 26px;
-
-      padding: 32px 26px;
-
-      box-shadow:
-        0 15px 50px rgba(0, 0, 0, 0.08);
-
+    .page {
+      width: min(100%, 460px);
+      padding: 28px;
       text-align: center;
     }
 
-    .heart {
-      font-size: 48px;
-      margin-bottom: 10px;
+    .logo {
+      width: 62px;
+      height: 62px;
+      margin: 0 auto 24px;
+      border-radius: 20px;
+      background: #f3f8f7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
     }
 
     h1 {
-      margin: 0;
-
-      font-size: 32px;
+      font-size: 42px;
+      letter-spacing: -1.8px;
+      margin-bottom: 10px;
       font-weight: 700;
     }
 
-    h2 {
-      margin: 0 0 8px;
-
-      font-size: 25px;
-    }
-
     .subtitle {
-      margin: 8px 0 30px;
-
-      color: #888;
-
-      font-size: 15px;
-    }
-
-    .welcome-text {
       color: #777;
-
-      font-size: 14px;
-
-      margin-bottom: 25px;
-
-      word-break: break-word;
-    }
-
-    .input-container {
-      position: relative;
-
-      margin-bottom: 12px;
-    }
-
-    input {
-      width: 100%;
-
-      padding: 15px;
-
-      border:
-        1px solid #dedede;
-
-      border-radius: 13px;
-
-      outline: none;
-
-      background: white;
-
-      color: #111;
-
       font-size: 16px;
-
-      transition: border 0.2s;
+      margin-bottom: 38px;
     }
 
-    input:focus {
-      border-color: #111;
-    }
-
-    .password-input {
-      padding-right: 60px;
-    }
-
-    .show-password {
-      position: absolute;
-
-      right: 12px;
-      top: 50%;
-
-      transform: translateY(-50%);
-
-      width: auto;
-
-      margin: 0;
-      padding: 6px 8px;
-
-      background: transparent;
-
-      color: #777;
-
-      font-size: 13px;
+    .buttons {
+      display: grid;
+      gap: 12px;
     }
 
     button {
       width: 100%;
-
       border: none;
-
-      border-radius: 13px;
-
-      padding: 15px;
-
-      margin-top: 5px;
-
-      cursor: pointer;
-
-      font-size: 16px;
-
+      border-radius: 14px;
+      padding: 15px 18px;
+      font-size: 15px;
       font-weight: 600;
-
-      transition:
-        transform 0.1s,
-        opacity 0.2s;
-    }
-
-    button:active {
-      transform: scale(0.98);
-    }
-
-    button:disabled {
-      opacity: 0.55;
-
-      cursor: not-allowed;
+      cursor: pointer;
+      transition: 0.2s ease;
     }
 
     .primary {
-      background: #111;
-
+      background: #173f3b;
       color: white;
     }
 
+    .primary:hover {
+      background: #0f332f;
+      transform: translateY(-1px);
+    }
+
     .secondary {
-      background: #eeeeee;
-
-      color: #111;
-
-      margin-top: 12px;
+      background: #f3f5f5;
+      color: #173f3b;
     }
 
-    .danger {
-      background: #eeeeee;
-
-      color: #b00020;
-
-      margin-top: 12px;
-    }
-
-    .link-button {
-      background: transparent;
-
-      color: #555;
-
-      padding: 8px;
-
-      margin-top: 10px;
-
-      font-size: 14px;
-    }
-
-    .message {
-      min-height: 24px;
-
-      margin-top: 18px;
-
-      font-size: 14px;
-
-      line-height: 1.5;
-    }
-
-    .message.success {
-      color: #167c3a;
-    }
-
-    .message.error {
-      color: #c62828;
-    }
-
-    .message.info {
-      color: #555;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    .home-icon {
-      font-size: 55px;
-
-      margin-bottom: 15px;
-    }
-
-    .home-title {
-      margin-bottom: 10px;
-    }
-
-    .home-card {
-      padding-bottom: 28px;
-    }
-
-    .divider {
-      height: 1px;
-
-      background: #eeeeee;
-
-      margin: 24px 0;
+    .secondary:hover {
+      background: #e9eeee;
     }
 
     .small {
-      color: #999;
-
-      font-size: 13px;
-
-      line-height: 1.5;
+      margin-top: 30px;
+      font-size: 12px;
+      color: #aaa;
     }
 
-    @media (max-width: 450px) {
-
-      .app {
-        padding: 15px;
-      }
-
-      .card {
-        padding: 30px 22px;
-      }
-
-      h1 {
-        font-size: 29px;
-      }
-
+    .loading {
+      color: #777;
+      font-size: 14px;
     }
-
   </style>
 </head>
 
 <body>
 
-  <main class="app">
-
-    <!-- ======================================
-         AUTH SCREEN
-    ======================================= -->
-
-    <section
-      id="authScreen"
-      class="card"
-    >
-
-      <div class="heart">
-        ❤️
-      </div>
-
-      <h1>
-        Our Space
-      </h1>
-
-      <p class="subtitle">
-        Just for us.
-      </p>
-
-
-      <!-- EMAIL -->
-
-      <input
-        type="email"
-        id="email"
-        placeholder="Email"
-        autocomplete="email"
-      >
-
-
-      <!-- PASSWORD -->
-
-      <div class="input-container">
-
-        <input
-          type="password"
-          id="password"
-          class="password-input"
-          placeholder="Password"
-          autocomplete="current-password"
-        >
-
-        <button
-          type="button"
-          id="showPasswordButton"
-          class="show-password"
-          onclick="togglePassword()"
-        >
-          Show
-        </button>
-
-      </div>
-
-
-      <!-- LOGIN -->
-
-      <button
-        id="loginButton"
-        class="primary"
-        onclick="login()"
-      >
-        Log In
-      </button>
-
-
-      <!-- CREATE -->
-
-      <button
-        id="createButton"
-        class="secondary"
-        onclick="createAccount()"
-      >
-        Create Account
-      </button>
-
-
-      <!-- FORGOT PASSWORD -->
-
-      <button
-        id="forgotButton"
-        class="link-button"
-        onclick="forgotPassword()"
-      >
-        Forgot password?
-      </button>
-
-
-      <!-- MESSAGE -->
-
-      <div
-        id="message"
-        class="message"
-      ></div>
-
-
-      <!-- RESEND CONFIRMATION -->
-
-      <button
-        id="resendButton"
-        class="link-button hidden"
-        onclick="resendConfirmation()"
-      >
-        Resend confirmation email
-      </button>
-
-    </section>
-
-
-
-    <!-- ======================================
-         HOME SCREEN
-    ======================================= -->
-
-    <section
-      id="homeScreen"
-      class="card home-card hidden"
-    >
-
-      <div class="home-icon">
-        ❤️
-      </div>
-
-      <h2 class="home-title">
-        Our Space
-      </h2>
-
-      <p
-        id="welcomeText"
-        class="welcome-text"
-      >
-        Welcome.
-      </p>
-
-      <div class="divider"></div>
-
-      <p class="small">
-        Your private space is ready.
-      </p>
-
-      <button
-        class="primary"
-        onclick="openChat()"
-      >
-        💬 Chat
-      </button>
-
-      <button
-        class="secondary"
-        onclick="comingSoon()"
-      >
-        📸 Memories
-      </button>
-
-      <button
-        class="secondary"
-        onclick="comingSoon()"
-      >
-        💌 Love Notes
-      </button>
-
-      <button
-        class="secondary"
-        onclick="comingSoon()"
-      >
-        📅 Plans
-      </button>
-
-      <button
-        class="danger"
-        onclick="logout()"
-      >
-        Log Out
-      </button>
-
-      <div
-        id="homeMessage"
-        class="message"
-      ></div>
-
-    </section>
-
+  <main class="page" id="page">
+    <div class="loading">Loading Our Space...</div>
   </main>
 
-
   <script>
-
-    // ==================================================
-    // SUPABASE CONFIGURATION
-    // ==================================================
-
-    const SUPABASE_URL =
-      "https://ywflohxufmfydkpkkqly.supabase.co";
-
-    const SUPABASE_KEY =
-      "sb_publishable_qTMUO8KxerEQBDQ-A7Huyg_8N2Tqpmr";
-
-    const APP_URL =
-      "https://our-space-topaz.vercel.app/";
-
-
-    const supabaseClient =
-      window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-      );
-
-
-    // ==================================================
-    // ELEMENTS
-    // ==================================================
-
-    const authScreen =
-      document.getElementById("authScreen");
-
-    const homeScreen =
-      document.getElementById("homeScreen");
-
-    const emailInput =
-      document.getElementById("email");
-
-    const passwordInput =
-      document.getElementById("password");
-
-    const messageElement =
-      document.getElementById("message");
-
-    const welcomeText =
-      document.getElementById("welcomeText");
-
-    const homeMessage =
-      document.getElementById("homeMessage");
-
-    const loginButton =
-      document.getElementById("loginButton");
-
-    const createButton =
-      document.getElementById("createButton");
-
-    const forgotButton =
-      document.getElementById("forgotButton");
-
-    const resendButton =
-      document.getElementById("resendButton");
-
-
-    // ==================================================
-    // MESSAGE HELPERS
-    // ==================================================
-
-    function showMessage(
-      text,
-      type = "info"
-    ) {
-
-      messageElement.textContent = text;
-
-      messageElement.className =
-        "message " + type;
-
-    }
-
-
-    function showHomeMessage(
-      text,
-      type = "info"
-    ) {
-
-      homeMessage.textContent = text;
-
-      homeMessage.className =
-        "message " + type;
-
-    }
-
-
-    function clearMessage() {
-
-      messageElement.textContent = "";
-
-      messageElement.className =
-        "message";
-
-    }
-
-
-    // ==================================================
-    // BUTTON LOADING
-    // ==================================================
-
-    function setAuthLoading(
-      loading
-    ) {
-
-      loginButton.disabled =
-        loading;
-
-      createButton.disabled =
-        loading;
-
-      forgotButton.disabled =
-        loading;
-
-    }
-
-
-    // ==================================================
-    // PASSWORD VISIBILITY
-    // ==================================================
-
-    function togglePassword() {
-
-      const button =
-        document.getElementById(
-          "showPasswordButton"
-        );
-
-
-      if (
-        passwordInput.type ===
-        "password"
-      ) {
-
-        passwordInput.type =
-          "text";
-
-        button.textContent =
-          "Hide";
-
-      } else {
-
-        passwordInput.type =
-          "password";
-
-        button.textContent =
-          "Show";
-
-      }
-
-    }
-
-
-    // ==================================================
-    // VALIDATE INPUT
-    // ==================================================
-
-    function validateFields() {
-
-      const email =
-        emailInput.value.trim();
-
-      const password =
-        passwordInput.value;
-
-
-      if (!email) {
-
-        showMessage(
-          "Please enter your email.",
-          "error"
-        );
-
-        emailInput.focus();
-
-        return false;
-
-      }
-
-
-      if (!password) {
-
-        showMessage(
-          "Please enter your password.",
-          "error"
-        );
-
-        passwordInput.focus();
-
-        return false;
-
-      }
-
-
-      if (password.length < 6) {
-
-        showMessage(
-          "Password must be at least 6 characters.",
-          "error"
-        );
-
-        passwordInput.focus();
-
-        return false;
-
-      }
-
-
-      return true;
-
-    }
-
-
-    // ==================================================
-    // LOG IN
-    // ==================================================
-
-    async function login() {
-
-      clearMessage();
-
-      resendButton.classList.add(
-        "hidden"
-      );
-
-
-      if (!validateFields()) {
-
-        return;
-
-      }
-
-
-      setAuthLoading(true);
-
-      showMessage(
-        "Logging in...",
-        "info"
-      );
-
-
-      try {
-
-        const {
-          data,
-          error
-        } =
-          await supabaseClient.auth.signInWithPassword({
-
-            email:
-              emailInput.value.trim(),
-
-            password:
-              passwordInput.value
-
-          });
-
-
-        if (error) {
-
-          showMessage(
-            getFriendlyLoginError(
-              error
-            ),
-            "error"
-          );
-
-          return;
-
+    const SUPABASE_URL = "https://ywflohxufmfydkpkkqly.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_qTMUO8KxerEQBDQ-A7Huyg_8N2Tqpmr";
+
+    const { createClient } = supabase;
+
+    const db = createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY,
+      {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true
         }
-
-
-        if (
-          !data ||
-          !data.user
-        ) {
-
-          showMessage(
-            "Login could not be completed.",
-            "error"
-          );
-
-          return;
-
-        }
-
-
-        showHome(
-          data.user
-        );
-
-      } catch (error) {
-
-        console.error(
-          "Login error:",
-          error
-        );
-
-        showMessage(
-          "Something went wrong. Please try again.",
-          "error"
-        );
-
-      } finally {
-
-        setAuthLoading(false);
-
-      }
-
-    }
-
-
-    // ==================================================
-    // FRIENDLY LOGIN ERRORS
-    // ==================================================
-
-    function getFriendlyLoginError(
-      error
-    ) {
-
-      const message =
-        (
-          error.message ||
-          ""
-        ).toLowerCase();
-
-
-      if (
-        message.includes(
-          "email not confirmed"
-        )
-      ) {
-
-        resendButton.classList.remove(
-          "hidden"
-        );
-
-        return (
-          "Please confirm your email first."
-        );
-
-      }
-
-
-      if (
-        message.includes(
-          "invalid login credentials"
-        )
-      ) {
-
-        return (
-          "Incorrect email or password."
-        );
-
-      }
-
-
-      if (
-        message.includes(
-          "too many requests"
-        )
-      ) {
-
-        return (
-          "Too many attempts. Please wait a little and try again."
-        );
-
-      }
-
-
-      return (
-        "❌ " +
-        (
-          error.message ||
-          "Login failed."
-        )
-      );
-
-    }
-
-
-    // ==================================================
-    // CREATE ACCOUNT
-    // ==================================================
-
-    async function createAccount() {
-
-      clearMessage();
-
-      resendButton.classList.add(
-        "hidden"
-      );
-
-
-      if (!validateFields()) {
-
-        return;
-
-      }
-
-
-      setAuthLoading(true);
-
-      showMessage(
-        "Creating your account...",
-        "info"
-      );
-
-
-      try {
-
-        const {
-          data,
-          error
-        } =
-          await supabaseClient.auth.signUp({
-
-            email:
-              emailInput.value.trim(),
-
-            password:
-              passwordInput.value,
-
-            options: {
-
-              emailRedirectTo:
-                APP_URL
-
-            }
-
-          });
-
-
-        if (error) {
-
-          showMessage(
-            getFriendlySignupError(
-              error
-            ),
-            "error"
-          );
-
-          return;
-
-        }
-
-
-        // ==========================================
-        // EXISTING ACCOUNT DETECTION
-        //
-        // Supabase can return an obfuscated
-        // user when email confirmation is enabled.
-        // An empty identities array indicates that
-        // no new identity was created.
-        // ==========================================
-
-        if (
-          data &&
-          data.user &&
-          Array.isArray(
-            data.user.identities
-          ) &&
-          data.user.identities.length === 0
-        ) {
-
-          showMessage(
-            "An account may already exist with this email. Try Log In instead.",
-            "error"
-          );
-
-          return;
-
-        }
-
-
-        // ==========================================
-        // ACCOUNT CREATED
-        // ==========================================
-
-        if (
-          data &&
-          data.session
-        ) {
-
-          showHome(
-            data.user
-          );
-
-          return;
-
-        }
-
-
-        // ==========================================
-        // EMAIL CONFIRMATION REQUIRED
-        // ==========================================
-
-        resendButton.classList.remove(
-          "hidden"
-        );
-
-
-        showMessage(
-          "❤️ Account created! Check your email and confirm your account.",
-          "success"
-        );
-
-
-      } catch (error) {
-
-        console.error(
-          "Signup error:",
-          error
-        );
-
-        showMessage(
-          "Something went wrong. Please try again.",
-          "error"
-        );
-
-      } finally {
-
-        setAuthLoading(false);
-
-      }
-
-    }
-
-
-    // ==================================================
-    // SIGNUP ERRORS
-    // ==================================================
-
-    function getFriendlySignupError(
-      error
-    ) {
-
-      const message =
-        (
-          error.message ||
-          ""
-        ).toLowerCase();
-
-
-      if (
-        message.includes(
-          "already registered"
-        )
-      ) {
-
-        return (
-          "This email is already registered. Please use Log In."
-        );
-
-      }
-
-
-      if (
-        message.includes(
-          "password"
-        )
-      ) {
-
-        return (
-          "Please check your password and try again."
-        );
-
-      }
-
-
-      if (
-        message.includes(
-          "email"
-        )
-      ) {
-
-        return (
-          "Please enter a valid email address."
-        );
-
-      }
-
-
-      return (
-        "❌ " +
-        (
-          error.message ||
-          "Account creation failed."
-        )
-      );
-
-    }
-
-
-    // ==================================================
-    // RESEND CONFIRMATION
-    // ==================================================
-
-    async function resendConfirmation() {
-
-      const email =
-        emailInput.value.trim();
-
-
-      if (!email) {
-
-        showMessage(
-          "Enter your email first.",
-          "error"
-        );
-
-        return;
-
-      }
-
-
-      resendButton.disabled =
-        true;
-
-
-      showMessage(
-        "Sending confirmation email...",
-        "info"
-      );
-
-
-      try {
-
-        const {
-          error
-        } =
-          await supabaseClient.auth.resend({
-
-            type:
-              "signup",
-
-            email:
-              email,
-
-            options: {
-
-              emailRedirectTo:
-                APP_URL
-
-            }
-
-          });
-
-
-        if (error) {
-
-          showMessage(
-            "❌ " +
-            error.message,
-            "error"
-          );
-
-          return;
-
-        }
-
-
-        showMessage(
-          "❤️ A new confirmation email has been sent.",
-          "success"
-        );
-
-
-      } catch (error) {
-
-        console.error(
-          "Resend error:",
-          error
-        );
-
-        showMessage(
-          "Could not send the email. Please try again later.",
-          "error"
-        );
-
-      } finally {
-
-        resendButton.disabled =
-          false;
-
-      }
-
-    }
-
-
-    // ==================================================
-    // FORGOT PASSWORD
-    // ==================================================
-
-    async function forgotPassword() {
-
-      const email =
-        emailInput.value.trim();
-
-
-      if (!email) {
-
-        showMessage(
-          "Enter your email first.",
-          "error"
-        );
-
-        emailInput.focus();
-
-        return;
-
-      }
-
-
-      forgotButton.disabled =
-        true;
-
-
-      showMessage(
-        "Sending password reset email...",
-        "info"
-      );
-
-
-      try {
-
-        const {
-          error
-        } =
-          await supabaseClient.auth.resetPasswordForEmail(
-
-            email,
-
-            {
-              redirectTo:
-                APP_URL
-            }
-
-          );
-
-
-        if (error) {
-
-          showMessage(
-            "❌ " +
-            error.message,
-            "error"
-          );
-
-          return;
-
-        }
-
-
-        showMessage(
-          "❤️ Check your email for the password reset link.",
-          "success"
-        );
-
-
-      } catch (error) {
-
-        console.error(
-          "Password reset error:",
-          error
-        );
-
-        showMessage(
-          "Could not send the reset email.",
-          "error"
-        );
-
-      } finally {
-
-        forgotButton.disabled =
-          false;
-
-      }
-
-    }
-
-
-    // ==================================================
-    // SHOW HOME
-    // ==================================================
-
-    function showHome(
-      user
-    ) {
-
-      authScreen.classList.add(
-        "hidden"
-      );
-
-      homeScreen.classList.remove(
-        "hidden"
-      );
-
-
-      const email =
-        user.email ||
-        "there";
-
-
-      welcomeText.textContent =
-        "Welcome back, " +
-        email +
-        " ❤️";
-
-
-      clearMessage();
-
-    }
-
-
-    // ==================================================
-    // SHOW LOGIN
-    // ==================================================
-
-    function showLogin() {
-
-      homeScreen.classList.add(
-        "hidden"
-      );
-
-      authScreen.classList.remove(
-        "hidden"
-      );
-
-
-      passwordInput.value =
-        "";
-
-      clearMessage();
-
-    }
-
-
-    // ==================================================
-    // LOG OUT
-    // ==================================================
-
-    async function logout() {
-
-      showHomeMessage(
-        "Logging out...",
-        "info"
-      );
-
-
-      const {
-        error
-      } =
-        await supabaseClient.auth.signOut();
-
-
-      if (error) {
-
-        showHomeMessage(
-          "❌ " +
-          error.message,
-          "error"
-        );
-
-        return;
-
-      }
-
-
-      showLogin();
-
-    }
-
-
-    // ==================================================
-    // AUTH STATE
-    // ==================================================
-
-    supabaseClient.auth.onAuthStateChange(
-
-      (event, session) => {
-
-        console.log(
-          "Auth event:",
-          event
-        );
-
-
-        if (
-          session &&
-          session.user
-        ) {
-
-          showHome(
-            session.user
-          );
-
-        } else {
-
-          showLogin();
-
-        }
-
-      }
-
-    );
-
-
-    // ==================================================
-    // CHECK EXISTING SESSION
-    // ==================================================
-
-    async function checkSession() {
-
-      try {
-
-        const {
-          data,
-          error
-        } =
-          await supabaseClient.auth.getSession();
-
-
-        if (error) {
-
-          console.error(
-            "Session error:",
-            error
-          );
-
-          return;
-
-        }
-
-
-        if (
-          data &&
-          data.session &&
-          data.session.user
-        ) {
-
-          showHome(
-            data.session.user
-          );
-
-        }
-
-      } catch (error) {
-
-        console.error(
-          "Session check error:",
-          error
-        );
-
-      }
-
-    }
-
-
-    // ==================================================
-    // FUTURE FEATURES
-    // ==================================================
-
-    function openChat() {
-
-      showHomeMessage(
-        "💬 Chat is the next feature we're building.",
-        "info"
-      );
-
-    }
-
-
-    function comingSoon() {
-
-      showHomeMessage(
-        "This feature is coming soon ❤️",
-        "info"
-      );
-
-    }
-
-
-    // ==================================================
-    // ENTER KEY
-    // ==================================================
-
-    emailInput.addEventListener(
-      "keydown",
-      function(event) {
-
-        if (
-          event.key === "Enter"
-        ) {
-
-          login();
-
-        }
-
       }
     );
 
+    async function start() {
+      const { data } = await db.auth.getSession();
 
-    passwordInput.addEventListener(
-      "keydown",
-      function(event) {
-
-        if (
-          event.key === "Enter"
-        ) {
-
-          login();
-
-        }
-
+      if (data.session) {
+        window.location.href = "app.html";
+        return;
       }
-    );
 
+      document.getElementById("page").innerHTML = `
+        <div class="logo">♡</div>
 
-    // ==================================================
-    // START
-    // ==================================================
+        <h1>Our Space</h1>
 
-    checkSession();
+        <p class="subtitle">
+          A little space, just for us.
+        </p>
 
+        <div class="buttons">
+          <button class="primary" onclick="goLogin()">
+            Log In
+          </button>
+
+          <button class="secondary" onclick="goSignup()">
+            Create Account
+          </button>
+        </div>
+
+        <p class="small">
+          Private. Personal. Ours.
+        </p>
+      `;
+    }
+
+    function goLogin() {
+      window.location.href = "login.html?mode=login";
+    }
+
+    function goSignup() {
+      window.location.href = "login.html?mode=signup";
+    }
+
+    start();
   </script>
 
 </body>
