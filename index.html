@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Our Space ❤️</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -95,6 +96,7 @@
       font-size: 14px;
       min-height: 20px;
       color: #555;
+      line-height: 1.5;
     }
   </style>
 </head>
@@ -125,11 +127,17 @@
         autocomplete="current-password"
       >
 
-      <button class="login-btn" onclick="login()">
+      <button
+        class="login-btn"
+        onclick="login()"
+      >
         Log In
       </button>
 
-      <button class="create-btn" onclick="createAccount()">
+      <button
+        class="create-btn"
+        onclick="createAccount()"
+      >
         Create Account
       </button>
 
@@ -142,7 +150,7 @@
   <script>
 
     // ==========================================
-    // SUPABASE CONNECTION
+    // SUPABASE
     // ==========================================
 
     const SUPABASE_URL =
@@ -150,6 +158,9 @@
 
     const SUPABASE_KEY =
       "sb_publishable_qTMUO8KxerEQBDQ-A7Huyg_8N2Tqpmr";
+
+    const APP_URL =
+      "https://our-space-topaz.vercel.app/";
 
     const supabaseClient =
       window.supabase.createClient(
@@ -181,7 +192,11 @@
 
 
       if (!email || !password) {
-        showMessage("Please enter your email and password.");
+
+        showMessage(
+          "Please enter your email and password."
+        );
+
         return;
       }
 
@@ -191,20 +206,33 @@
 
       const { data, error } =
         await supabaseClient.auth.signInWithPassword({
+
           email: email,
+
           password: password
+
         });
 
 
       if (error) {
-        showMessage("❌ " + error.message);
+
+        showMessage(
+          "❌ " + error.message
+        );
+
         return;
       }
 
 
-      showMessage("❤️ Login successful!");
+      showMessage(
+        "❤️ Login successful!"
+      );
 
-      console.log("Logged in user:", data.user);
+
+      console.log(
+        "Logged in user:",
+        data.user
+      );
 
     }
 
@@ -223,36 +251,61 @@
 
 
       if (!email || !password) {
-        showMessage("Please enter an email and password.");
+
+        showMessage(
+          "Please enter an email and password."
+        );
+
         return;
       }
 
 
       if (password.length < 6) {
-        showMessage("Password must be at least 6 characters.");
+
+        showMessage(
+          "Password must be at least 6 characters."
+        );
+
         return;
       }
 
 
-      showMessage("Creating your account...");
+      showMessage(
+        "Creating your account..."
+      );
 
 
       const { data, error } =
         await supabaseClient.auth.signUp({
+
           email: email,
-          password: password
+
+          password: password,
+
+          options: {
+
+            emailRedirectTo: APP_URL
+
+          }
+
         });
 
 
       if (error) {
-        showMessage("❌ " + error.message);
+
+        showMessage(
+          "❌ " + error.message
+        );
+
         return;
       }
 
 
       if (data.session) {
 
-        showMessage("❤️ Account created! You're logged in.");
+        showMessage(
+          "❤️ Account created! You're logged in."
+        );
 
       } else {
 
@@ -263,9 +316,38 @@
       }
 
 
-      console.log("Created user:", data.user);
+      console.log(
+        "Created user:",
+        data.user
+      );
 
     }
+
+
+    // ==========================================
+    // CHECK EXISTING SESSION
+    // ==========================================
+
+    async function checkSession() {
+
+      const {
+        data: { session }
+      } = await supabaseClient.auth.getSession();
+
+
+      if (session) {
+
+        console.log(
+          "Already logged in:",
+          session.user
+        );
+
+      }
+
+    }
+
+
+    checkSession();
 
   </script>
 
