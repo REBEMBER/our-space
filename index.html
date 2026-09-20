@@ -217,7 +217,15 @@
       width: 19px;
       height: 19px;
 
-      stroke-width: 1.8;
+      stroke-width: 1.65;
+
+      transition:
+        transform 0.2s ease;
+    }
+
+    .icon-button:hover svg {
+      transform:
+        rotate(20deg);
     }
 
     /* ==========================================
@@ -882,73 +890,36 @@
               stroke="currentColor"
               stroke-linecap="round"
               stroke-linejoin="round"
+              aria-hidden="true"
             >
-              <circle
-                cx="12"
-                cy="12"
-                r="3"
+              <path
+                d="
+                  M12 8
+                  a4 4 0 1 0
+                  0 8
+                  a4 4 0 0 0
+                  0-8
+                "
               />
 
               <path
                 d="
-                  M19.4 15
-                  A1.7 1.7 0 0 0
-                  19.74 16.88
-                  L19.8 16.94
-                  L18.1 18.64
-                  L18.04 18.58
-                  A1.7 1.7 0 0 0
-                  16.16 18.24
-                  A1.7 1.7 0 0 0
-                  15.13 19.8
-                  V20
-                  H12.73
-                  V19.8
-                  A1.7 1.7 0 0 0
-                  11.7 18.24
-                  A1.7 1.7 0 0 0
-                  9.82 18.58
-                  L9.76 18.64
-                  L8.06 16.94
-                  L8.12 16.88
-                  A1.7 1.7 0 0 0
-                  8.46 15
-                  A1.7 1.7 0 0 0
-                  6.9 13.97
-                  H6.2
-                  V11.57
-                  H6.9
-                  A1.7 1.7 0 0 0
-                  8.46 10.54
-                  A1.7 1.7 0 0 0
-                  8.12 8.66
-                  L8.06 8.6
-                  L9.76 6.9
-                  L9.82 6.96
-                  A1.7 1.7 0 0 0
-                  11.7 7.3
-                  A1.7 1.7 0 0 0
-                  12.73 5.74
-                  V4
-                  H15.13
-                  V5.74
-                  A1.7 1.7 0 0 0
-                  16.16 7.3
-                  A1.7 1.7 0 0 0
-                  18.04 6.96
-                  L18.1 6.9
-                  L19.8 8.6
-                  L19.74 8.66
-                  A1.7 1.7 0 0 0
-                  19.4 10.54
-                  A1.7 1.7 0 0 0
-                  20.74 11.66
-                  H21
-                  V14.06
-                  H20.74
-                  A1.7 1.7 0 0 0
-                  19.4 15
-                  Z
+                  M12 2.75
+                  v2
+                  M12 19.25
+                  v2
+                  M21.25 12
+                  h-2
+                  M4.75 12
+                  h-2
+                  M18.54 5.46
+                  l-1.42 1.42
+                  M6.88 17.12
+                  l-1.42 1.42
+                  M18.54 18.54
+                  l-1.42-1.42
+                  M6.88 6.88
+                  l-1.42-1.42
                 "
               />
             </svg>
@@ -1182,19 +1153,22 @@
     const SUPABASE_PUBLISHABLE_KEY =
       "sb_publishable_qTMUO8KxerEQBDQ-A7Huyg_8N2Tqpmr";
 
-    const { createClient } = supabase;
+    const {
+      createClient
+    } = supabase;
 
-    const client = createClient(
-      SUPABASE_URL,
-      SUPABASE_PUBLISHABLE_KEY,
-      {
-        auth: {
-          persistSession: true,
-          autoRefreshToken: true,
-          detectSessionInUrl: true
+    const client =
+      createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY,
+        {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true
+          }
         }
-      }
-    );
+      );
 
     /* ==========================================
        STATE
@@ -1238,9 +1212,12 @@
     async function checkAuthentication() {
 
       const {
-        data: { user },
+        data: {
+          user
+        },
         error
-      } = await client.auth.getUser();
+      } =
+        await client.auth.getUser();
 
       if (
         error ||
@@ -1259,7 +1236,7 @@
     }
 
     /* ==========================================
-       LOAD USER PROFILE
+       PROFILE
     ========================================== */
 
     async function loadProfile() {
@@ -1267,14 +1244,19 @@
       const {
         data,
         error
-      } = await client
-        .from("user_profiles")
-        .select("username")
-        .eq(
-          "user_id",
-          currentUser.id
-        )
-        .maybeSingle();
+      } =
+        await client
+          .from(
+            "user_profiles"
+          )
+          .select(
+            "username"
+          )
+          .eq(
+            "user_id",
+            currentUser.id
+          )
+          .maybeSingle();
 
       if (
         error ||
