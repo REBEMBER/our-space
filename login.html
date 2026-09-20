@@ -3,33 +3,16 @@
 <head>
   <meta charset="UTF-8">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <title>Our Space — Login</title>
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
   <meta name="theme-color" content="#F7F9FC">
 
-  <style>
-    :root {
-      --navy: #152B46;
-      --navy-dark: #102238;
-      --peach: #F3B29F;
-      --peach-soft: #F9D5C9;
-      --blue-light: #EEF5FA;
-      --white: #FFFFFF;
-      --off-white: #F7F9FC;
-      --charcoal: #26313D;
-      --muted: #718092;
-      --border: #E2E9F0;
-      --danger: #B14D4D;
-    }
+  <title>Our Space — Login</title>
 
+  <style>
     * {
       box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
     }
 
     html,
@@ -37,230 +20,228 @@
       margin: 0;
       padding: 0;
       min-height: 100%;
-      font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Arial,
-        sans-serif;
-      background:
-        radial-gradient(
-          circle at 10% 5%,
-          rgba(243,178,159,0.2),
-          transparent 30%
-        ),
-        radial-gradient(
-          circle at 95% 95%,
-          rgba(220,234,245,0.4),
-          transparent 35%
-        ),
-        var(--off-white);
-      color: var(--charcoal);
+      font-family: Arial, Helvetica, sans-serif;
+      background: #F7F9FC;
+      color: #26313D;
     }
 
     body {
       min-height: 100vh;
       display: flex;
-      justify-content: center;
       align-items: center;
-      padding: 20px;
+      justify-content: center;
+      padding: 24px;
     }
 
-    .card {
-      width: min(100%, 430px);
-      background: rgba(255,255,255,0.96);
-      border: 1px solid var(--border);
+    .login-card {
+      width: 100%;
+      max-width: 390px;
+      background: #FFFFFF;
       border-radius: 28px;
-      padding: 30px;
-      box-shadow: 0 20px 55px rgba(21,43,70,0.09);
+      padding: 38px 28px 30px;
+      box-shadow: 0 18px 50px rgba(21, 43, 70, 0.10);
     }
 
-    .logo {
-      font-size: 27px;
-      font-weight: 750;
-      color: var(--navy);
+    .brand {
+      text-align: center;
+      margin-bottom: 34px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      color: #152B46;
+      font-size: 32px;
+      font-weight: 700;
       letter-spacing: -0.8px;
-      margin-bottom: 8px;
     }
 
-    .subtitle {
-      color: var(--muted);
-      line-height: 1.5;
-      margin-bottom: 27px;
+    .brand p {
+      margin: 9px 0 0;
+      color: #718092;
+      font-size: 14px;
     }
 
-    .tabs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      background: var(--blue-light);
-      border-radius: 14px;
-      padding: 4px;
-      margin-bottom: 23px;
-    }
-
-    .tab {
-      border: 0;
-      background: transparent;
-      padding: 11px;
-      border-radius: 10px;
-      color: var(--muted);
-      font-weight: 650;
-      cursor: pointer;
-    }
-
-    .tab.active {
-      background: var(--white);
-      color: var(--navy);
-      box-shadow: 0 2px 7px rgba(21,43,70,0.07);
+    .field {
+      margin-bottom: 18px;
     }
 
     label {
       display: block;
-      font-size: 13px;
-      font-weight: 650;
-      margin-bottom: 7px;
-      color: var(--charcoal);
+      margin-bottom: 8px;
+      color: #26313D;
+      font-size: 14px;
+      font-weight: 600;
     }
 
     input {
       width: 100%;
-      border: 1px solid var(--border);
-      background: var(--white);
-      border-radius: 13px;
-      padding: 14px;
+      height: 54px;
+      border: 1px solid #E2E9F0;
+      border-radius: 15px;
+      padding: 0 16px;
+
+      background: #F7F9FC;
+      color: #26313D;
+
       font-size: 16px;
       outline: none;
-      color: var(--charcoal);
-      margin-bottom: 16px;
+
+      transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
     }
 
     input:focus {
-      border-color: var(--navy);
-      box-shadow: 0 0 0 3px rgba(21,43,70,0.08);
+      border-color: #152B46;
+      box-shadow: 0 0 0 3px rgba(21, 43, 70, 0.08);
     }
 
-    .primary {
-      width: 100%;
-      border: 0;
-      background: var(--navy);
-      color: white;
-      border-radius: 14px;
-      padding: 14px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      margin-top: 4px;
+    .password-wrap {
+      position: relative;
     }
 
-    .primary:disabled {
-      opacity: 0.65;
-      cursor: wait;
+    .password-wrap input {
+      padding-right: 52px;
     }
 
-    .message {
-      margin-top: 15px;
-      padding: 12px 13px;
-      border-radius: 12px;
+    .show-password {
+      position: absolute;
+      right: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+
+      border: none;
+      background: transparent;
+
+      color: #718092;
       font-size: 13px;
-      line-height: 1.45;
+      font-weight: 600;
+
+      cursor: pointer;
+    }
+
+    .login-button {
+      width: 100%;
+      height: 56px;
+      margin-top: 8px;
+
+      border: none;
+      border-radius: 16px;
+
+      background: #152B46;
+      color: #FFFFFF;
+
+      font-size: 16px;
+      font-weight: 700;
+
+      cursor: pointer;
+
+      transition:
+        transform 0.08s ease,
+        filter 0.08s ease;
+    }
+
+    .login-button:active {
+      transform: scale(0.98);
+      filter: brightness(0.94);
+    }
+
+    .login-button:disabled {
+      opacity: 0.65;
+      cursor: default;
+    }
+
+    .error {
       display: none;
+      margin-top: 16px;
+      padding: 12px 14px;
+
+      border-radius: 12px;
+
+      background: #FFF0EC;
+      color: #A34D3B;
+
+      font-size: 14px;
+      line-height: 1.4;
+      text-align: center;
     }
 
-    .message.error {
-      display: block;
-      background: #FFF0F0;
-      color: var(--danger);
-    }
-
-    .message.success {
-      display: block;
-      background: var(--blue-light);
-      color: var(--navy);
-    }
-
-    .hidden {
-      display: none !important;
+    .footer {
+      margin-top: 25px;
+      text-align: center;
+      color: #9AA5B1;
+      font-size: 12px;
     }
   </style>
 </head>
 
 <body>
 
-  <main class="card">
+  <main class="login-card">
 
-    <div class="logo">Our Space</div>
-
-    <div class="subtitle">
-      A private space for the two of you.
+    <div class="brand">
+      <h1>Our Space</h1>
+      <p>Welcome back</p>
     </div>
 
-    <div class="tabs">
-      <button
-        id="loginTab"
-        class="tab active"
-        type="button"
-      >
-        Log in
-      </button>
+    <form id="loginForm">
 
-      <button
-        id="signupTab"
-        class="tab"
-        type="button"
-      >
-        Create account
-      </button>
-    </div>
-
-    <form id="authForm">
-
-      <div id="nameGroup" class="hidden">
-        <label for="name">Name</label>
+      <div class="field">
+        <label for="username">Username</label>
 
         <input
-          id="name"
+          id="username"
           type="text"
-          autocomplete="name"
-          placeholder="Your name"
+          autocomplete="username"
+          autocapitalize="none"
+          spellcheck="false"
+          placeholder="Username"
+          required
         >
       </div>
 
-      <label for="email">Email</label>
+      <div class="field">
+        <label for="password">Password</label>
 
-      <input
-        id="email"
-        type="email"
-        autocomplete="email"
-        placeholder="you@example.com"
-        required
-      >
+        <div class="password-wrap">
 
-      <label for="password">Password</label>
+          <input
+            id="password"
+            type="password"
+            autocomplete="current-password"
+            placeholder="Password"
+            required
+          >
 
-      <input
-        id="password"
-        type="password"
-        autocomplete="current-password"
-        placeholder="Your password"
-        required
-      >
+          <button
+            type="button"
+            class="show-password"
+            id="showPassword"
+          >
+            Show
+          </button>
+
+        </div>
+      </div>
 
       <button
-        id="submitButton"
-        class="primary"
         type="submit"
+        class="login-button"
+        id="loginButton"
       >
-        Log in
+        Log In
       </button>
+
+      <div
+        class="error"
+        id="errorMessage"
+      ></div>
 
     </form>
 
-    <div
-      id="message"
-      class="message"
-      aria-live="polite"
-    ></div>
+    <div class="footer">
+      Our Space
+    </div>
 
   </main>
 
@@ -273,8 +254,8 @@
     const SUPABASE_PUBLISHABLE_KEY =
       "sb_publishable_qTMUO8KxerEQBDQ-A7Huyg_8N2Tqpmr";
 
-    const CONFIRMATION_URL =
-      "https://our-space-topaz.vercel.app/confirmation.html";
+    const FUNCTION_URL =
+      SUPABASE_URL + "/functions/v1/username-login";
 
     const client = window.supabase.createClient(
       SUPABASE_URL,
@@ -288,161 +269,112 @@
       }
     );
 
-    const authForm = document.getElementById("authForm");
-    const loginTab = document.getElementById("loginTab");
-    const signupTab = document.getElementById("signupTab");
-    const nameGroup = document.getElementById("nameGroup");
-    const nameInput = document.getElementById("name");
-    const submitButton = document.getElementById("submitButton");
-    const message = document.getElementById("message");
+    const form = document.getElementById("loginForm");
+    const usernameInput = document.getElementById("username");
+    const passwordInput = document.getElementById("password");
+    const loginButton = document.getElementById("loginButton");
+    const errorMessage = document.getElementById("errorMessage");
+    const showPassword = document.getElementById("showPassword");
 
-    let mode = "login";
+    showPassword.addEventListener("click", function () {
 
-    function showMessage(text, type) {
-      message.textContent = text;
-      message.className = `message ${type}`;
-    }
-
-    function clearMessage() {
-      message.textContent = "";
-      message.className = "message";
-    }
-
-    function setMode(newMode) {
-      mode = newMode;
-
-      clearMessage();
-
-      if (mode === "signup") {
-        loginTab.classList.remove("active");
-        signupTab.classList.add("active");
-
-        nameGroup.classList.remove("hidden");
-        nameInput.required = true;
-
-        submitButton.textContent = "Create account";
-
+      if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        showPassword.textContent = "Hide";
       } else {
-        signupTab.classList.remove("active");
-        loginTab.classList.add("active");
-
-        nameGroup.classList.add("hidden");
-        nameInput.required = false;
-
-        submitButton.textContent = "Log in";
+        passwordInput.type = "password";
+        showPassword.textContent = "Show";
       }
+
+    });
+
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.style.display = "block";
     }
 
-    loginTab.addEventListener("click", () => {
-      setMode("login");
-    });
+    function hideError() {
+      errorMessage.style.display = "none";
+      errorMessage.textContent = "";
+    }
 
-    signupTab.addEventListener("click", () => {
-      setMode("signup");
-    });
+    form.addEventListener("submit", async function(event) {
 
-    authForm.addEventListener("submit", async event => {
       event.preventDefault();
 
-      clearMessage();
+      hideError();
 
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-      const name = nameInput.value.trim();
+      const username =
+        usernameInput.value.trim().toLowerCase();
 
-      submitButton.disabled = true;
-      submitButton.textContent =
-        mode === "signup"
-          ? "Creating account..."
-          : "Logging in...";
+      const password =
+        passwordInput.value;
+
+      if (!username || !password) {
+        showError("Enter your username and password.");
+        return;
+      }
+
+      loginButton.disabled = true;
+      loginButton.textContent = "Logging in...";
 
       try {
-        if (mode === "signup") {
 
-          const {
-            data,
-            error
-          } = await client.auth.signUp({
-            email,
-            password,
-            options: {
-              data: {
-                name
-              },
-              emailRedirectTo: CONFIRMATION_URL
-            }
-          });
+        const response = await fetch(
+          FUNCTION_URL,
+          {
+            method: "POST",
 
-          if (error) {
-            throw error;
+            headers: {
+              "Content-Type": "application/json",
+              "apikey": SUPABASE_PUBLISHABLE_KEY
+            },
+
+            body: JSON.stringify({
+              username,
+              password
+            })
           }
-
-          if (data.user && data.session) {
-            window.location.replace("index.html");
-            return;
-          }
-
-          showMessage(
-            "Account created. Check your email to confirm your account.",
-            "success"
-          );
-
-        } else {
-
-          const {
-            data,
-            error
-          } = await client.auth.signInWithPassword({
-            email,
-            password
-          });
-
-          if (error) {
-            throw error;
-          }
-
-          if (data.user) {
-            window.location.replace("index.html");
-            return;
-          }
-        }
-
-      } catch (error) {
-        console.error(error);
-
-        showMessage(
-          error.message || "Something went wrong. Please try again.",
-          "error"
         );
 
-      } finally {
-        submitButton.disabled = false;
+        const result = await response.json();
 
-        if (mode === "login") {
-          submitButton.textContent = "Log in";
-        } else {
-          submitButton.textContent = "Create account";
+        if (!response.ok) {
+          throw new Error(
+            result.error || "Invalid username or password."
+          );
         }
-      }
-    });
 
-    async function checkExistingSession() {
-      try {
-        const {
-          data: {
-            user
-          }
-        } = await client.auth.getUser();
-
-        if (user) {
-          window.location.replace("index.html");
+        if (!result.access_token || !result.refresh_token) {
+          throw new Error("Login session could not be created.");
         }
+
+        const { error: sessionError } =
+          await client.auth.setSession({
+            access_token: result.access_token,
+            refresh_token: result.refresh_token
+          });
+
+        if (sessionError) {
+          throw sessionError;
+        }
+
+        window.location.href = "index.html";
+
       } catch (error) {
-        console.log("No active user.");
-      }
-    }
 
-    checkExistingSession();
+        console.error(error);
+
+        showError(
+          error.message ||
+          "Unable to log in. Please try again."
+        );
+
+        loginButton.disabled = false;
+        loginButton.textContent = "Log In";
+      }
+
+    });
   </script>
 
 </body>
