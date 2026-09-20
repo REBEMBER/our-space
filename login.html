@@ -2,17 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Login — Our Space</title>
-
-  <meta
-    name="description"
-    content="Sign in to your private Our Space."
-  >
+  <meta name="description" content="Sign in to your private Our Space.">
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -30,14 +23,12 @@
       --muted: #777a84;
       --border: #e5e6ea;
       --accent: #6c63ff;
-      --accent-dark: #5750df;
       --danger: #d94b5b;
       --success: #278a61;
     }
 
     body {
       min-height: 100vh;
-
       font-family:
         Inter,
         -apple-system,
@@ -50,12 +41,12 @@
       background:
         radial-gradient(
           circle at 10% 10%,
-          rgba(108,99,255,.08),
+          rgba(108, 99, 255, .08),
           transparent 30%
         ),
         radial-gradient(
           circle at 90% 90%,
-          rgba(108,99,255,.07),
+          rgba(108, 99, 255, .07),
           transparent 30%
         ),
         var(--bg);
@@ -114,10 +105,9 @@
     }
 
     .box {
-      background: rgba(255,255,255,.94);
+      background: rgba(255,255,255,.95);
       border: 1px solid var(--border);
       border-radius: 25px;
-
       padding: 30px;
 
       box-shadow:
@@ -150,7 +140,9 @@
     .tab.active {
       background: white;
       color: var(--text);
-      box-shadow: 0 2px 8px rgba(0,0,0,.06);
+
+      box-shadow:
+        0 2px 8px rgba(0,0,0,.06);
     }
 
     .intro {
@@ -212,7 +204,7 @@
     }
 
     input.password-input {
-      padding-right: 52px;
+      padding-right: 55px;
     }
 
     .show-password {
@@ -231,31 +223,10 @@
       font-weight: 700;
     }
 
-    .strength {
-      display: none;
-      height: 4px;
-      background: #ededf0;
-      border-radius: 10px;
-      overflow: hidden;
-      margin-top: 8px;
-    }
-
-    .strength-bar {
-      width: 0%;
-      height: 100%;
-      transition: width .2s;
-    }
-
-    .password-hint {
-      display: none;
-      margin-top: 7px;
-      color: var(--muted);
-      font-size: 11px;
-    }
-
     .forgot-row {
       display: flex;
       justify-content: flex-end;
+
       margin-top: -7px;
       margin-bottom: 18px;
     }
@@ -263,10 +234,11 @@
     .link-btn {
       border: 0;
       background: transparent;
+
       color: var(--accent);
+
       font-size: 12px;
       font-weight: 700;
-      padding: 0;
     }
 
     .link-btn:hover {
@@ -307,6 +279,7 @@
       display: none;
 
       border-radius: 11px;
+
       padding: 12px 13px;
 
       margin-bottom: 17px;
@@ -317,40 +290,80 @@
 
     .message.error {
       display: block;
+
       background: #fff1f3;
       color: var(--danger);
+
       border: 1px solid #ffd8de;
     }
 
     .message.success {
       display: block;
+
       background: #eefaf4;
       color: var(--success);
+
       border: 1px solid #d0efdf;
+    }
+
+    .strength {
+      display: none;
+
+      height: 4px;
+
+      background: #ededf0;
+      border-radius: 10px;
+
+      overflow: hidden;
+
+      margin-top: 8px;
+    }
+
+    .strength-bar {
+      width: 0%;
+      height: 100%;
+
+      transition: width .2s;
+    }
+
+    .password-hint {
+      display: none;
+
+      margin-top: 7px;
+
+      color: var(--muted);
+      font-size: 11px;
     }
 
     .bottom-note {
       text-align: center;
+
       color: var(--muted);
+
       font-size: 11px;
+
       margin-top: 20px;
+
       line-height: 1.5;
     }
 
-    /* Modal */
+    /* Password reset modal */
 
     .modal {
       position: fixed;
       inset: 0;
 
       background: rgba(10,10,15,.45);
+
       backdrop-filter: blur(5px);
 
       display: none;
+
       align-items: center;
       justify-content: center;
 
       padding: 20px;
+
       z-index: 100;
     }
 
@@ -363,10 +376,13 @@
       max-width: 390px;
 
       background: white;
+
       border-radius: 22px;
+
       padding: 28px;
 
-      box-shadow: 0 30px 90px rgba(0,0,0,.2);
+      box-shadow:
+        0 30px 90px rgba(0,0,0,.2);
     }
 
     .modal-box h3 {
@@ -376,34 +392,40 @@
 
     .modal-box p {
       color: var(--muted);
+
       font-size: 13px;
       line-height: 1.5;
+
       margin-bottom: 18px;
     }
 
     .modal-actions {
       display: flex;
       gap: 9px;
+
       margin-top: 15px;
     }
 
-    .secondary {
+    .secondary,
+    .modal-primary {
       flex: 1;
-      border: 1px solid var(--border);
-      background: white;
+
       border-radius: 11px;
+
       padding: 11px;
+
       font-weight: 700;
     }
 
+    .secondary {
+      border: 1px solid var(--border);
+      background: white;
+    }
+
     .modal-primary {
-      flex: 1;
       border: 0;
       background: var(--text);
       color: white;
-      border-radius: 11px;
-      padding: 11px;
-      font-weight: 700;
     }
 
     @media (max-width: 500px) {
@@ -424,13 +446,19 @@
 
     <div class="brand">
       <div class="brand-icon">OS</div>
+
       <h1>Our Space</h1>
-      <p>Your private place for two.</p>
+
+      <p>
+        Your private place for two.
+      </p>
     </div>
+
 
     <div class="box">
 
       <div class="tabs">
+
         <button
           id="loginTab"
           class="tab active"
@@ -446,22 +474,37 @@
         >
           Create account
         </button>
+
       </div>
+
+
+      <!-- LOGIN -->
 
       <div id="loginForm">
 
         <div class="intro">
-          <h2>Welcome back.</h2>
+
+          <h2>
+            Welcome back.
+          </h2>
+
           <p>
             Sign in to continue to your space.
           </p>
+
         </div>
 
-        <div id="loginMessage" class="message"></div>
+
+        <div
+          id="loginMessage"
+          class="message"
+        ></div>
+
 
         <form id="loginFormElement">
 
           <div class="field">
+
             <label for="loginEmail">
               Email
             </label>
@@ -473,7 +516,9 @@
               placeholder="you@example.com"
               required
             >
+
           </div>
+
 
           <div class="field">
 
@@ -504,7 +549,9 @@
 
           </div>
 
+
           <div class="forgot-row">
+
             <button
               id="forgotBtn"
               class="link-btn"
@@ -512,7 +559,9 @@
             >
               Forgot password?
             </button>
+
           </div>
+
 
           <button
             id="loginBtn"
@@ -526,23 +575,37 @@
 
       </div>
 
+
+      <!-- SIGN UP -->
+
       <div
         id="signupForm"
         style="display:none;"
       >
 
         <div class="intro">
-          <h2>Create your space.</h2>
+
+          <h2>
+            Create your space.
+          </h2>
+
           <p>
-            Make an account and we'll send you a confirmation email.
+            Create an account to start your private space.
           </p>
+
         </div>
 
-        <div id="signupMessage" class="message"></div>
+
+        <div
+          id="signupMessage"
+          class="message"
+        ></div>
+
 
         <form id="signupFormElement">
 
           <div class="field">
+
             <label for="signupEmail">
               Email
             </label>
@@ -554,7 +617,9 @@
               placeholder="you@example.com"
               required
             >
+
           </div>
+
 
           <div class="field">
 
@@ -584,6 +649,7 @@
 
             </div>
 
+
             <div
               id="strength"
               class="strength"
@@ -594,12 +660,14 @@
               ></div>
             </div>
 
+
             <div
               id="passwordHint"
               class="password-hint"
             ></div>
 
           </div>
+
 
           <button
             id="signupBtn"
@@ -615,6 +683,7 @@
 
     </div>
 
+
     <div class="bottom-note">
       Your account is protected by Supabase Authentication.
     </div>
@@ -622,7 +691,7 @@
   </div>
 
 
-  <!-- Forgot password modal -->
+  <!-- PASSWORD RESET MODAL -->
 
   <div
     id="resetModal"
@@ -631,17 +700,21 @@
 
     <div class="modal-box">
 
-      <h3>Reset your password</h3>
+      <h3>
+        Reset your password
+      </h3>
 
       <p>
-        Enter your email and we'll send you a password
-        reset link.
+        Enter your email and we'll send you
+        a password reset link.
       </p>
+
 
       <div
         id="resetMessage"
         class="message"
       ></div>
+
 
       <input
         id="resetEmail"
@@ -649,6 +722,7 @@
         autocomplete="email"
         placeholder="you@example.com"
       >
+
 
       <div class="modal-actions">
 
@@ -677,6 +751,10 @@
 
   <script>
 
+    /* ============================
+       SUPABASE
+    ============================ */
+
     const SUPABASE_URL =
       "https://ywflohxufmfydkpkkqly.supabase.co";
 
@@ -686,7 +764,12 @@
     const APP_URL =
       "https://our-space-topaz.vercel.app/";
 
+    const CONFIRMATION_URL =
+      "https://our-space-topaz.vercel.app/confirmation.html";
+
+
     const { createClient } = supabase;
+
 
     const client = createClient(
       SUPABASE_URL,
@@ -701,9 +784,9 @@
     );
 
 
-    /* ---------------------------
-       Elements
-    --------------------------- */
+    /* ============================
+       ELEMENTS
+    ============================ */
 
     const loginTab =
       document.getElementById("loginTab");
@@ -736,25 +819,35 @@
       document.getElementById("signupMessage");
 
 
-    /* ---------------------------
-       Helpers
-    --------------------------- */
+    /* ============================
+       HELPERS
+    ============================ */
 
-    function showMessage(element, message, type) {
+    function showMessage(
+      element,
+      message,
+      type
+    ) {
       element.textContent = message;
-      element.className = "message " + type;
+
+      element.className =
+        "message " + type;
     }
+
 
     function clearMessage(element) {
       element.textContent = "";
       element.className = "message";
     }
 
+
     function goHome() {
       window.location.replace("index.html");
     }
 
+
     function goConfirmation(email) {
+
       try {
         sessionStorage.setItem(
           "confirmationEmail",
@@ -767,37 +860,49 @@
       );
     }
 
+
     function friendlyAuthError(error) {
 
       const message =
         String(error?.message || "")
           .toLowerCase();
 
+
       if (
-        message.includes("invalid login credentials")
+        message.includes(
+          "invalid login credentials"
+        )
       ) {
         return "The email or password is incorrect.";
       }
 
+
       if (
-        message.includes("email not confirmed")
+        message.includes(
+          "email not confirmed"
+        )
       ) {
-        return "Please confirm your email before logging in.";
+        return "Your email hasn't been confirmed yet.";
       }
+
 
       if (
         message.includes("rate limit") ||
         message.includes("rate exceeded") ||
         message.includes("too many requests")
       ) {
-        return "Too many requests. Please wait a little before trying again.";
+        return "Too many requests right now. Please wait a little and try again.";
       }
 
+
       if (
-        message.includes("password should be at least")
+        message.includes(
+          "password should be at least"
+        )
       ) {
         return "Your password must contain at least 6 characters.";
       }
+
 
       if (
         message.includes("invalid email")
@@ -805,20 +910,26 @@
         return "Please enter a valid email address.";
       }
 
+
       if (
-        message.includes("user already registered")
+        message.includes(
+          "user already registered"
+        )
       ) {
         return "This account may already exist. Try logging in instead.";
       }
 
-      return error?.message ||
-        "Something went wrong. Please try again.";
+
+      return (
+        error?.message ||
+        "Something went wrong. Please try again."
+      );
     }
 
 
-    /* ---------------------------
-       Check existing session
-    --------------------------- */
+    /* ============================
+       EXISTING SESSION
+    ============================ */
 
     async function checkExistingUser() {
 
@@ -829,29 +940,30 @@
           error
         } = await client.auth.getUser();
 
+
         if (
           !error &&
-          data &&
-          data.user
+          data?.user
         ) {
           goHome();
-          return;
         }
 
       } catch (error) {
+
         console.log(
-          "No active account:",
-          error
+          "No active session."
         );
+
       }
     }
+
 
     checkExistingUser();
 
 
-    /* ---------------------------
-       Tabs
-    --------------------------- */
+    /* ============================
+       TABS
+    ============================ */
 
     loginTab.addEventListener(
       "click",
@@ -885,9 +997,9 @@
     );
 
 
-    /* ---------------------------
-       Show / hide password
-    --------------------------- */
+    /* ============================
+       SHOW / HIDE PASSWORD
+    ============================ */
 
     document
       .querySelectorAll(".show-password")
@@ -902,7 +1014,10 @@
                 button.dataset.target
               );
 
-            if (target.type === "password") {
+
+            if (
+              target.type === "password"
+            ) {
 
               target.type = "text";
               button.textContent = "Hide";
@@ -911,15 +1026,18 @@
 
               target.type = "password";
               button.textContent = "Show";
+
             }
+
           }
         );
+
       });
 
 
-    /* ---------------------------
-       Password strength
-    --------------------------- */
+    /* ============================
+       PASSWORD STRENGTH
+    ============================ */
 
     const signupPassword =
       document.getElementById(
@@ -949,46 +1067,67 @@
         const value =
           signupPassword.value;
 
+
         if (!value) {
+
           strength.style.display = "none";
           passwordHint.style.display = "none";
+
           return;
         }
+
 
         strength.style.display = "block";
         passwordHint.style.display = "block";
 
+
         let score = 0;
 
-        if (value.length >= 6) score++;
-        if (value.length >= 10) score++;
-        if (/[A-Z]/.test(value)) score++;
-        if (/[0-9]/.test(value)) score++;
-        if (/[^A-Za-z0-9]/.test(value)) score++;
 
-        const percentage =
-          Math.min(score, 5) * 20;
+        if (value.length >= 6)
+          score++;
+
+        if (value.length >= 10)
+          score++;
+
+        if (/[A-Z]/.test(value))
+          score++;
+
+        if (/[0-9]/.test(value))
+          score++;
+
+        if (/[^A-Za-z0-9]/.test(value))
+          score++;
+
 
         strengthBar.style.width =
-          percentage + "%";
+          Math.min(score, 5) * 20 + "%";
+
 
         if (score <= 1) {
+
           passwordHint.textContent =
             "Weak password";
+
         } else if (score <= 3) {
+
           passwordHint.textContent =
             "Decent password";
+
         } else {
+
           passwordHint.textContent =
             "Strong password";
+
         }
+
       }
     );
 
 
-    /* ---------------------------
-       Login
-    --------------------------- */
+    /* ============================
+       LOGIN
+    ============================ */
 
     loginFormElement.addEventListener(
       "submit",
@@ -996,7 +1135,9 @@
 
         event.preventDefault();
 
+
         clearMessage(loginMessage);
+
 
         const email =
           document
@@ -1005,22 +1146,29 @@
             .trim()
             .toLowerCase();
 
+
         const password =
           document
             .getElementById("loginPassword")
             .value;
 
+
         if (!email || !password) {
+
           showMessage(
             loginMessage,
             "Please enter your email and password.",
             "error"
           );
+
           return;
         }
 
+
         loginBtn.disabled = true;
-        loginBtn.textContent = "Logging in...";
+        loginBtn.textContent =
+          "Logging in...";
+
 
         const {
           data,
@@ -1031,6 +1179,7 @@
             password
           });
 
+
         if (error) {
 
           showMessage(
@@ -1040,15 +1189,14 @@
           );
 
           loginBtn.disabled = false;
-          loginBtn.textContent = "Log in";
+          loginBtn.textContent =
+            "Log in";
 
           return;
         }
 
-        if (
-          !data ||
-          !data.user
-        ) {
+
+        if (!data?.user) {
 
           showMessage(
             loginMessage,
@@ -1057,19 +1205,22 @@
           );
 
           loginBtn.disabled = false;
-          loginBtn.textContent = "Log in";
+          loginBtn.textContent =
+            "Log in";
 
           return;
         }
 
+
         goHome();
+
       }
     );
 
 
-    /* ---------------------------
-       Create account
-    --------------------------- */
+    /* ============================
+       CREATE ACCOUNT
+    ============================ */
 
     signupFormElement.addEventListener(
       "submit",
@@ -1077,7 +1228,9 @@
 
         event.preventDefault();
 
+
         clearMessage(signupMessage);
+
 
         const email =
           document
@@ -1086,42 +1239,66 @@
             .trim()
             .toLowerCase();
 
+
         const password =
           signupPassword.value;
 
+
         if (!email || !password) {
+
           showMessage(
             signupMessage,
             "Please complete all fields.",
             "error"
           );
+
           return;
         }
 
+
         if (password.length < 6) {
+
           showMessage(
             signupMessage,
             "Your password must contain at least 6 characters.",
             "error"
           );
+
           return;
         }
+
 
         signupBtn.disabled = true;
         signupBtn.textContent =
           "Creating account...";
+
 
         const {
           data,
           error
         } =
           await client.auth.signUp({
+
             email,
+
             password,
+
             options: {
-              emailRedirectTo: APP_URL
+
+              /*
+                IMPORTANT:
+                After clicking the confirmation
+                email, Supabase sends the user to
+                confirmation.html.
+              */
+
+              emailRedirectTo:
+                CONFIRMATION_URL
+
             }
+
           });
+
 
         if (error) {
 
@@ -1140,36 +1317,34 @@
 
 
         /*
-          If a session exists, the project is configured
-          for automatic confirmation.
-
-          Otherwise, email confirmation is required.
+          If Supabase automatically created
+          a session, go directly into the app.
         */
 
         if (data?.session) {
+
           goHome();
+
           return;
         }
 
 
         /*
-          Supabase may intentionally return an obfuscated
-          result for an existing account when email
-          confirmation is enabled.
-
-          We don't claim with certainty that the account
-          doesn't exist. We simply send the user to the
-          confirmation screen.
+          Email confirmation is required.
+          Save the email and show the
+          confirmation-success flow once
+          the user clicks the email.
         */
 
         goConfirmation(email);
+
       }
     );
 
 
-    /* ---------------------------
-       Forgot password
-    --------------------------- */
+    /* ============================
+       FORGOT PASSWORD
+    ============================ */
 
     const resetModal =
       document.getElementById(
@@ -1206,7 +1381,7 @@
       "click",
       () => {
 
-        const currentEmail =
+        resetEmail.value =
           document
             .getElementById(
               "loginEmail"
@@ -1214,8 +1389,6 @@
             .value
             .trim();
 
-        resetEmail.value =
-          currentEmail;
 
         clearMessage(resetMessage);
 
@@ -1223,10 +1396,6 @@
           "show"
         );
 
-        setTimeout(
-          () => resetEmail.focus(),
-          50
-        );
       }
     );
 
@@ -1238,6 +1407,7 @@
         resetModal.classList.remove(
           "show"
         );
+
       }
     );
 
@@ -1249,10 +1419,13 @@
         if (
           event.target === resetModal
         ) {
+
           resetModal.classList.remove(
             "show"
           );
+
         }
+
       }
     );
 
@@ -1266,7 +1439,9 @@
             .trim()
             .toLowerCase();
 
+
         clearMessage(resetMessage);
+
 
         if (!email) {
 
@@ -1279,19 +1454,24 @@
           return;
         }
 
+
         sendReset.disabled = true;
         sendReset.textContent =
           "Sending...";
 
+
         const {
           error
         } =
-          await client.auth.resetPasswordForEmail(
-            email,
-            {
-              redirectTo: APP_URL
-            }
-          );
+          await client.auth
+            .resetPasswordForEmail(
+              email,
+              {
+                redirectTo:
+                  APP_URL
+              }
+            );
+
 
         if (error) {
 
@@ -1308,22 +1488,26 @@
           return;
         }
 
+
         showMessage(
           resetMessage,
-          "If this email is associated with an account, a reset link has been sent.",
+          "If this email belongs to an account, a reset link has been sent.",
           "success"
         );
 
+
         sendReset.disabled = false;
+
         sendReset.textContent =
           "Send link";
+
       }
     );
 
 
-    /* ---------------------------
-       Auth state listener
-    --------------------------- */
+    /* ============================
+       AUTH STATE
+    ============================ */
 
     client.auth.onAuthStateChange(
       (event, session) => {
@@ -1332,14 +1516,11 @@
           event === "SIGNED_IN" &&
           session
         ) {
+
           goHome();
+
         }
 
-        if (
-          event === "SIGNED_OUT"
-        ) {
-          // Stay on login page.
-        }
       }
     );
 
