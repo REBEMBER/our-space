@@ -1,28 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
-
-  <meta name="theme-color" content="#F7F9FC">
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#F7F9FC" />
   <title>Our Space — Login</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     * {
       box-sizing: border-box;
-    }
-
-    html,
-    body {
       margin: 0;
       padding: 0;
-      min-height: 100%;
-      font-family: Arial, Helvetica, sans-serif;
-      background: #F7F9FC;
-      color: #26313D;
     }
 
     body {
@@ -30,35 +20,48 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px;
+      padding: 20px;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f7f9fc;
+      color: #26313d;
     }
 
     .login-card {
       width: 100%;
       max-width: 390px;
-      background: #FFFFFF;
-      border-radius: 28px;
-      padding: 38px 28px 30px;
-      box-shadow: 0 18px 50px rgba(21, 43, 70, 0.10);
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 38px 30px 32px;
+      box-shadow: 0 12px 40px rgba(21, 43, 70, 0.10);
+      border: 1px solid #e7edf3;
     }
 
-    .brand {
-      text-align: center;
-      margin-bottom: 34px;
-    }
-
-    .brand h1 {
-      margin: 0;
-      color: #152B46;
-      font-size: 32px;
+    .logo {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 20px;
+      border-radius: 18px;
+      background: #152b46;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 27px;
       font-weight: 700;
-      letter-spacing: -0.8px;
     }
 
-    .brand p {
-      margin: 9px 0 0;
-      color: #718092;
+    h1 {
+      text-align: center;
+      color: #152b46;
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #7a8794;
       font-size: 14px;
+      margin-bottom: 30px;
     }
 
     .field {
@@ -67,151 +70,147 @@
 
     label {
       display: block;
-      margin-bottom: 8px;
-      color: #26313D;
       font-size: 14px;
       font-weight: 600;
+      margin-bottom: 8px;
+      color: #26313d;
+    }
+
+    .password-wrapper {
+      position: relative;
     }
 
     input {
       width: 100%;
-      height: 54px;
-      border: 1px solid #E2E9F0;
-      border-radius: 15px;
-      padding: 0 16px;
-
-      background: #F7F9FC;
-      color: #26313D;
-
+      height: 52px;
+      border: 1px solid #d9e2eb;
+      border-radius: 13px;
+      padding: 0 15px;
       font-size: 16px;
+      color: #26313d;
+      background: #fbfcfe;
       outline: none;
-
-      transition:
-        border-color 0.15s ease,
-        box-shadow 0.15s ease;
+      transition: 0.2s ease;
     }
 
     input:focus {
-      border-color: #152B46;
-      box-shadow: 0 0 0 3px rgba(21, 43, 70, 0.08);
+      border-color: #5c9bb2;
+      box-shadow: 0 0 0 3px rgba(92, 155, 178, 0.12);
+      background: #ffffff;
     }
 
-    .password-wrap {
-      position: relative;
-    }
-
-    .password-wrap input {
-      padding-right: 52px;
+    .password-wrapper input {
+      padding-right: 58px;
     }
 
     .show-password {
       position: absolute;
-      right: 13px;
+      right: 12px;
       top: 50%;
       transform: translateY(-50%);
-
       border: none;
       background: transparent;
-
-      color: #718092;
+      color: #5c7183;
+      cursor: pointer;
       font-size: 13px;
       font-weight: 600;
-
-      cursor: pointer;
+      padding: 8px;
     }
 
     .login-button {
       width: 100%;
-      height: 56px;
+      height: 52px;
       margin-top: 8px;
-
       border: none;
-      border-radius: 16px;
-
-      background: #152B46;
-      color: #FFFFFF;
-
+      border-radius: 13px;
+      background: #152b46;
+      color: #ffffff;
       font-size: 16px;
       font-weight: 700;
-
       cursor: pointer;
-
-      transition:
-        transform 0.08s ease,
-        filter 0.08s ease;
+      transition: 0.2s ease;
     }
 
-    .login-button:active {
-      transform: scale(0.98);
-      filter: brightness(0.94);
+    .login-button:hover {
+      background: #1d3b5e;
     }
 
     .login-button:disabled {
       opacity: 0.65;
-      cursor: default;
+      cursor: not-allowed;
     }
 
-    .error {
-      display: none;
-      margin-top: 16px;
-      padding: 12px 14px;
-
-      border-radius: 12px;
-
-      background: #FFF0EC;
-      color: #A34D3B;
-
+    .message {
+      min-height: 22px;
+      margin-top: 17px;
+      text-align: center;
       font-size: 14px;
       line-height: 1.4;
-      text-align: center;
+    }
+
+    .message.error {
+      color: #c45c5c;
+    }
+
+    .message.success {
+      color: #4f8a70;
     }
 
     .footer {
-      margin-top: 25px;
       text-align: center;
-      color: #9AA5B1;
+      margin-top: 25px;
+      color: #9aa5af;
       font-size: 12px;
+    }
+
+    @media (max-width: 420px) {
+      .login-card {
+        padding: 32px 22px 28px;
+      }
+
+      h1 {
+        font-size: 25px;
+      }
     }
   </style>
 </head>
 
 <body>
 
-  <main class="login-card">
+  <div class="login-card">
 
-    <div class="brand">
-      <h1>Our Space</h1>
-      <p>Welcome back</p>
-    </div>
+    <div class="logo">♡</div>
+
+    <h1>Our Space</h1>
+
+    <p class="subtitle">
+      Your private space, just for two.
+    </p>
 
     <form id="loginForm">
 
       <div class="field">
         <label for="username">Username</label>
-
         <input
           id="username"
           type="text"
           autocomplete="username"
-          autocapitalize="none"
-          spellcheck="false"
-          placeholder="Username"
+          placeholder="Enter your username"
           required
-        >
+        />
       </div>
 
       <div class="field">
         <label for="password">Password</label>
 
-        <div class="password-wrap">
-
+        <div class="password-wrapper">
           <input
             id="password"
             type="password"
             autocomplete="current-password"
-            placeholder="Password"
+            placeholder="Enter your password"
             required
-          >
+          />
 
           <button
             type="button"
@@ -220,7 +219,6 @@
           >
             Show
           </button>
-
         </div>
       </div>
 
@@ -229,23 +227,22 @@
         class="login-button"
         id="loginButton"
       >
-        Log In
+        Login
       </button>
 
       <div
-        class="error"
-        id="errorMessage"
+        id="message"
+        class="message"
+        aria-live="polite"
       ></div>
 
     </form>
 
     <div class="footer">
-      Our Space
+      Private • Personal • Our Space
     </div>
 
-  </main>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  </div>
 
   <script>
     const SUPABASE_URL =
@@ -254,10 +251,12 @@
     const SUPABASE_PUBLISHABLE_KEY =
       "sb_publishable_qTMUO8KxerEQBDQ-A7Huyg_8N2Tqpmr";
 
-    const FUNCTION_URL =
-      SUPABASE_URL + "/functions/v1/username-login";
+    const USERNAME_LOGIN_FUNCTION =
+      `${SUPABASE_URL}/functions/v1/username-login`;
 
-    const client = window.supabase.createClient(
+    const { createClient } = supabase;
+
+    const client = createClient(
       SUPABASE_URL,
       SUPABASE_PUBLISHABLE_KEY,
       {
@@ -269,40 +268,31 @@
       }
     );
 
-    const form = document.getElementById("loginForm");
+    const loginForm = document.getElementById("loginForm");
     const usernameInput = document.getElementById("username");
     const passwordInput = document.getElementById("password");
     const loginButton = document.getElementById("loginButton");
-    const errorMessage = document.getElementById("errorMessage");
-    const showPassword = document.getElementById("showPassword");
+    const showPasswordButton = document.getElementById("showPassword");
+    const message = document.getElementById("message");
 
-    showPassword.addEventListener("click", function () {
+    function showMessage(text, type = "error") {
+      message.textContent = text;
+      message.className = `message ${type}`;
+    }
 
-      if (passwordInput.type === "password") {
-        passwordInput.type = "text";
-        showPassword.textContent = "Hide";
-      } else {
-        passwordInput.type = "password";
-        showPassword.textContent = "Show";
-      }
+    showPasswordButton.addEventListener("click", () => {
+      const isPassword =
+        passwordInput.type === "password";
 
+      passwordInput.type =
+        isPassword ? "text" : "password";
+
+      showPasswordButton.textContent =
+        isPassword ? "Hide" : "Show";
     });
 
-    function showError(message) {
-      errorMessage.textContent = message;
-      errorMessage.style.display = "block";
-    }
-
-    function hideError() {
-      errorMessage.style.display = "none";
-      errorMessage.textContent = "";
-    }
-
-    form.addEventListener("submit", async function(event) {
-
+    loginForm.addEventListener("submit", async (event) => {
       event.preventDefault();
-
-      hideError();
 
       const username =
         usernameInput.value.trim().toLowerCase();
@@ -311,23 +301,28 @@
         passwordInput.value;
 
       if (!username || !password) {
-        showError("Enter your username and password.");
+        showMessage("Please enter your username and password.");
         return;
       }
 
       loginButton.disabled = true;
       loginButton.textContent = "Logging in...";
+      showMessage("", "");
 
       try {
-
         const response = await fetch(
-          FUNCTION_URL,
+          USERNAME_LOGIN_FUNCTION,
           {
             method: "POST",
 
             headers: {
               "Content-Type": "application/json",
-              "apikey": SUPABASE_PUBLISHABLE_KEY
+
+              "apikey":
+                SUPABASE_PUBLISHABLE_KEY,
+
+              "Authorization":
+                `Bearer ${SUPABASE_PUBLISHABLE_KEY}`
             },
 
             body: JSON.stringify({
@@ -337,44 +332,72 @@
           }
         );
 
-        const result = await response.json();
+        let result = {};
+
+        try {
+          result = await response.json();
+        } catch {
+          result = {};
+        }
 
         if (!response.ok) {
           throw new Error(
-            result.error || "Invalid username or password."
+            result.error ||
+            `Login failed (${response.status}).`
           );
         }
 
-        if (!result.access_token || !result.refresh_token) {
-          throw new Error("Login session could not be created.");
+        if (
+          !result.access_token ||
+          !result.refresh_token
+        ) {
+          throw new Error(
+            "Login succeeded but no session was returned."
+          );
         }
 
-        const { error: sessionError } =
-          await client.auth.setSession({
-            access_token: result.access_token,
-            refresh_token: result.refresh_token
-          });
+        const {
+          data: sessionData,
+          error: sessionError
+        } = await client.auth.setSession({
+          access_token: result.access_token,
+          refresh_token: result.refresh_token
+        });
 
         if (sessionError) {
           throw sessionError;
         }
 
-        window.location.href = "index.html";
+        if (!sessionData.session) {
+          throw new Error(
+            "Unable to create your session."
+          );
+        }
+
+        showMessage(
+          "Login successful. Entering Our Space...",
+          "success"
+        );
+
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 300);
 
       } catch (error) {
+        console.error("Login error:", error);
 
-        console.error(error);
-
-        showError(
+        showMessage(
           error.message ||
           "Unable to log in. Please try again."
         );
 
+      } finally {
         loginButton.disabled = false;
-        loginButton.textContent = "Log In";
+        loginButton.textContent = "Login";
       }
-
     });
+
+    usernameInput.focus();
   </script>
 
 </body>
