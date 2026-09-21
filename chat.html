@@ -7,7 +7,8 @@
     name="viewport"
     content="width=device-width, initial-scale=1.0, viewport-fit=cover"
   >
-  <title>Our Space — Chat</title>
+
+  <title>Our Space</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -15,13 +16,16 @@
     :root {
       --bg: #F8F0EC;
       --navy: #152B46;
+      --navy-light: #1D3B60;
       --peach: #F3B29F;
       --blue: #DCEAF5;
       --white: #FFFFFF;
       --text: #26313D;
       --muted: #7A8794;
-      --border: rgba(21, 43, 70, 0.10);
-      --shadow: 0 8px 24px rgba(21, 43, 70, 0.06);
+      --border: rgba(21, 43, 70, 0.09);
+      --soft-border: rgba(21, 43, 70, 0.06);
+      --shadow: 0 10px 30px rgba(21, 43, 70, 0.06);
+      --bubble-shadow: 0 5px 18px rgba(21, 43, 70, 0.045);
     }
 
     * {
@@ -30,9 +34,9 @@
 
     html,
     body {
-      margin: 0;
       width: 100%;
       height: 100%;
+      margin: 0;
       background: var(--bg);
       color: var(--text);
       font-family:
@@ -57,222 +61,584 @@
       cursor: pointer;
     }
 
+    /* =========================
+       APP
+    ========================= */
+
     .app {
       width: 100%;
       height: 100dvh;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
 
-    /* HEADER */
+    /* =========================
+       HEADER
+    ========================= */
 
     .header {
       flex-shrink: 0;
+      position: relative;
+      z-index: 40;
+
       padding:
         max(12px, env(safe-area-inset-top))
-        16px
+        18px
         12px;
-      background: rgba(248, 240, 236, 0.97);
+
+      background: rgba(248, 240, 236, 0.94);
       border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(14px);
-      position: relative;
-      z-index: 20;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
     }
 
     .header-inner {
-      width: min(100%, 760px);
+      width: min(100%, 820px);
       margin: 0 auto;
+
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      gap: 14px;
     }
 
-    .header-left,
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
     .header-right {
       display: flex;
       align-items: center;
-      gap: 9px;
+      gap: 8px;
     }
 
-    .icon-button {
+    .header-button {
       width: 38px;
       height: 38px;
-      padding: 0;
+      flex-shrink: 0;
+
       border: 1px solid var(--border);
       border-radius: 12px;
-      background: rgba(255, 255, 255, 0.8);
+
+      background: rgba(255, 255, 255, 0.82);
       color: var(--navy);
+
       display: flex;
       align-items: center;
       justify-content: center;
+
+      transition:
+        background 0.15s ease,
+        transform 0.15s ease;
     }
 
-    .icon-button:active {
+    .header-button:hover {
+      background: var(--white);
+    }
+
+    .header-button:active {
       transform: scale(0.96);
     }
 
-    .icon-button svg {
+    .header-button svg {
       width: 17px;
       height: 17px;
       stroke: currentColor;
     }
 
-    .heading {
+    .header-copy {
       min-width: 0;
     }
 
-    .title {
+    .header-title {
       margin: 0;
+
       color: var(--navy);
       font-size: 15px;
-      line-height: 1.2;
-      font-weight: 750;
+      line-height: 1.15;
+      font-weight: 800;
+      letter-spacing: -0.01em;
     }
 
-    .subtitle {
+    .header-subtitle {
       margin: 3px 0 0;
+
       color: var(--muted);
       font-size: 10px;
-      line-height: 1.2;
+      line-height: 1.1;
+      font-weight: 500;
     }
 
-    /* MESSAGES */
+    /* =========================
+       SELECTION TOOLBAR
+    ========================= */
+
+    .selection-toolbar {
+      width: min(100%, 820px);
+      margin: 10px auto 0;
+
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+
+      padding: 8px 9px;
+
+      background: rgba(255, 255, 255, 0.90);
+      border: 1px solid rgba(243, 178, 159, 0.55);
+      border-radius: 15px;
+
+      box-shadow: 0 5px 18px rgba(21, 43, 70, 0.04);
+    }
+
+    .selection-toolbar.visible {
+      display: flex;
+    }
+
+    .selection-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-left: 5px;
+    }
+
+    .selection-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--peach);
+    }
+
+    .selection-count {
+      color: var(--navy);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .selection-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .toolbar-button {
+      height: 32px;
+      border: 0;
+      border-radius: 10px;
+      padding: 0 11px;
+
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .toolbar-delete {
+      width: 32px;
+      padding: 0;
+
+      background: var(--navy);
+      color: var(--white);
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .toolbar-delete svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+    }
+
+    .toolbar-cancel {
+      background: var(--blue);
+      color: var(--navy);
+    }
+
+    /* =========================
+       MESSAGES AREA
+    ========================= */
 
     .messages-scroll {
       flex: 1;
       min-height: 0;
       overflow-y: auto;
+
       -webkit-overflow-scrolling: touch;
       overscroll-behavior: contain;
+
+      scrollbar-width: thin;
+      scrollbar-color: rgba(21, 43, 70, 0.12) transparent;
     }
 
-    .messages {
-      width: min(100%, 760px);
+    .messages-scroll::-webkit-scrollbar {
+      width: 7px;
+    }
+
+    .messages-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .messages-scroll::-webkit-scrollbar-thumb {
+      background: rgba(21, 43, 70, 0.12);
+      border-radius: 999px;
+    }
+
+    .messages-container {
+      width: min(100%, 800px);
       margin: 0 auto;
-      padding: 20px 14px 18px;
+
+      padding:
+        22px 17px
+        20px;
     }
 
-    .message {
+    /* =========================
+       DATE DIVIDER
+    ========================= */
+
+    .date-divider {
       display: flex;
-      width: 100%;
-      margin: 6px 0;
+      justify-content: center;
+
+      margin:
+        15px 0
+        11px;
     }
 
-    .message.mine {
+    .date-divider span {
+      padding: 5px 10px;
+
+      background: rgba(255, 255, 255, 0.68);
+      border: 1px solid var(--soft-border);
+      border-radius: 999px;
+
+      color: var(--muted);
+      font-size: 9px;
+      line-height: 1;
+      font-weight: 750;
+      letter-spacing: 0.025em;
+    }
+
+    /* =========================
+       MESSAGE ROW
+    ========================= */
+
+    .message-row {
+      width: 100%;
+
+      display: flex;
+      position: relative;
+
+      margin: 4px 0;
+    }
+
+    .message-row.mine {
       justify-content: flex-end;
     }
 
-    .message.theirs {
+    .message-row.theirs {
       justify-content: flex-start;
     }
 
-    .bubble {
-      max-width: min(80%, 520px);
-      padding: 10px 13px 8px;
-      border-radius: 18px;
-      box-shadow: var(--shadow);
-      white-space: pre-wrap;
-      word-break: break-word;
+    .message-content {
+      position: relative;
+      max-width: min(77%, 560px);
     }
 
-    .mine .bubble {
+    /* =========================
+       MESSAGE BUBBLE
+    ========================= */
+
+    .message-bubble {
+      position: relative;
+
+      padding:
+        10px 14px
+        8px;
+
+      border-radius: 19px;
+
+      box-shadow: var(--bubble-shadow);
+
+      transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease,
+        transform 0.1s ease;
+
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+
+    .message-row.mine .message-bubble {
       background: var(--navy);
       color: var(--white);
+
+      border: 1px solid var(--navy);
+
       border-bottom-right-radius: 7px;
     }
 
-    .theirs .bubble {
+    .message-row.theirs .message-bubble {
       background: var(--white);
       color: var(--text);
+
       border: 1px solid var(--border);
+
       border-bottom-left-radius: 7px;
     }
 
-    .message-text {
-      font-size: 14px;
-      line-height: 1.45;
+    .message-row.grouped-mine .message-bubble {
+      border-top-right-radius: 12px;
     }
 
-    .message-meta {
-      margin-top: 5px;
-      display: flex;
-      justify-content: flex-end;
-      gap: 5px;
-      font-size: 9px;
-      line-height: 1;
-      opacity: 0.6;
+    .message-row.grouped-theirs .message-bubble {
+      border-top-left-radius: 12px;
+    }
+
+    .message-row.selected .message-bubble {
+      border-color: var(--peach);
+      box-shadow:
+        0 0 0 2px rgba(243, 178, 159, 0.20),
+        var(--bubble-shadow);
+    }
+
+    .message-text {
+      display: block;
+
+      font-size: 14px;
+      line-height: 1.48;
+      letter-spacing: -0.004em;
+    }
+
+    /* =========================
+       DELETED MESSAGE
+    ========================= */
+
+    .message-bubble.deleted {
+      opacity: 1;
+      box-shadow: var(--bubble-shadow);
+    }
+
+    .message-row.mine .message-bubble.deleted {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: var(--white);
+    }
+
+    .message-row.theirs .message-bubble.deleted {
+      background: var(--white);
+      border-color: var(--border);
+      color: var(--text);
     }
 
     .deleted-label {
       display: block;
+
       margin-bottom: 4px;
+
+      color: inherit;
+      opacity: 0.58;
+
       font-size: 8px;
-      font-weight: 800;
+      line-height: 1;
+
+      font-weight: 850;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      opacity: 0.62;
     }
 
     .deleted-content {
+      display: block;
+
+      color: inherit;
+      font-size: 14px;
+      line-height: 1.48;
       font-style: normal;
     }
 
-    .date-separator {
+    /* =========================
+       MESSAGE META
+    ========================= */
+
+    .message-meta {
+      margin-top: 5px;
+
       display: flex;
-      justify-content: center;
-      margin: 19px 0 11px;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 5px;
+
+      color: inherit;
+      opacity: 0.56;
+
+      font-size: 8.5px;
+      line-height: 1;
+      font-weight: 600;
     }
 
-    .date-separator span {
-      padding: 5px 9px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.7);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 9px;
-      font-weight: 700;
+    .message-status {
+      font-weight: 750;
     }
 
-    .empty {
-      min-height: 100%;
+    /* =========================
+       MESSAGE MENU
+    ========================= */
+
+    .message-menu-trigger {
+      position: absolute;
+
+      right: 5px;
+      top: 50%;
+
+      width: 22px;
+      height: 22px;
+
+      padding: 0;
+
+      transform: translateY(-50%);
+
+      border: 0;
+      border-radius: 8px;
+
+      background: transparent;
+      color: currentColor;
+
+      opacity: 0;
+
       display: flex;
       align-items: center;
       justify-content: center;
+
+      transition:
+        opacity 0.15s ease,
+        background 0.15s ease;
+    }
+
+    .message-bubble:hover .message-menu-trigger,
+    .message-menu-trigger:focus-visible {
+      opacity: 0.5;
+    }
+
+    .message-menu-trigger:hover {
+      opacity: 0.9;
+      background: rgba(255, 255, 255, 0.10);
+    }
+
+    .message-menu-trigger svg {
+      width: 13px;
+      height: 13px;
+
+      fill: currentColor;
+      stroke: none;
+    }
+
+    .message-menu {
+      position: absolute;
+
+      right: 4px;
+      top: calc(100% + 6px);
+
+      min-width: 86px;
+
+      padding: 5px;
+
+      display: none;
+
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+
+      box-shadow: var(--shadow);
+
+      z-index: 30;
+    }
+
+    .message-menu.open {
+      display: block;
+    }
+
+    .message-menu button {
+      width: 100%;
+
+      border: 0;
+      border-radius: 7px;
+
+      padding: 8px 9px;
+
+      background: transparent;
+      color: var(--navy);
+
+      text-align: left;
+
+      font-size: 10px;
+      font-weight: 750;
+    }
+
+    .message-menu button:hover {
+      background: var(--blue);
+    }
+
+    /* =========================
+       EMPTY / ERROR
+    ========================= */
+
+    .empty-state {
+      min-height: 100%;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
       padding: 50px 20px;
     }
 
     .empty-card {
-      width: min(100%, 330px);
-      padding: 26px 22px;
-      background: rgba(255, 255, 255, 0.8);
+      width: min(100%, 320px);
+
+      padding: 28px 24px;
+
+      background: rgba(255, 255, 255, 0.74);
       border: 1px solid var(--border);
-      border-radius: 22px;
-      text-align: center;
+      border-radius: 23px;
+
       box-shadow: var(--shadow);
+
+      text-align: center;
     }
 
     .empty-card h2 {
-      margin: 0 0 8px;
+      margin: 0 0 7px;
+
       color: var(--navy);
       font-size: 17px;
+      font-weight: 800;
     }
 
     .empty-card p {
       margin: 0;
+
       color: var(--muted);
-      font-size: 13px;
-      line-height: 1.5;
+      font-size: 12px;
+      line-height: 1.55;
     }
 
     .error-card {
       width: min(100%, 560px);
-      margin: 30px auto;
-      padding: 16px;
-      border-radius: 15px;
+
+      margin: 28px auto;
+
+      padding: 16px 17px;
+
       background: var(--white);
-      border: 1px solid rgba(150, 60, 55, 0.2);
-      color: #873C36;
+      border: 1px solid rgba(170, 75, 65, 0.20);
+      border-radius: 15px;
+
+      color: #863C36;
+
       font-size: 12px;
       line-height: 1.5;
     }
@@ -282,72 +648,108 @@
       margin-bottom: 5px;
     }
 
-    /* COMPOSER */
+    /* =========================
+       COMPOSER
+    ========================= */
 
     .composer-area {
       flex-shrink: 0;
+
       padding:
-        9px 12px
+        10px 17px
         max(12px, env(safe-area-inset-bottom));
-      background: rgba(248, 240, 236, 0.97);
+
+      background: rgba(248, 240, 236, 0.95);
       border-top: 1px solid var(--border);
-      backdrop-filter: blur(14px);
+
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
     }
 
     .composer {
-      width: min(100%, 760px);
+      width: min(100%, 800px);
       margin: 0 auto;
+
       display: flex;
       align-items: flex-end;
+
       gap: 8px;
     }
 
-    .input-wrap {
+    .input-shell {
       flex: 1;
       min-width: 0;
+
       display: flex;
       align-items: flex-end;
-      padding: 3px 6px 3px 12px;
-      border: 1px solid var(--border);
-      border-radius: 17px;
+
+      padding:
+        4px 6px
+        4px 13px;
+
       background: var(--white);
-      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+
+      box-shadow:
+        0 7px 22px rgba(21, 43, 70, 0.045);
     }
 
-    textarea {
+    .message-input {
       width: 100%;
+
       min-height: 40px;
       max-height: 130px;
-      margin: 0;
-      padding: 9px 3px;
+
+      padding:
+        8px 2px;
+
       border: 0;
       outline: 0;
       resize: none;
+
       background: transparent;
       color: var(--text);
-      line-height: 1.4;
+
       font-size: 14px;
+      line-height: 1.4;
     }
 
-    textarea::placeholder {
+    .message-input::placeholder {
       color: var(--muted);
     }
 
     .send-button {
-      width: 44px;
-      height: 44px;
+      width: 45px;
+      height: 45px;
       flex-shrink: 0;
+
+      padding: 0;
+
       border: 0;
-      border-radius: 14px;
+      border-radius: 15px;
+
       background: var(--navy);
       color: var(--white);
+
       display: flex;
       align-items: center;
       justify-content: center;
+
+      box-shadow:
+        0 8px 19px rgba(21, 43, 70, 0.14);
+
+      transition:
+        transform 0.15s ease,
+        background 0.15s ease;
+    }
+
+    .send-button:hover {
+      background: var(--navy-light);
     }
 
     .send-button:active {
-      transform: scale(0.96);
+      transform: scale(0.95);
     }
 
     .send-button:disabled {
@@ -361,133 +763,301 @@
       stroke: currentColor;
     }
 
-    @media (max-width: 600px) {
-      .messages {
+    /* =========================
+       MOBILE
+    ========================= */
+
+    @media (max-width: 620px) {
+      .header {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .messages-container {
         padding-left: 10px;
         padding-right: 10px;
       }
 
-      .bubble {
-        max-width: 86%;
+      .composer-area {
+        padding-left: 10px;
+        padding-right: 10px;
       }
 
-      .message-text {
+      .message-content {
+        max-width: 84%;
+      }
+
+      .message-text,
+      .deleted-content {
         font-size: 13.5px;
+      }
+
+      .message-menu-trigger {
+        opacity: 0.42;
+      }
+
+      .selection-toolbar {
+        margin-left: 10px;
+        margin-right: 10px;
+
+        width: auto;
       }
     }
   </style>
 </head>
 
 <body>
+
   <div class="app">
 
+    <!-- HEADER -->
     <header class="header">
+
       <div class="header-inner">
 
         <div class="header-left">
+
           <button
-            class="icon-button"
+            class="header-button"
             id="homeButton"
             type="button"
             aria-label="Home"
             title="Home"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke-width="1.7"
+            >
               <path d="M4 10.5 12 4l8 6.5"></path>
               <path d="M6.5 9.5V20h11V9.5"></path>
               <path d="M10 20v-5h4v5"></path>
             </svg>
           </button>
 
-          <div class="heading">
-            <p class="title">Our Space</p>
-            <p class="subtitle" id="subtitle">Private chat</p>
+          <div class="header-copy">
+            <p class="header-title">Our Space</p>
+            <p
+              class="header-subtitle"
+              id="headerSubtitle"
+            >
+              Private chat
+            </p>
           </div>
+
         </div>
 
         <div class="header-right">
+
           <button
-            class="icon-button"
+            class="header-button"
             id="logoutButton"
             type="button"
             aria-label="Log out"
             title="Log out"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke-width="1.7"
+            >
               <path d="M10 4H5.8A1.8 1.8 0 0 0 4 5.8v12.4A1.8 1.8 0 0 0 5.8 20H10"></path>
               <path d="M14 8l4 4-4 4"></path>
               <path d="M9 12h9"></path>
             </svg>
           </button>
+
         </div>
 
       </div>
+
+      <!-- SELECTION TOOLBAR -->
+
+      <div
+        class="selection-toolbar"
+        id="selectionToolbar"
+      >
+        <div class="selection-info">
+          <span class="selection-dot"></span>
+          <span
+            class="selection-count"
+            id="selectionCount"
+          >
+            0 selected
+          </span>
+        </div>
+
+        <div class="selection-actions">
+
+          <button
+            class="toolbar-button toolbar-delete"
+            id="deleteButton"
+            type="button"
+            aria-label="Delete"
+            title="Delete"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke-width="1.7"
+            >
+              <path d="M4 7h16"></path>
+              <path d="M9 7V4h6v3"></path>
+              <path d="M7 7l1 13h8l1-13"></path>
+            </svg>
+          </button>
+
+          <button
+            class="toolbar-button toolbar-cancel"
+            id="cancelSelectionButton"
+            type="button"
+          >
+            Cancel
+          </button>
+
+        </div>
+      </div>
+
     </header>
 
-    <main class="messages-scroll" id="messagesScroll">
-      <div class="messages" id="messages"></div>
+    <!-- MESSAGES -->
+
+    <main
+      class="messages-scroll"
+      id="messagesScroll"
+    >
+      <div
+        class="messages-container"
+        id="messages"
+      ></div>
     </main>
 
-    <div class="composer-area">
-      <form class="composer" id="composer">
+    <!-- COMPOSER -->
 
-        <div class="input-wrap">
+    <div class="composer-area">
+
+      <form
+        class="composer"
+        id="composer"
+      >
+
+        <div class="input-shell">
+
           <textarea
+            class="message-input"
             id="messageInput"
             rows="1"
             placeholder="Write a message..."
             autocomplete="off"
           ></textarea>
+
         </div>
 
         <button
           class="send-button"
           id="sendButton"
           type="submit"
-          aria-label="Send"
-          title="Send"
+          aria-label="Send message"
+          title="Send message"
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke-width="1.8"
+          >
             <path d="M21 3 10.5 13.5"></path>
             <path d="m21 3-6.5 18-4-7.5L3 9.5 21 3Z"></path>
           </svg>
         </button>
 
       </form>
+
     </div>
+
   </div>
 
   <script>
-    const SUPABASE_URL = "https://ywflohxufmfydkpkkqly.supabase.co";
+    /* ==========================================
+       SUPABASE
+    ========================================== */
+
+    const SUPABASE_URL =
+      "https://ywflohxufmfydkpkkqly.supabase.co";
+
     const SUPABASE_PUBLISHABLE_KEY =
       "sb_publishable_qTMUO8KxerEQBDQ-A7Huyg_8N2Tqpmr";
 
     const SPACE_ID =
       "6547fe99-ed80-421c-8572-50ae3fb6fbe4";
 
-    const client = supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_PUBLISHABLE_KEY,
-      {
-        auth: {
-          persistSession: true,
-          autoRefreshToken: true,
-          detectSessionInUrl: true
+    const client =
+      supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY,
+        {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true
+          }
         }
-      }
-    );
+      );
 
-    const messagesEl = document.getElementById("messages");
-    const scrollEl = document.getElementById("messagesScroll");
-    const form = document.getElementById("composer");
-    const input = document.getElementById("messageInput");
-    const sendButton = document.getElementById("sendButton");
-    const homeButton = document.getElementById("homeButton");
-    const logoutButton = document.getElementById("logoutButton");
+    /* ==========================================
+       ELEMENTS
+    ========================================== */
+
+    const messagesEl =
+      document.getElementById("messages");
+
+    const messagesScroll =
+      document.getElementById("messagesScroll");
+
+    const input =
+      document.getElementById("messageInput");
+
+    const composer =
+      document.getElementById("composer");
+
+    const sendButton =
+      document.getElementById("sendButton");
+
+    const homeButton =
+      document.getElementById("homeButton");
+
+    const logoutButton =
+      document.getElementById("logoutButton");
+
+    const headerSubtitle =
+      document.getElementById("headerSubtitle");
+
+    const selectionToolbar =
+      document.getElementById("selectionToolbar");
+
+    const selectionCount =
+      document.getElementById("selectionCount");
+
+    const deleteButton =
+      document.getElementById("deleteButton");
+
+    const cancelSelectionButton =
+      document.getElementById(
+        "cancelSelectionButton"
+      );
+
+    /* ==========================================
+       STATE
+    ========================================== */
 
     let currentUser = null;
-    let channel = null;
-    let messageRows = [];
+    let messages = [];
+    let selectedIds = new Set();
+    let selectionMode = false;
+    let realtimeChannel = null;
+
+    /* ==========================================
+       HELPERS
+    ========================================== */
 
     function escapeHtml(value) {
       return String(value ?? "")
@@ -498,187 +1068,483 @@
         .replaceAll("'", "&#039;");
     }
 
-    function formatTime(value) {
-      if (!value) return "";
-
-      return new Date(value).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit"
-      });
-    }
-
-    function getDateKey(value) {
-      const d = new Date(value);
-
-      return (
-        d.getFullYear() +
-        "-" +
-        String(d.getMonth() + 1).padStart(2, "0") +
-        "-" +
-        String(d.getDate()).padStart(2, "0")
+    function timeLabel(value) {
+      return new Date(value).toLocaleTimeString(
+        [],
+        {
+          hour: "2-digit",
+          minute: "2-digit"
+        }
       );
     }
 
-    function formatDate(value) {
-      return new Date(value).toLocaleDateString([], {
-        day: "numeric",
-        month: "long",
-        year: "numeric"
+    function dateKey(value) {
+      const d = new Date(value);
+
+      return [
+        d.getFullYear(),
+        String(d.getMonth() + 1).padStart(2, "0"),
+        String(d.getDate()).padStart(2, "0")
+      ].join("-");
+    }
+
+    function dateLabel(value) {
+      return new Date(value).toLocaleDateString(
+        [],
+        {
+          day: "numeric",
+          month: "long",
+          year: "numeric"
+        }
+      );
+    }
+
+    function isMine(message) {
+      return (
+        currentUser &&
+        message.sender_id === currentUser.id
+      );
+    }
+
+    function closeMenus() {
+      document
+        .querySelectorAll(".message-menu.open")
+        .forEach((menu) => {
+          menu.classList.remove("open");
+        });
+    }
+
+    function scrollBottom() {
+      requestAnimationFrame(() => {
+        messagesScroll.scrollTo({
+          top: messagesScroll.scrollHeight,
+          behavior: "smooth"
+        });
       });
     }
 
-    function showError(message) {
+    function renderError(message) {
       messagesEl.innerHTML = `
         <div class="error-card">
-          <strong>Chat error</strong>
+          <strong>Unable to load the chat</strong>
           ${escapeHtml(message)}
         </div>
       `;
     }
 
+    /* ==========================================
+       STATUS
+    ========================================== */
+
+    function messageStatus(message) {
+      if (message.seen_at) {
+        return "Seen";
+      }
+
+      if (message.delivered_at) {
+        return "Delivered";
+      }
+
+      return "Sent";
+    }
+
+    /* ==========================================
+       RENDER
+    ========================================== */
+
     function renderMessages() {
-      if (!messageRows.length) {
+
+      closeMenus();
+
+      if (!messages.length) {
+
         messagesEl.innerHTML = `
-          <div class="empty">
+          <div class="empty-state">
             <div class="empty-card">
-              <h2>No messages yet</h2>
-              <p>Send a message to start the conversation.</p>
+              <h2>Our Space</h2>
+              <p>
+                Start your conversation here.
+              </p>
             </div>
           </div>
         `;
+
+        updateSelectionToolbar();
         return;
       }
 
       let html = "";
-      let previousDate = "";
+      let previousDate = null;
 
-      for (const row of messageRows) {
-        const date = getDateKey(row.created_at);
+      for (let i = 0; i < messages.length; i++) {
 
-        if (date !== previousDate) {
+        const message = messages[i];
+
+        const mine = isMine(message);
+        const deleted = Boolean(
+          message.deleted_at
+        );
+
+        const currentDate =
+          dateKey(message.created_at);
+
+        if (currentDate !== previousDate) {
+
           html += `
-            <div class="date-separator">
-              <span>${escapeHtml(formatDate(row.created_at))}</span>
+            <div class="date-divider">
+              <span>
+                ${escapeHtml(
+                  dateLabel(
+                    message.created_at
+                  )
+                )}
+              </span>
             </div>
           `;
 
-          previousDate = date;
+          previousDate = currentDate;
         }
 
-        const mine =
-          currentUser &&
-          row.sender_id === currentUser.id;
+        const previous =
+          i > 0
+            ? messages[i - 1]
+            : null;
 
-        const deleted = Boolean(row.deleted_at);
+        const grouped =
+          previous &&
+          previous.sender_id ===
+            message.sender_id &&
+          dateKey(previous.created_at) ===
+            currentDate;
 
-        const deletedLabel = deleted
-          ? `<span class="deleted-label">Deleted</span>`
-          : "";
+        const selected =
+          selectedIds.has(message.id);
 
-        const status = mine
-          ? (
-              row.seen_at
-                ? "Seen"
-                : row.delivered_at
-                  ? "Delivered"
-                  : "Sent"
+        const rowClass = [
+          "message-row",
+          mine ? "mine" : "theirs",
+          grouped
+            ? (
+              mine
+                ? "grouped-mine"
+                : "grouped-theirs"
             )
+            : "",
+          selected
+            ? "selected"
+            : ""
+        ]
+          .filter(Boolean)
+          .join(" ");
+
+        const deletedHtml = deleted
+          ? `
+            <span class="deleted-label">
+              Deleted
+            </span>
+          `
           : "";
+
+        const contentClass = deleted
+          ? "deleted-content"
+          : "message-text";
+
+        const statusHtml = mine
+          ? `
+            <span class="message-status">
+              ${escapeHtml(
+                messageStatus(message)
+              )}
+            </span>
+          `
+          : "";
+
+        const menuHtml =
+          mine && !deleted
+            ? `
+              <button
+                class="message-menu-trigger"
+                type="button"
+                data-menu-trigger="${message.id}"
+                aria-label="Message options"
+              >
+                <svg viewBox="0 0 24 24">
+                  <circle
+                    cx="5"
+                    cy="12"
+                    r="1.7"
+                  ></circle>
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="1.7"
+                  ></circle>
+                  <circle
+                    cx="19"
+                    cy="12"
+                    r="1.7"
+                  ></circle>
+                </svg>
+              </button>
+
+              <div
+                class="message-menu"
+                data-menu="${message.id}"
+              >
+                <button
+                  type="button"
+                  data-select="${message.id}"
+                >
+                  Select
+                </button>
+              </div>
+            `
+            : "";
 
         html += `
-          <div class="message ${mine ? "mine" : "theirs"}">
-            <div class="bubble">
-              ${deletedLabel}
-              <div class="${deleted ? "deleted-content" : "message-text"}">
-                ${escapeHtml(row.content)}
+          <div
+            class="${rowClass}"
+            data-row="${message.id}"
+          >
+
+            <div class="message-content">
+
+              <div
+                class="message-bubble ${
+                  deleted
+                    ? "deleted"
+                    : ""
+                }"
+              >
+
+                ${deletedHtml}
+
+                <span class="${contentClass}">
+                  ${escapeHtml(
+                    message.content
+                  )}
+                </span>
+
+                <div class="message-meta">
+                  <span>
+                    ${escapeHtml(
+                      timeLabel(
+                        message.created_at
+                      )
+                    )}
+                  </span>
+
+                  ${statusHtml}
+                </div>
+
+                ${menuHtml}
+
               </div>
 
-              <div class="message-meta">
-                <span>${escapeHtml(formatTime(row.created_at))}</span>
-                ${mine ? `<span>${escapeHtml(status)}</span>` : ""}
-              </div>
             </div>
+
           </div>
         `;
       }
 
       messagesEl.innerHTML = html;
 
-      requestAnimationFrame(() => {
-        scrollEl.scrollTop = scrollEl.scrollHeight;
-      });
+      updateSelectionToolbar();
     }
 
-    async function loadMessages() {
-      if (!currentUser) return;
+    /* ==========================================
+       SELECTION
+    ========================================== */
 
-      /*
-        IMPORTANT:
-        The first query only uses the ORIGINAL message columns.
-        That means newer delete/status columns cannot break the chat.
-      */
+    function enterSelection(id) {
+      selectionMode = true;
+      selectedIds.add(Number(id));
+      updateSelectionToolbar();
+    }
 
-      const { data, error } = await client
-        .from("messages")
-        .select(
-          "id,space_id,sender_id,content,created_at"
-        )
-        .eq("space_id", SPACE_ID)
-        .order("created_at", { ascending: true });
+    function toggleSelection(id) {
 
-      if (error) {
-        console.error("MESSAGE LOAD ERROR:", error);
-        showError(error.message);
+      const numericId = Number(id);
+
+      if (selectedIds.has(numericId)) {
+        selectedIds.delete(numericId);
+      } else {
+        selectedIds.add(numericId);
+      }
+
+      if (!selectedIds.size) {
+        exitSelection();
         return;
       }
 
-      messageRows = data || [];
-
-      /*
-        Try to enrich with the newer columns.
-        If they don't exist, the normal chat still works.
-      */
-
-      if (messageRows.length) {
-        try {
-          const ids = messageRows.map((row) => row.id);
-
-          const { data: extraRows, error: extraError } =
-            await client
-              .from("messages")
-              .select(
-                "id,deleted_at,deleted_by,delivered_at,seen_at"
-              )
-              .in("id", ids);
-
-          if (!extraError && extraRows) {
-            const extraMap = new Map(
-              extraRows.map((row) => [
-                row.id,
-                row
-              ])
-            );
-
-            messageRows = messageRows.map((row) => ({
-              ...row,
-              ...(extraMap.get(row.id) || {})
-            }));
-          }
-        } catch (extraError) {
-          console.warn(
-            "Optional message fields unavailable:",
-            extraError
-          );
-        }
-      }
-
-      renderMessages();
+      updateSelectionToolbar();
     }
 
-    async function sendMessage() {
-      const text = input.value.trim();
+    function exitSelection() {
+      selectionMode = false;
+      selectedIds.clear();
+      closeMenus();
+      updateSelectionToolbar();
 
-      if (!text) {
+      document
+        .querySelectorAll(
+          ".message-row.selected"
+        )
+        .forEach((row) => {
+          row.classList.remove(
+            "selected"
+          );
+        });
+    }
+
+    function updateSelectionToolbar() {
+
+      if (!selectionMode) {
+
+        selectionToolbar.classList.remove(
+          "visible"
+        );
+
+        return;
+      }
+
+      selectionToolbar.classList.add(
+        "visible"
+      );
+
+      selectionCount.textContent =
+        `${selectedIds.size} ${
+          selectedIds.size === 1
+            ? "message"
+            : "messages"
+        } selected`;
+
+      document
+        .querySelectorAll(
+          "[data-row]"
+        )
+        .forEach((row) => {
+
+          const id =
+            Number(
+              row.dataset.row
+            );
+
+          row.classList.toggle(
+            "selected",
+            selectedIds.has(id)
+          );
+        });
+    }
+
+    /* ==========================================
+       LOAD
+    ========================================== */
+
+    async function loadMessages(
+      shouldScroll = false
+    ) {
+
+      if (!currentUser) {
+        return;
+      }
+
+      let result =
+        await client
+          .from("messages")
+          .select(
+            `
+              id,
+              space_id,
+              sender_id,
+              content,
+              created_at,
+              deleted_at,
+              deleted_by,
+              delivered_at,
+              seen_at
+            `
+          )
+          .eq(
+            "space_id",
+            SPACE_ID
+          )
+          .order(
+            "created_at",
+            {
+              ascending: true
+            }
+          );
+
+      /*
+        Fallback in case the newer columns
+        are unavailable.
+      */
+
+      if (result.error) {
+
+        console.warn(
+          "Extended message query failed. Falling back.",
+          result.error
+        );
+
+        result =
+          await client
+            .from("messages")
+            .select(
+              `
+                id,
+                space_id,
+                sender_id,
+                content,
+                created_at
+              `
+            )
+            .eq(
+              "space_id",
+              SPACE_ID
+            )
+            .order(
+              "created_at",
+              {
+                ascending: true
+              }
+            );
+      }
+
+      if (result.error) {
+
+        console.error(
+          result.error
+        );
+
+        renderError(
+          result.error.message
+        );
+
+        return;
+      }
+
+      messages =
+        result.data || [];
+
+      renderMessages();
+
+      if (shouldScroll) {
+        scrollBottom();
+      }
+    }
+
+    /* ==========================================
+       SEND
+    ========================================== */
+
+    async function sendMessage() {
+
+      const value =
+        input.value.trim();
+
+      if (!value) {
         return;
       }
 
@@ -688,203 +1554,411 @@
 
       sendButton.disabled = true;
 
-      const { error } = await client
-        .from("messages")
-        .insert({
-          space_id: SPACE_ID,
-          sender_id: currentUser.id,
-          content: text
-        });
+      const { error } =
+        await client
+          .from("messages")
+          .insert({
+            space_id: SPACE_ID,
+            sender_id:
+              currentUser.id,
+            content: value
+          });
 
       sendButton.disabled = false;
 
       if (error) {
-        console.error("SEND ERROR:", error);
+
+        console.error(
+          "Send error:",
+          error
+        );
+
         alert(error.message);
+
         return;
       }
 
       input.value = "";
       input.style.height = "40px";
 
-      await loadMessages();
+      await loadMessages(true);
 
       input.focus();
     }
 
-    async function markIncomingMessages() {
-      if (!currentUser || !messageRows.length) {
+    /* ==========================================
+       DELETE
+    ========================================== */
+
+    async function deleteSelected() {
+
+      if (!selectedIds.size) {
         return;
       }
 
-      const ids = messageRows
-        .filter(
-          (row) =>
-            row.sender_id !== currentUser.id
-        )
-        .map((row) => row.id);
+      const ids = Array.from(
+        selectedIds
+      );
 
-      if (!ids.length) {
-        return;
-      }
+      deleteButton.disabled = true;
 
       try {
-        await client.rpc(
-          "mark_messages_delivered",
-          {
-            p_message_ids: ids
-          }
-        );
-      } catch (error) {
-        console.warn(
-          "Delivered status unavailable:",
-          error
-        );
-      }
 
-      try {
-        await client.rpc(
-          "mark_messages_seen",
-          {
-            p_message_ids: ids
+        for (const id of ids) {
+
+          const message =
+            messages.find(
+              (item) =>
+                Number(item.id) ===
+                Number(id)
+            );
+
+          if (!message) {
+            continue;
           }
-        );
+
+          if (
+            message.sender_id !==
+              currentUser.id
+          ) {
+            continue;
+          }
+
+          const { error } =
+            await client.rpc(
+              "soft_delete_message",
+              {
+                p_message_id:
+                  id
+              }
+            );
+
+          if (error) {
+            throw error;
+          }
+        }
+
+        exitSelection();
+
+        await loadMessages();
+
       } catch (error) {
-        console.warn(
-          "Seen status unavailable:",
+
+        console.error(
+          "Delete error:",
           error
         );
+
+        alert(
+          error.message ||
+          "Could not delete the message."
+        );
+
+      } finally {
+
+        deleteButton.disabled = false;
       }
     }
+
+    /* ==========================================
+       REALTIME
+    ========================================== */
 
     function subscribeRealtime() {
-      if (channel) {
-        client.removeChannel(channel);
+
+      if (realtimeChannel) {
+
+        client.removeChannel(
+          realtimeChannel
+        );
       }
 
-      channel = client
-        .channel("our-space-chat")
-        .on(
-          "postgres_changes",
-          {
-            event: "INSERT",
-            schema: "public",
-            table: "messages",
-            filter: "space_id=eq." + SPACE_ID
-          },
-          async () => {
-            await loadMessages();
-          }
-        )
-        .on(
-          "postgres_changes",
-          {
-            event: "UPDATE",
-            schema: "public",
-            table: "messages",
-            filter: "space_id=eq." + SPACE_ID
-          },
-          async () => {
-            await loadMessages();
-          }
-        )
-        .subscribe();
+      realtimeChannel =
+        client
+          .channel(
+            "our-space-chat"
+          )
+          .on(
+            "postgres_changes",
+            {
+              event: "INSERT",
+              schema: "public",
+              table: "messages",
+              filter:
+                `space_id=eq.${SPACE_ID}`
+            },
+            async () => {
+              await loadMessages(true);
+            }
+          )
+          .on(
+            "postgres_changes",
+            {
+              event: "UPDATE",
+              schema: "public",
+              table: "messages",
+              filter:
+                `space_id=eq.${SPACE_ID}`
+            },
+            async () => {
+              await loadMessages(false);
+            }
+          )
+          .subscribe();
     }
 
-    async function initialise() {
-      const { data, error } =
-        await client.auth.getSession();
+    /* ==========================================
+       EVENTS
+    ========================================== */
 
-      if (error) {
-        console.error("SESSION ERROR:", error);
-        window.location.href = "login.html";
-        return;
-      }
+    composer.addEventListener(
+      "submit",
+      async (event) => {
 
-      if (!data.session || !data.session.user) {
-        window.location.href = "login.html";
-        return;
-      }
-
-      currentUser = data.session.user;
-
-      await loadMessages();
-      await markIncomingMessages();
-      await loadMessages();
-
-      subscribeRealtime();
-    }
-
-    /*
-      SEND BUTTON
-    */
-
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-
-      await sendMessage();
-    });
-
-    /*
-      ENTER KEY
-      Enter = send
-      Shift + Enter = new line
-    */
-
-    input.addEventListener("keydown", async (event) => {
-      if (
-        event.key === "Enter" &&
-        !event.shiftKey &&
-        !event.isComposing
-      ) {
         event.preventDefault();
-        event.stopPropagation();
 
         await sendMessage();
       }
-    });
-
-    /*
-      AUTO-RESIZE TEXTAREA
-    */
-
-    input.addEventListener("input", () => {
-      input.style.height = "auto";
-
-      const height = Math.min(
-        input.scrollHeight,
-        130
-      );
-
-      input.style.height = height + "px";
-    });
-
-    homeButton.addEventListener("click", () => {
-      window.location.href = "index.html";
-    });
-
-    logoutButton.addEventListener(
-      "click",
-      async () => {
-        await client.auth.signOut();
-        window.location.href = "login.html";
-      }
     );
 
-    client.auth.onAuthStateChange(
-      (event, session) => {
+    input.addEventListener(
+      "keydown",
+      async (event) => {
+
         if (
-          event === "SIGNED_OUT" ||
-          !session
+          event.key === "Enter" &&
+          !event.shiftKey &&
+          !event.isComposing
         ) {
-          window.location.href = "login.html";
+
+          event.preventDefault();
+
+          await sendMessage();
         }
       }
     );
 
-    initialise();
+    input.addEventListener(
+      "input",
+      () => {
+
+        input.style.height =
+          "auto";
+
+        input.style.height =
+          Math.min(
+            input.scrollHeight,
+            130
+          ) + "px";
+      }
+    );
+
+    messagesEl.addEventListener(
+      "click",
+      (event) => {
+
+        const trigger =
+          event.target.closest(
+            "[data-menu-trigger]"
+          );
+
+        if (trigger) {
+
+          event.stopPropagation();
+
+          const id =
+            trigger.dataset
+              .menuTrigger;
+
+          const menu =
+            document.querySelector(
+              `[data-menu="${id}"]`
+            );
+
+          if (!menu) {
+            return;
+          }
+
+          const open =
+            menu.classList.contains(
+              "open"
+            );
+
+          closeMenus();
+
+          if (!open) {
+            menu.classList.add(
+              "open"
+            );
+          }
+
+          return;
+        }
+
+        const selectButton =
+          event.target.closest(
+            "[data-select]"
+          );
+
+        if (selectButton) {
+
+          event.stopPropagation();
+
+          enterSelection(
+            selectButton.dataset
+              .select
+          );
+
+          closeMenus();
+
+          return;
+        }
+
+        if (!selectionMode) {
+          return;
+        }
+
+        const row =
+          event.target.closest(
+            "[data-row]"
+          );
+
+        if (!row) {
+          return;
+        }
+
+        const id =
+          Number(
+            row.dataset.row
+          );
+
+        const message =
+          messages.find(
+            (item) =>
+              Number(item.id) ===
+              id
+          );
+
+        if (
+          message &&
+          message.sender_id ===
+            currentUser.id &&
+          !message.deleted_at
+        ) {
+          toggleSelection(id);
+        }
+      }
+    );
+
+    document.addEventListener(
+      "click",
+      (event) => {
+
+        if (
+          !event.target.closest(
+            ".message-menu"
+          ) &&
+          !event.target.closest(
+            ".message-menu-trigger"
+          )
+        ) {
+          closeMenus();
+        }
+      }
+    );
+
+    cancelSelectionButton.addEventListener(
+      "click",
+      () => {
+        exitSelection();
+      }
+    );
+
+    deleteButton.addEventListener(
+      "click",
+      async () => {
+        await deleteSelected();
+      }
+    );
+
+    homeButton.addEventListener(
+      "click",
+      () => {
+        window.location.href =
+          "index.html";
+      }
+    );
+
+    logoutButton.addEventListener(
+      "click",
+      async () => {
+
+        await client.auth.signOut();
+
+        window.location.href =
+          "login.html";
+      }
+    );
+
+    /* ==========================================
+       AUTH + START
+    ========================================== */
+
+    client.auth.onAuthStateChange(
+      (event, session) => {
+
+        if (
+          event === "SIGNED_OUT" ||
+          !session
+        ) {
+          window.location.href =
+            "login.html";
+        }
+      }
+    );
+
+    async function start() {
+
+      const { data, error } =
+        await client.auth.getSession();
+
+      if (error) {
+
+        console.error(
+          error
+        );
+
+        window.location.href =
+          "login.html";
+
+        return;
+      }
+
+      if (
+        !data.session ||
+        !data.session.user
+      ) {
+
+        window.location.href =
+          "login.html";
+
+        return;
+      }
+
+      currentUser =
+        data.session.user;
+
+      headerSubtitle.textContent =
+        "Private chat";
+
+      await loadMessages(true);
+
+      subscribeRealtime();
+    }
+
+    start();
   </script>
+
 </body>
 </html>
 ```
