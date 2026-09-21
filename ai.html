@@ -217,6 +217,26 @@ async function session(){
   return true;
 }
 
+async function migrateLocalHistory(){
+  const KEY="our_space_ai_history_v1";
+  const DONE="our_space_ai_history_migrated_v1";
+  if(localStorage.getItem(DONE))return;
+  let oldHistory=[];
+  try{oldHistory=JSON.parse(localStorage.getItem(KEY)||"[]")}catch{}
+  oldHistory=Array.isArray(oldHistory)?oldHistory.filter(m=>m&&(m.role==="user"||m.role==="model")&&typeof m.content==="string").slice(-100):[];
+  if(!oldHistory.length){localStorage.setItem(DONE,"1");return}
+  try{
+    const title=(oldHistory.find(m=>m.role==="user")?.content||"Imported chat").replace(/\s+/g," ").trim().slice(0,55)||"Imported chat";
+    const created=await client.from("ai_chats").insert({user_id:currentUser.id,title}).select("id").single();
+    if(created.error||!created.data)throw created.error||new Error("chat migration failed");
+    const rows=oldHistory.map(m=>({chat_id:created.data.id,user_id:currentUser.id,role:m.role,content:m.content}));
+    const inserted=await client.from("ai_messages").insert(rows);
+    if(inserted.error)throw inserted.error;
+    localStorage.removeItem(KEY);
+    localStorage.setItem(DONE,"1");
+  }catch(error){console.error("AI history migration:",error)}
+}
+
 async function loadChats(){
   const {data,error}=await client.from("ai_chats").select("id,title,created_at,updated_at").order("updated_at",{ascending:false}) .limit(1000);
   if(error){console.error(error);return}
@@ -326,7 +346,8 @@ async function send(text){
     if(reloadError)throw reloadError;
     messages=updated||[];
     $("chatTitle").textContent=chats.find(c=>c.id===currentChatId)?.title||data.reply?.slice(0,55)||"Chat";
-    await loadChats();
+    await migrateLocalHistory();
+  await loadChats();
     const fresh=chats.find(c=>c.id===currentChatId);if(fresh)$("chatTitle").textContent=fresh.title;
     renderMessages();$("status").textContent=data.memory_saved?"Saved to memory":"Ready";
   }catch(e){
