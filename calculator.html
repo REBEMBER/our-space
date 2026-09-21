@@ -371,6 +371,78 @@
     html[data-theme="forest"] .function { background:#D9E9E0 !important; color:#173A31 !important; }
     html[data-theme="forest"] .operator { background:#D8A58F !important; color:#173A31 !important; }
 
+    /* ==========================================
+       EXPANDED ACCOUNT THEMES
+    ========================================== */
+    html[data-theme="dark"] body{
+      background:#0B121B !important;
+      color:#EDF3F7 !important;
+    }
+    html[data-theme="dark"] .calculator{
+      background:#172331 !important;
+      border-color:rgba(237,243,247,.12);
+      box-shadow:0 24px 60px rgba(0,0,0,.24);
+    }
+    html[data-theme="dark"] .display{
+      background:linear-gradient(145deg,#1A2A3A,#2B455D) !important;
+      color:#F3F7FA !important;
+    }
+    html[data-theme="dark"] .number{
+      background:#26394D !important;
+      color:#F3F7FA !important;
+      border-color:rgba(237,243,247,.10) !important;
+    }
+    html[data-theme="dark"] .function{
+      background:#304960 !important;
+      color:#F3F7FA !important;
+      border-color:rgba(237,243,247,.10) !important;
+    }
+    html[data-theme="dark"] .operator{
+      background:#EFA58C !important;
+      color:#21140F !important;
+      border-color:rgba(255,255,255,.10) !important;
+    }
+
+    html[data-theme="ocean"] body{background:#ECF7FC !important;color:#193547 !important;}
+    html[data-theme="ocean"] .calculator{background:#FFFFFF !important;}
+    html[data-theme="ocean"] .display{background:linear-gradient(145deg,#0E4266,#1E638F) !important;}
+    html[data-theme="ocean"] .number{background:#FFFFFF !important;color:#0E4266 !important;}
+    html[data-theme="ocean"] .function{background:#D3EDF8 !important;color:#0E4266 !important;}
+    html[data-theme="ocean"] .operator{background:#72CAE6 !important;color:#08324D !important;}
+
+    html[data-theme="forest"] body{background:#EEF6F1 !important;color:#253A32 !important;}
+    html[data-theme="forest"] .calculator{background:#FFFFFF !important;}
+    html[data-theme="forest"] .display{background:linear-gradient(145deg,#164638,#286554) !important;}
+    html[data-theme="forest"] .number{background:#FFFFFF !important;color:#164638 !important;}
+    html[data-theme="forest"] .function{background:#D7EAE1 !important;color:#164638 !important;}
+    html[data-theme="forest"] .operator{background:#DDA187 !important;color:#3B2116 !important;}
+
+    html[data-theme="blush"] body{background:#FFF1F5 !important;color:#3D2731 !important;}
+    html[data-theme="blush"] .calculator{background:#FFFFFF !important;}
+    html[data-theme="blush"] .display{background:linear-gradient(145deg,#762B49,#9B3F62) !important;}
+    html[data-theme="blush"] .number{background:#FFFFFF !important;color:#762B49 !important;border-color:rgba(118,43,73,.09) !important;}
+    html[data-theme="blush"] .function{background:#FADCE7 !important;color:#762B49 !important;}
+    html[data-theme="blush"] .operator{background:#F3A2BC !important;color:#4C1730 !important;}
+
+    html[data-theme="sunset"] body{background:#FFF4EC !important;color:#3E2A22 !important;}
+    html[data-theme="sunset"] .calculator{background:#FFFFFF !important;}
+    html[data-theme="sunset"] .display{background:linear-gradient(145deg,#71381F,#9B583B) !important;}
+    html[data-theme="sunset"] .number{background:#FFFFFF !important;color:#71381F !important;border-color:rgba(113,56,31,.09) !important;}
+    html[data-theme="sunset"] .function{background:#FBE0D1 !important;color:#71381F !important;}
+    html[data-theme="sunset"] .operator{background:#F4A77E !important;color:#4C2414 !important;}
+
+    html[data-theme="warm"] .display{
+      background:linear-gradient(145deg,#152B46,#1D3B60) !important;
+    }
+    html[data-theme="warm"] .operator{
+      background:#F3B29F !important;
+      color:#152B46 !important;
+    }
+
+    button:focus-visible{
+      outline:3px solid currentColor;
+      outline-offset:2px;
+    }
   </style>
 </head>
 
@@ -433,7 +505,9 @@
       "warm",
       "dark",
       "ocean",
-      "forest"
+      "forest",
+      "blush",
+      "sunset"
     ]);
 
     async function loadAccountSettings() {
