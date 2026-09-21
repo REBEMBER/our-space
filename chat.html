@@ -1791,30 +1791,27 @@ function renderError(message) {
           if (directError) throw directError;
         }
 
-        // Never trust the UI until the database confirms the state.
-        const { data: deletedRow, error: verifyError } = await client
-          .from("messages")
-          .select("id, space_id, sender_id, content, created_at, deleted_at, deleted_by, seen_at")
-          .eq("id", message.id)
-          .maybeSingle();
-
-        if (verifyError) throw verifyError;
-
-        if (!deletedRow?.deleted_at) {
-          throw new Error(
-            "The database did not mark this message as deleted. Run the latest supabase_push_setup.sql in Supabase."
-          );
-        }
-
+        // The deletion RPC itself is the database confirmation.
+        // Deleted rows are intentionally hidden from Salma by RLS, so a follow-up
+        // SELECT can legitimately return no row on her device.
         const localIndex = messages.findIndex(
           (item) => Number(item.id) === Number(message.id)
         );
 
         if (localIndex !== -1) {
-          messages[localIndex] = {
-            ...messages[localIndex],
-            ...deletedRow
-          };
+          if (currentUser.id === MOHAMMAD_USER_ID) {
+            // Mohammad keeps the original message visible with a Deleted label.
+            messages[localIndex] = {
+              ...messages[localIndex],
+              deleted_at: new Date().toISOString(),
+              deleted_by: currentUser.id
+            };
+          } else {
+            // Salma must lose the message from her device immediately.
+            messages = messages.filter(
+              (item) => Number(item.id) !== Number(message.id)
+            );
+          }
         }
 
         renderMessages();
@@ -1893,7 +1890,51 @@ function renderError(message) {
       // Supabase failure mode where a filtered UPDATE subscription silently
       // receives nothing even though the table itself is in the publication.
       realtimeChannel = client
-        .channel(channelName)
+        .channel(channelName, {
+          config: {
+            private: true
+          }
+        })
+        .on(
+          "broadcast",
+          {
+            event: "message_deleted"
+          },
+          (payload) => {
+            const deletedId = Number(payload?.payload?.message_id);
+            const deletedSpace = String(payload?.payload?.space_id || "");
+
+            if (
+              !deletedId ||
+              deletedSpace !== String(SPACE_ID)
+            ) {
+              return;
+            }
+
+            const localIndex = messages.findIndex(
+              (item) => Number(item.id) === deletedId
+            );
+
+            if (localIndex === -1) {
+              return;
+            }
+
+            if (currentUser?.id === MOHAMMAD_USER_ID) {
+              messages[localIndex] = {
+                ...messages[localIndex],
+                deleted_at:
+                  messages[localIndex].deleted_at ||
+                  new Date().toISOString()
+              };
+            } else {
+              messages = messages.filter(
+                (item) => Number(item.id) !== deletedId
+              );
+            }
+
+            renderMessages();
+          }
+        )
         .on(
           "postgres_changes",
           {
