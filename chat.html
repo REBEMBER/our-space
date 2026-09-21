@@ -1063,10 +1063,7 @@
       syncComposerHeight();
 
       const apply = () => {
-        const lastRow =
-          messagesEl.querySelector("[data-row]:last-of-type");
-
-        if (!lastRow) {
+        if (!messagesEl.querySelector("[data-row]")) {
           messagesScroll.scrollTop = 0;
           return;
         }
