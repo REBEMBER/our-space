@@ -187,8 +187,14 @@
       top: var(--header-height, 0px);
       left: 0;
       right: 0;
-      bottom: var(--composer-height, 100px);
+      bottom: 0;
       overflow-y: auto;
+
+      /* The composer floats above this layer. Reserve its exact measured
+         height inside the scroll content so the final bubble can always
+         scroll completely above the composer, including on iPhone. */
+      padding-bottom: calc(var(--composer-height, 100px) + 24px);
+      scroll-padding-bottom: calc(var(--composer-height, 100px) + 24px);
 
       -webkit-overflow-scrolling: touch;
       overscroll-behavior: contain;
@@ -1197,6 +1203,8 @@
               messagesScroll.clientHeight
             );
 
+          // Scroll to the absolute content end. The reserved bottom spacer
+          // keeps the final bubble visibly above the fixed composer.
           messagesScroll.scrollTop = maxScroll;
         });
       });
@@ -1286,6 +1294,45 @@
     }
 
     syncLayoutMetrics();
+
+    // iOS Safari can change the visual viewport when the keyboard opens,
+    // closes, or the browser chrome expands/collapses. Keep the measured
+    // composer height and bottom spacer synchronized with those changes.
+    let viewportSyncFrame = 0;
+
+    function syncVisualViewport() {
+      if (viewportSyncFrame) return;
+
+      viewportSyncFrame = requestAnimationFrame(() => {
+        viewportSyncFrame = 0;
+
+        const wasAtBottom = isAtBottom();
+        syncLayoutMetrics();
+
+        if (wasAtBottom) {
+          scrollToLatest();
+        }
+      });
+    }
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener(
+        "resize",
+        syncVisualViewport,
+        { passive: true }
+      );
+      window.visualViewport.addEventListener(
+        "scroll",
+        syncVisualViewport,
+        { passive: true }
+      );
+    }
+
+    window.addEventListener(
+      "resize",
+      syncVisualViewport,
+      { passive: true }
+    );
 
 function renderError(message) {
       messagesEl.innerHTML = `
