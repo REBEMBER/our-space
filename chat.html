@@ -211,7 +211,7 @@
       flex-direction: column;
       justify-content: flex-start;
       padding:
-        24px 17px 150px;
+        24px 17px calc(var(--composer-height, 100px) + 20px);
     }
 
     /* =========================
@@ -758,7 +758,7 @@
       }
 
       .messages-container {
-        padding-bottom: 150px;
+        padding-bottom: calc(var(--composer-height, 100px) + 20px);
       }
 
       .message-content {
@@ -1079,8 +1079,26 @@
         });
     }
 
+    function syncComposerHeight() {
+      const composerArea = document.querySelector(".composer-area");
+      if (!composerArea) return;
+      document.documentElement.style.setProperty(
+        "--composer-height",
+        `${composerArea.getBoundingClientRect().height}px`
+      );
+    }
+
+    const composerResizeObserver = new ResizeObserver(() => {
+      syncComposerHeight();
+    });
+
+    composerResizeObserver.observe(document.querySelector(".composer-area"));
+    syncComposerHeight();
+
     function scrollBottom() {
-      messagesScroll.scrollTop = messagesScroll.scrollHeight;
+      requestAnimationFrame(() => {
+        messagesScroll.scrollTop = messagesScroll.scrollHeight;
+      });
     }
 
     function renderError(message) {
@@ -1491,6 +1509,11 @@
       if (shouldScroll) {
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
+            syncComposerHeight();
+            const lastRow = messagesEl.querySelector("[data-row]:last-of-type");
+            if (lastRow) {
+              lastRow.scrollIntoView({ block: "end", inline: "nearest" });
+            }
             messagesScroll.scrollTop = messagesScroll.scrollHeight;
           });
         });
@@ -1546,6 +1569,7 @@
       input.value = "";
       input.style.height =
         "40px";
+      syncComposerHeight();
 
       await loadMessages(true);
 
@@ -1706,6 +1730,8 @@
             input.scrollHeight,
             130
           ) + "px";
+
+        syncComposerHeight();
       }
     );
 
