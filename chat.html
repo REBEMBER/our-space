@@ -1487,7 +1487,11 @@
       renderMessages();
 
       if (shouldScroll) {
-        scrollBottom();
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            messagesScroll.scrollTop = messagesScroll.scrollHeight;
+          });
+        });
       }
     }
 
