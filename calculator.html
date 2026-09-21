@@ -1,13 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script>
-    (() => {
-      document.documentElement.dataset.theme =
-        localStorage.getItem("our_space_theme") || "warm";
-    })();
-  </script>
-  <meta charset="UTF-8">
+<meta charset="UTF-8">
 
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -420,7 +414,6 @@
     const SUPABASE_URL = "https://ywflohxufmfydkpkkqly.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_qTMUO8KxerEQBDQ-A7Huyg_8N2Tqpmr";
     const DEFAULT_UNLOCK_CODE = "0000";
-    const CALCULATOR_KEY = "our_space_calculator_code";
 
     const authClient = supabase.createClient(
       SUPABASE_URL,
@@ -434,15 +427,12 @@
       }
     );
 
-    let unlockCode =
-      localStorage.getItem(CALCULATOR_KEY) ||
-      DEFAULT_UNLOCK_CODE;
+    let unlockCode = DEFAULT_UNLOCK_CODE;
 
     authClient.auth.getUser().then(({ data }) => {
       const remoteCode = data?.user?.user_metadata?.calculator_code;
       if (/^\d{4,12}$/.test(remoteCode || "")) {
         unlockCode = remoteCode;
-        localStorage.setItem(CALCULATOR_KEY, remoteCode);
       }
     }).catch(() => {});
 
