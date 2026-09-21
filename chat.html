@@ -2,13 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script>
-    (() => {
-      const theme = localStorage.getItem("our_space_theme") || "warm";
-      document.documentElement.dataset.theme = theme;
-    })();
-  </script>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0, viewport-fit=cover"
@@ -2205,13 +2199,10 @@ function renderError(message) {
         data.session.user;
 
       const savedTheme =
-        currentUser.user_metadata?.our_space_theme ||
-        localStorage.getItem("our_space_theme");
+        currentUser.user_metadata?.our_space_theme || "warm";
 
-      if (savedTheme) {
-        document.documentElement.dataset.theme = savedTheme;
-        localStorage.setItem("our_space_theme", savedTheme);
-      }
+      document.documentElement.dataset.theme =
+        savedTheme;
 
       headerSubtitle.textContent =
         "Private chat";
