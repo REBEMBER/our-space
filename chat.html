@@ -758,7 +758,7 @@
       }
 
       .messages-container {
-        padding-bottom: calc(var(--composer-height, 100px) + 20px);
+        padding-bottom: calc(var(--composer-height, 100px) + 8px);
       }
 
       .message-content {
@@ -1591,16 +1591,36 @@
       if (message.deleted_at) return;
 
       try {
-        const { error } = await client.rpc(
+        // Primary path: secure database RPC.
+        const { data: rpcChanged, error: rpcError } = await client.rpc(
           "delete_message_for_everyone",
           { p_message_id: message.id }
         );
 
-        if (error) throw error;
+        if (rpcError) {
+          console.warn("Delete RPC failed; trying direct update:", rpcError);
+        }
 
+        // Compatibility fallback: this also works if the RPC has not yet
+        // been installed, provided the sender has the required UPDATE policy.
+        if (rpcError || rpcChanged === false) {
+          const { error: directError } = await client
+            .from("messages")
+            .update({
+              deleted_at: new Date().toISOString(),
+              deleted_by: currentUser.id
+            })
+            .eq("id", message.id)
+            .eq("sender_id", currentUser.id)
+            .is("deleted_at", null);
+
+          if (directError) throw directError;
+        }
+
+        // Never trust the UI until the database confirms the state.
         const { data: deletedRow, error: verifyError } = await client
           .from("messages")
-          .select("id, deleted_at, deleted_by")
+          .select("id, space_id, sender_id, content, created_at, deleted_at, deleted_by, seen_at")
           .eq("id", message.id)
           .maybeSingle();
 
@@ -1608,17 +1628,21 @@
 
         if (!deletedRow?.deleted_at) {
           throw new Error(
-            "The message was not deleted in the database. Please run the latest supabase_push_setup.sql in Supabase."
+            "The database did not mark this message as deleted. Run the latest supabase_push_setup.sql in Supabase."
           );
         }
 
-        const local = messages.find(
+        const localIndex = messages.findIndex(
           (item) => Number(item.id) === Number(message.id)
         );
-        if (local) {
-          local.deleted_at = deletedRow.deleted_at;
-          local.deleted_by = deletedRow.deleted_by || currentUser.id;
+
+        if (localIndex !== -1) {
+          messages[localIndex] = {
+            ...messages[localIndex],
+            ...deletedRow
+          };
         }
+
         renderMessages();
       } catch (error) {
         console.error("Delete error:", error);
@@ -1678,10 +1702,16 @@
     function subscribeRealtime() {
       if (realtimeChannel) {
         client.removeChannel(realtimeChannel);
+        realtimeChannel = null;
       }
 
       const channelName = "our-space-chat-" + SPACE_ID;
 
+      // Do NOT filter the Postgres Changes subscription here.
+      // The database/RLS layer decides which rows the user may receive,
+      // then we filter by SPACE_ID in the browser. This avoids a common
+      // Supabase failure mode where a filtered UPDATE subscription silently
+      // receives nothing even though the table itself is in the publication.
       realtimeChannel = client
         .channel(channelName)
         .on(
@@ -1689,10 +1719,18 @@
           {
             event: "*",
             schema: "public",
-            table: "messages",
-            filter: `space_id=eq.${SPACE_ID}`
+            table: "messages"
           },
           async (payload) => {
+            const incoming = payload.new || payload.old || {};
+
+            if (
+              incoming.space_id &&
+              String(incoming.space_id) !== String(SPACE_ID)
+            ) {
+              return;
+            }
+
             if (payload.eventType === "INSERT") {
               await loadMessages(true);
               return;
@@ -1700,51 +1738,66 @@
 
             if (payload.eventType === "UPDATE") {
               const updated = payload.new;
+
+              if (!updated?.id) {
+                await syncMessagesSilently();
+                return;
+              }
+
               const index = messages.findIndex(
                 (item) => Number(item.id) === Number(updated.id)
               );
 
-              if (index !== -1) {
-                const current = messages[index];
-                messages[index] = {
-                  ...current,
-                  ...updated
-                };
-
-                const seenOnlyUpdate =
-                  current.content === updated.content &&
-                  current.deleted_at === updated.deleted_at &&
-                  current.seen_at !== updated.seen_at;
-
-                if (seenOnlyUpdate) {
-                  const status = document.querySelector(
-                    `[data-status="${updated.id}"]`
-                  );
-                  if (status) {
-                    status.textContent = updated.seen_at ? "Seen" : "Sent";
-                  }
-                } else {
-                  const wasNearBottom =
-                    messagesScroll.scrollHeight -
-                    messagesScroll.scrollTop -
-                    messagesScroll.clientHeight < 80;
-
-                  renderMessages();
-
-                  if (wasNearBottom) {
-                    requestAnimationFrame(() => {
-                      messagesScroll.scrollTop = messagesScroll.scrollHeight;
-                    });
-                  }
-                }
-              } else {
+              if (index === -1) {
                 await loadMessages(false);
+                return;
               }
+
+              // Merge the event immediately. If Supabase omits a field,
+              // the existing local value remains intact.
+              const current = messages[index];
+              messages[index] = {
+                ...current,
+                ...updated
+              };
+
+              const seenOnlyUpdate =
+                current.content === messages[index].content &&
+                current.deleted_at === messages[index].deleted_at &&
+                current.seen_at !== messages[index].seen_at;
+
+              if (seenOnlyUpdate) {
+                const status = document.querySelector(
+                  `[data-status="${updated.id}"]`
+                );
+                if (status) {
+                  status.textContent =
+                    messages[index].seen_at ? "Seen" : "Sent";
+                }
+                return;
+              }
+
+              const wasNearBottom =
+                messagesScroll.scrollHeight -
+                messagesScroll.scrollTop -
+                messagesScroll.clientHeight < 80;
+
+              renderMessages();
+
+              if (wasNearBottom) {
+                requestAnimationFrame(() => {
+                  messagesScroll.scrollTop = messagesScroll.scrollHeight;
+                });
+              }
+
               return;
             }
 
+            // A hard DELETE is not used by our app, but handle it safely.
             if (payload.eventType === "DELETE") {
               const deletedId = Number(payload.old?.id);
+              if (!deletedId) return;
+
               messages = messages.filter(
                 (item) => Number(item.id) !== deletedId
               );
@@ -1752,15 +1805,19 @@
             }
           }
         )
-        .subscribe((status) => {
-          console.log("Our Space realtime:", status);
+        .subscribe((status, error) => {
+          console.log("Our Space realtime:", status, error || "");
 
-          if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+          if (
+            status === "CHANNEL_ERROR" ||
+            status === "TIMED_OUT" ||
+            status === "CLOSED"
+          ) {
             setTimeout(() => {
               if (document.visibilityState === "visible") {
                 subscribeRealtime();
               }
-            }, 1500);
+            }, 1000);
           }
         });
     }
@@ -1985,7 +2042,7 @@
       subscribeRealtime();
 
       // Keep both accounts synchronized even if a realtime event is delayed.
-      setInterval(syncMessagesSilently, 1500);
+      setInterval(syncMessagesSilently, 1000);
 
       input.focus();
     }
