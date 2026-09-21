@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+    (() => {
+      document.documentElement.dataset.theme =
+        localStorage.getItem("our_space_theme") || "warm";
+    })();
+  </script>
   <meta charset="UTF-8">
 
   <meta name="viewport"
@@ -350,6 +356,27 @@
       font-family: inherit;
     }
 
+      html[data-theme="dark"] body { background:#101722 !important; }
+    html[data-theme="dark"] .calculator { background:#182231 !important; border-color:rgba(234,241,247,.10); }
+    html[data-theme="dark"] .display { background:linear-gradient(145deg,#0B1220,#1A2A3E) !important; }
+    html[data-theme="dark"] .number { background:#223247 !important; color:#EAF1F7 !important; }
+    html[data-theme="dark"] .function { background:#2A4055 !important; color:#EAF1F7 !important; }
+    html[data-theme="dark"] .operator { background:#E7A58F !important; color:#152B46 !important; }
+
+    html[data-theme="ocean"] body { background:#EEF6FB !important; }
+    html[data-theme="ocean"] .calculator { background:#FFFFFF !important; }
+    html[data-theme="ocean"] .display { background:linear-gradient(145deg,#123B5D,#1C557F) !important; }
+    html[data-theme="ocean"] .number { background:#FFFFFF !important; color:#123B5D !important; }
+    html[data-theme="ocean"] .function { background:#D7ECF7 !important; color:#123B5D !important; }
+    html[data-theme="ocean"] .operator { background:#8BCDE5 !important; color:#123B5D !important; }
+
+    html[data-theme="forest"] body { background:#EEF4F0 !important; }
+    html[data-theme="forest"] .calculator { background:#FFFFFF !important; }
+    html[data-theme="forest"] .display { background:linear-gradient(145deg,#173A31,#255447) !important; }
+    html[data-theme="forest"] .number { background:#FFFFFF !important; color:#173A31 !important; }
+    html[data-theme="forest"] .function { background:#D9E9E0 !important; color:#173A31 !important; }
+    html[data-theme="forest"] .operator { background:#D8A58F !important; color:#173A31 !important; }
+
   </style>
 </head>
 
@@ -390,7 +417,34 @@
   </main>
 
   <script>
-    const UNLOCK_CODE = "0000";
+    const SUPABASE_URL = "https://ywflohxufmfydkpkkqly.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_qTMUO8KxerEQBDQ-A7Huyg_8N2Tqpmr";
+    const DEFAULT_UNLOCK_CODE = "0000";
+    const CALCULATOR_KEY = "our_space_calculator_code";
+
+    const authClient = supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY,
+      {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true
+        }
+      }
+    );
+
+    let unlockCode =
+      localStorage.getItem(CALCULATOR_KEY) ||
+      DEFAULT_UNLOCK_CODE;
+
+    authClient.auth.getUser().then(({ data }) => {
+      const remoteCode = data?.user?.user_metadata?.calculator_code;
+      if (/^\d{4,12}$/.test(remoteCode || "")) {
+        unlockCode = remoteCode;
+        localStorage.setItem(CALCULATOR_KEY, remoteCode);
+      }
+    }).catch(() => {});
 
     const display = document.getElementById("display");
 
@@ -463,7 +517,7 @@
        * 0 → 0 → 0 → 0 → =
        */
       if (
-        currentInput === UNLOCK_CODE &&
+        currentInput === unlockCode &&
         previousInput === "" &&
         operator === null
       ) {
