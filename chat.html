@@ -211,7 +211,7 @@
       flex-direction: column;
       justify-content: flex-start;
       padding:
-        24px 17px calc(var(--composer-height, 100px) + 20px);
+        24px 17px calc(var(--composer-height, 100px) + 8px);
     }
 
     /* =========================
@@ -1239,7 +1239,7 @@
         const statusHtml =
           mine
             ? `
-              <span class="message-status">
+              <span class="message-status" data-status="${message.id}">
                 ${escapeHtml(
                   messageStatus(
                     message
@@ -1512,9 +1512,11 @@
             syncComposerHeight();
             const lastRow = messagesEl.querySelector("[data-row]:last-of-type");
             if (lastRow) {
-              lastRow.scrollIntoView({ block: "end", inline: "nearest" });
+              const targetTop = lastRow.offsetTop - messagesScroll.clientHeight + lastRow.offsetHeight + 8;
+              messagesScroll.scrollTop = Math.max(0, targetTop);
+            } else {
+              messagesScroll.scrollTop = messagesScroll.scrollHeight;
             }
-            messagesScroll.scrollTop = messagesScroll.scrollHeight;
           });
         });
       }
@@ -1593,7 +1595,14 @@
 
         if (error) throw error;
 
-        await loadMessages(false);
+        const local = messages.find(
+          (item) => Number(item.id) === Number(message.id)
+        );
+        if (local) {
+          local.deleted_at = local.deleted_at || new Date().toISOString();
+          local.deleted_by = currentUser.id;
+        }
+        renderMessages();
       } catch (error) {
         console.error("Delete error:", error);
         alert(error.message || "Could not delete the message.");
@@ -1645,7 +1654,14 @@
                   current.deleted_at === updated.deleted_at &&
                   current.seen_at !== updated.seen_at;
 
-                if (!seenOnlyUpdate) {
+                if (seenOnlyUpdate) {
+                  const status = document.querySelector(
+                    `[data-status="${updated.id}"]`
+                  );
+                  if (status) {
+                    status.textContent = updated.seen_at ? "Seen" : "Sent";
+                  }
+                } else {
                   const wasNearBottom =
                     messagesScroll.scrollHeight -
                     messagesScroll.scrollTop -
