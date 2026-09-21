@@ -176,7 +176,10 @@
 
     .messages-scroll {
       position: absolute;
-      inset: 0;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
       overflow-y: auto;
 
       -webkit-overflow-scrolling: touch;
@@ -203,6 +206,7 @@
       width: min(100%, 800px);
       margin: 0 auto;
 
+      min-height: 100%;
       padding:
         24px 17px 150px;
     }
@@ -1073,9 +1077,10 @@
     }
 
     function scrollBottom() {
-      requestAnimationFrame(() => {
+      messagesScroll.scrollTop = messagesScroll.scrollHeight;
+      setTimeout(() => {
         messagesScroll.scrollTop = messagesScroll.scrollHeight;
-      });
+      }, 50);
     }
 
     function renderError(message) {
@@ -1487,11 +1492,7 @@
       renderMessages();
 
       if (shouldScroll) {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            messagesScroll.scrollTop = messagesScroll.scrollHeight;
-          });
-        });
+        scrollBottom();
       }
     }
 
