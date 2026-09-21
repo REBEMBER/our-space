@@ -752,6 +752,170 @@
     }
 
     /* =========================
+       MOHAMMAD AI REPLY ASSISTANT
+    ========================= */
+
+    .composer-row {
+      width: min(100%, 800px);
+      margin: 0 auto;
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+    }
+
+    .composer-row .composer {
+      width: auto;
+      flex: 1;
+      margin: 0;
+    }
+
+    .reply-assist {
+      width: min(100%, 800px);
+      margin: 0 auto 9px;
+      padding: 10px;
+      background: rgba(255,255,255,.94);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 10px 26px rgba(21,43,70,.08);
+      display: none;
+    }
+
+    .reply-assist.visible {
+      display: block;
+    }
+
+    .reply-assist-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 7px;
+    }
+
+    .reply-assist-title {
+      color: var(--navy);
+      font-size: 10px;
+      font-weight: 850;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .reply-assist-status {
+      color: var(--muted);
+      font-size: 9px;
+    }
+
+    .reply-assist-note {
+      color: var(--muted);
+      font-size: 9px;
+    }
+
+    .reply-assist-close {
+      width: 26px;
+      height: 26px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--soft-surface, var(--blue));
+      color: var(--navy);
+      font-size: 15px;
+      line-height: 1;
+    }
+
+    .reply-assist-suggestion {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      background: var(--soft-surface, var(--blue));
+      color: var(--text);
+      padding: 11px 12px;
+      text-align: left;
+      font-size: 13px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      transition: border-color .15s ease, background .15s ease;
+    }
+
+    .reply-assist-suggestion:hover:not(:disabled) {
+      background: var(--white);
+      border-color: rgba(21,43,70,.20);
+    }
+
+    .reply-assist-suggestion.sent {
+      cursor: default;
+      opacity: .72;
+    }
+
+    .reply-assist-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 7px;
+    }
+
+    .reply-assist-action {
+      height: 31px;
+      padding: 0 9px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--white);
+      color: var(--navy);
+      font-size: 9px;
+      font-weight: 800;
+    }
+
+    .reply-assist-action:hover:not(:disabled) {
+      background: var(--blue);
+    }
+
+    .reply-assist-action.active {
+      background: var(--navy);
+      color: var(--white);
+      border-color: var(--navy);
+    }
+
+    .reply-assist-action.send-reply {
+      margin-left: auto;
+    }
+
+    .best-reply-button {
+      height: 49px;
+      min-width: 103px;
+      flex-shrink: 0;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      background: var(--white);
+      color: var(--navy);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      box-shadow: 0 8px 19px rgba(21,43,70,.08);
+      font-size: 10px;
+      font-weight: 850;
+    }
+
+    .best-reply-button.visible {
+      display: flex;
+    }
+
+    .best-reply-button:hover:not(:disabled) {
+      background: var(--blue);
+    }
+
+    .best-reply-button:disabled {
+      opacity: .55;
+      cursor: default;
+    }
+
+    .best-reply-button svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+    }
+
+    /* =========================
        MOBILE
     ========================= */
 
@@ -796,6 +960,16 @@
       }
 
       .input-icon {
+        display: none;
+      }
+
+      .best-reply-button {
+        width: 50px;
+        min-width: 50px;
+        padding: 0;
+      }
+
+      .best-reply-button span {
         display: none;
       }
 
@@ -1025,57 +1199,87 @@
 
     <div class="composer-area">
 
-      <form
-        class="composer"
-        id="composer"
-      >
-
-        <div class="input-shell">
-
-          <div class="input-icon">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke-width="1.7"
-            >
-              <path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5 7.8 7.8 0 0 1-3.3-.7L4 20l1.7-4.6A7.4 7.4 0 0 1 5 11.5 7.5 7.5 0 1 1 20 11.5Z"></path>
-            </svg>
+      <div class="reply-assist" id="replyAssist">
+        <div class="reply-assist-header">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="reply-assist-title">Best reply</span>
+            <span class="reply-assist-note">Learns from your feedback</span>
           </div>
-
-          <textarea
-            class="message-input"
-            id="messageInput"
-            rows="1"
-            placeholder="Type a message..."
-            autocomplete="off"
-          ></textarea>
-
+          <div style="display:flex;align-items:center;gap:6px">
+            <span class="reply-assist-status" id="replyAssistStatus">Ready</span>
+            <button class="reply-assist-close" id="replyAssistClose" type="button" aria-label="Close">×</button>
+          </div>
         </div>
 
         <button
-          class="send-button"
-          id="sendButton"
-          type="submit"
-          aria-label="Send message"
-          title="Send message"
+          class="reply-assist-suggestion"
+          id="replyAssistSuggestion"
+          type="button"
+          aria-label="Send suggested reply"
+        ></button>
+
+        <div class="reply-assist-actions">
+          <button class="reply-assist-action" id="replyAssistLike" type="button">Like</button>
+          <button class="reply-assist-action" id="replyAssistDislike" type="button">Dislike</button>
+          <button class="reply-assist-action send-reply" id="replyAssistSend" type="button">Send</button>
+        </div>
+      </div>
+
+      <div class="composer-row">
+
+        <button
+          class="best-reply-button"
+          id="bestReplyButton"
+          type="button"
+          aria-label="Get the best reply to Salma"
+          title="Get the best reply to Salma"
         >
-
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke-width="1.8"
-          >
-            <path d="M21 3 10.5 13.5"></path>
-            <path d="m21 3-6.5 18-4-7.5L3 9.5 21 3Z"></path>
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7">
+            <path d="M12 3v4M12 17v4M3 12h4M17 12h4"></path>
+            <circle cx="12" cy="12" r="4"></circle>
           </svg>
-
-          <span class="send-label">
-            Send
-          </span>
-
+          <span>Best reply</span>
         </button>
 
-      </form>
+        <form class="composer" id="composer">
+          <div class="input-shell">
+
+            <div class="input-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7">
+                <path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5 7.8 7.8 0 0 1-3.3-.7L4 20l1.7-4.6A7.4 7.4 0 0 1 5 11.5 7.5 7.5 0 1 1 20 11.5Z"></path>
+              </svg>
+            </div>
+
+            <textarea
+              class="message-input"
+              id="messageInput"
+              rows="1"
+              placeholder="Type a message..."
+              autocomplete="off"
+            ></textarea>
+
+          </div>
+
+          <button
+            class="send-button"
+            id="sendButton"
+            type="submit"
+            aria-label="Send message"
+            title="Send message"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke-width="1.8"
+            >
+              <path d="M21 3 10.5 13.5"></path>
+              <path d="m21 3-6.5 18-4-7.5L3 9.5 21 3Z"></path>
+            </svg>
+            <span class="send-label">Send</span>
+          </button>
+        </form>
+
+      </div>
 
     </div>
 
@@ -1138,6 +1342,23 @@
     const headerSubtitle =
       document.getElementById("headerSubtitle");
 
+    const replyAssist =
+      document.getElementById("replyAssist");
+    const replyAssistStatus =
+      document.getElementById("replyAssistStatus");
+    const replyAssistSuggestion =
+      document.getElementById("replyAssistSuggestion");
+    const replyAssistLike =
+      document.getElementById("replyAssistLike");
+    const replyAssistDislike =
+      document.getElementById("replyAssistDislike");
+    const replyAssistSend =
+      document.getElementById("replyAssistSend");
+    const replyAssistClose =
+      document.getElementById("replyAssistClose");
+    const bestReplyButton =
+      document.getElementById("bestReplyButton");
+
 
     /* ==========================================
        STATE
@@ -1148,6 +1369,9 @@
     let realtimeChannel = null;
     let visibleMessageObserver = null;
     let isChatVisible = document.visibilityState === "visible";
+    let replySuggestion = null;
+    let replySuggestionSent = false;
+    let busyReplySuggestion = false;
 
     /* ==========================================
        HELPERS
@@ -1659,7 +1883,209 @@ function renderError(message) {
 
     document.addEventListener("visibilitychange", updateChatVisibility);
 
-    /* ==========================================
+    function latestIncomingMessage() {
+      if (!currentUser) return null;
+
+      for (let i = messages.length - 1; i >= 0; i--) {
+        const message = messages[i];
+        if (
+          message &&
+          !message.deleted_at &&
+          message.sender_id !== currentUser.id
+        ) {
+          return message;
+        }
+      }
+
+      return null;
+    }
+
+    function clearReplySuggestion() {
+      replySuggestion = null;
+      replySuggestionSent = false;
+      replyAssist.classList.remove("visible");
+      replyAssistSuggestion.textContent = "";
+      replyAssistSuggestion.classList.remove("sent");
+      replyAssistStatus.textContent = "Ready";
+      replyAssistLike.classList.remove("active");
+      replyAssistDislike.classList.remove("active");
+      setReplyButtonsEnabled(false);
+      syncLayoutMetrics();
+    }
+
+    function setReplyButtonsEnabled(enabled) {
+      replyAssistLike.disabled = !enabled;
+      replyAssistDislike.disabled = !enabled;
+      replyAssistSend.disabled = !enabled;
+      replyAssistSuggestion.disabled = !enabled;
+    }
+
+    function showReplyAssist(data) {
+      replySuggestion = data;
+      replySuggestionSent = false;
+      replyAssist.classList.add("visible");
+      replyAssistSuggestion.textContent = data.suggestion || "";
+      replyAssistSuggestion.classList.remove("sent");
+      replyAssistStatus.textContent = "Ready to send";
+      replyAssistLike.classList.remove("active");
+      replyAssistDislike.classList.remove("active");
+      setReplyButtonsEnabled(true);
+      syncLayoutMetrics();
+    }
+
+    async function requestBestReply() {
+      if (!currentUser || currentUser.id !== MOHAMMAD_USER_ID) return;
+
+      const incoming = latestIncomingMessage();
+
+      if (!incoming) {
+        alert("There is no message from Salma to reply to yet.");
+        return;
+      }
+
+      clearReplySuggestion();
+      bestReplyButton.disabled = true;
+      bestReplyButton.innerHTML =
+        '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"></path><circle cx="12" cy="12" r="4"></circle></svg><span>Thinking...</span>';
+
+      replyAssist.classList.add("visible");
+      replyAssistStatus.textContent = "Thinking...";
+      replyAssistSuggestion.textContent = "Generating the best reply for this moment...";
+      setReplyButtonsEnabled(false);
+      syncLayoutMetrics();
+
+      try {
+        const sessionResult = await client.auth.getSession();
+        const session = sessionResult?.data?.session;
+
+        if (!session) {
+          throw new Error("Your session has expired. Please sign in again.");
+        }
+
+        const response = await fetch("/api/ai", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + session.access_token
+          },
+          body: JSON.stringify({
+            mode: "suggest_reply",
+            source_message_id: Number(incoming.id)
+          })
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(data.error || "Could not generate a reply.");
+        }
+
+        if (!data.suggestion || !data.suggestion_id) {
+          throw new Error("The AI returned an empty suggestion.");
+        }
+
+        showReplyAssist({
+          suggestion_id: data.suggestion_id,
+          source_message_id: Number(data.source_message_id),
+          suggestion: String(data.suggestion)
+        });
+      } catch (error) {
+        replyAssistStatus.textContent = "Error";
+        replyAssistSuggestion.textContent =
+          error.message || "Could not generate a reply.";
+        setReplyButtonsEnabled(false);
+      } finally {
+        bestReplyButton.disabled = false;
+        bestReplyButton.innerHTML =
+          '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"></path><circle cx="12" cy="12" r="4"></circle></svg><span>Best reply</span>';
+        syncLayoutMetrics();
+      }
+    }
+
+    async function rateReply(rating) {
+      if (!replySuggestion || !currentUser) return;
+
+      replyAssistLike.disabled = true;
+      replyAssistDislike.disabled = true;
+
+      try {
+        const sessionResult = await client.auth.getSession();
+        const session = sessionResult?.data?.session;
+
+        if (!session) {
+          throw new Error("Your session has expired. Please sign in again.");
+        }
+
+        const response = await fetch("/api/ai", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + session.access_token
+          },
+          body: JSON.stringify({
+            mode: "save_reply_feedback",
+            suggestion_id: replySuggestion.suggestion_id,
+            source_message_id: replySuggestion.source_message_id,
+            suggestion: replySuggestion.suggestion,
+            rating
+          })
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(data.error || "Could not save your feedback.");
+        }
+
+        replyAssistLike.classList.toggle("active", rating === 1);
+        replyAssistDislike.classList.toggle("active", rating === -1);
+        replyAssistStatus.textContent =
+          replySuggestionSent ? "Saved" : "Feedback saved";
+      } catch (error) {
+        replyAssistStatus.textContent =
+          error.message || "Feedback could not be saved.";
+      } finally {
+        replyAssistLike.disabled = false;
+        replyAssistDislike.disabled = false;
+      }
+    }
+
+    async function sendReplySuggestion() {
+      if (!replySuggestion || replySuggestionSent || busyReplySuggestion) return;
+
+      const incoming = latestIncomingMessage();
+
+      if (
+        !incoming ||
+        Number(incoming.id) !== Number(replySuggestion.source_message_id)
+      ) {
+        clearReplySuggestion();
+        alert("A newer message from Salma arrived. Generate a fresh reply.");
+        return;
+      }
+
+      busyReplySuggestion = true;
+      replyAssistStatus.textContent = "Sending...";
+      setReplyButtonsEnabled(false);
+
+      try {
+        await sendMessage(replySuggestion.suggestion, true);
+        replySuggestionSent = true;
+        replyAssistSuggestion.classList.add("sent");
+        replyAssistSuggestion.disabled = true;
+        replyAssistSend.disabled = true;
+        replyAssistStatus.textContent = "Sent — rate it above.";
+      } catch (error) {
+        replyAssistStatus.textContent =
+          error.message || "Could not send.";
+        setReplyButtonsEnabled(true);
+      } finally {
+        busyReplySuggestion = false;
+        syncLayoutMetrics();
+      }
+    }
+
+        /* ==========================================
        LOAD
     ========================================== */
 
@@ -1757,10 +2183,13 @@ function renderError(message) {
        SEND
     ========================================== */
 
-    async function sendMessage() {
+    async function sendMessage(
+      messageOverride = null,
+      preserveReplySuggestion = false
+    ) {
 
       const value =
-        input.value.trim();
+        String(messageOverride ?? input.value).trim();
 
       if (!value) {
         return;
@@ -1808,6 +2237,10 @@ function renderError(message) {
 
       if (sentMessage && window.OurSpaceNotifications) {
         await window.OurSpaceNotifications.sendMessage(sentMessage);
+      }
+
+      if (!preserveReplySuggestion) {
+        clearReplySuggestion();
       }
 
       input.focus();
@@ -1908,6 +2341,22 @@ function renderError(message) {
               current.deleted_by !== next.deleted_by ||
               current.seen_at !== next.seen_at;
           });
+
+        if (
+          hasNewMessage &&
+          currentUser?.id === MOHAMMAD_USER_ID
+        ) {
+          const latestNextMessage =
+            nextMessages[nextMessages.length - 1];
+
+          if (
+            latestNextMessage &&
+            latestNextMessage.sender_id !== currentUser.id &&
+            !latestNextMessage.deleted_at
+          ) {
+            clearReplySuggestion();
+          }
+        }
 
         if (
           hasNewMessage &&
@@ -2035,6 +2484,14 @@ function renderError(message) {
               );
 
               if (!alreadyExists) {
+                if (
+                  currentUser?.id === MOHAMMAD_USER_ID &&
+                  inserted.sender_id !== currentUser.id &&
+                  !inserted.deleted_at
+                ) {
+                  clearReplySuggestion();
+                }
+
                 messages.push(inserted);
                 messages.sort(
                   (a, b) =>
@@ -2138,6 +2595,36 @@ function renderError(message) {
        EVENTS
     ========================================== */
 
+    bestReplyButton.addEventListener(
+      "click",
+      requestBestReply
+    );
+
+    replyAssistSuggestion.addEventListener(
+      "click",
+      sendReplySuggestion
+    );
+
+    replyAssistSend.addEventListener(
+      "click",
+      sendReplySuggestion
+    );
+
+    replyAssistLike.addEventListener(
+      "click",
+      () => rateReply(1)
+    );
+
+    replyAssistDislike.addEventListener(
+      "click",
+      () => rateReply(-1)
+    );
+
+    replyAssistClose.addEventListener(
+      "click",
+      clearReplySuggestion
+    );
+
     composer.addEventListener(
       "submit",
       async (event) => {
@@ -2145,6 +2632,15 @@ function renderError(message) {
         event.preventDefault();
 
         await sendMessage();
+      }
+    );
+
+    input.addEventListener(
+      "input",
+      () => {
+        if (replySuggestion && input.value.trim()) {
+          clearReplySuggestion();
+        }
       }
     );
 
@@ -2329,6 +2825,13 @@ function renderError(message) {
 
       currentUser =
         user;
+
+      if (currentUser.id === MOHAMMAD_USER_ID) {
+        bestReplyButton.classList.add("visible");
+      } else {
+        bestReplyButton.classList.remove("visible");
+        clearReplySuggestion();
+      }
 
       window.OurSpaceTheme.syncFromUser(currentUser);
 
