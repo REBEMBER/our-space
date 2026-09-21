@@ -1,4 +1,4 @@
-
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,8 +23,10 @@
       --text: #26313D;
       --muted: #7A8794;
       --border: rgba(21, 43, 70, 0.09);
+      --input-border: rgba(21, 43, 70, 0.18);
       --soft-border: rgba(21, 43, 70, 0.06);
       --shadow: 0 10px 30px rgba(21, 43, 70, 0.06);
+      --input-shadow: 0 8px 24px rgba(21, 43, 70, 0.08);
       --bubble-shadow: 0 5px 18px rgba(21, 43, 70, 0.045);
     }
 
@@ -60,10 +62,6 @@
     button {
       cursor: pointer;
     }
-
-    /* =========================
-       APP
-    ========================= */
 
     .app {
       width: 100%;
@@ -293,7 +291,7 @@
 
       padding:
         22px 17px
-        20px;
+        24px;
     }
 
     /* =========================
@@ -656,11 +654,11 @@
       flex-shrink: 0;
 
       padding:
-        10px 17px
-        max(12px, env(safe-area-inset-bottom));
+        11px 17px
+        max(13px, env(safe-area-inset-bottom));
 
-      background: rgba(248, 240, 236, 0.95);
-      border-top: 1px solid var(--border);
+      background: rgba(248, 240, 236, 0.97);
+      border-top: 1px solid rgba(21, 43, 70, 0.08);
 
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
@@ -673,8 +671,12 @@
       display: flex;
       align-items: flex-end;
 
-      gap: 8px;
+      gap: 9px;
     }
+
+    /*
+      MUCH MORE OBVIOUS INPUT
+    */
 
     .input-shell {
       flex: 1;
@@ -683,16 +685,56 @@
       display: flex;
       align-items: flex-end;
 
+      min-height: 49px;
+
       padding:
-        4px 6px
-        4px 13px;
+        4px 7px
+        4px 15px;
 
       background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 18px;
+
+      border:
+        1.5px solid
+        var(--input-border);
+
+      border-radius: 17px;
+
+      box-shadow: var(--input-shadow);
+
+      transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+    }
+
+    .input-shell:focus-within {
+      border-color: rgba(21, 43, 70, 0.35);
 
       box-shadow:
-        0 7px 22px rgba(21, 43, 70, 0.045);
+        0 0 0 3px rgba(220, 234, 245, 0.8),
+        var(--input-shadow);
+    }
+
+    .input-icon {
+      width: 18px;
+      height: 18px;
+
+      margin:
+        0 8px 10px 0;
+
+      flex-shrink: 0;
+
+      color: var(--navy);
+      opacity: 0.55;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .input-icon svg {
+      width: 17px;
+      height: 17px;
+      stroke: currentColor;
     }
 
     .message-input {
@@ -702,7 +744,7 @@
       max-height: 130px;
 
       padding:
-        8px 2px;
+        9px 2px;
 
       border: 0;
       outline: 0;
@@ -716,15 +758,21 @@
     }
 
     .message-input::placeholder {
-      color: var(--muted);
+      color: #6F7D89;
+      opacity: 1;
     }
 
+    /*
+      CLEAR SEND BUTTON
+    */
+
     .send-button {
-      width: 45px;
-      height: 45px;
+      height: 49px;
+      min-width: 76px;
+
       flex-shrink: 0;
 
-      padding: 0;
+      padding: 0 14px;
 
       border: 0;
       border-radius: 15px;
@@ -735,9 +783,10 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      gap: 8px;
 
       box-shadow:
-        0 8px 19px rgba(21, 43, 70, 0.14);
+        0 8px 19px rgba(21, 43, 70, 0.17);
 
       transition:
         transform 0.15s ease,
@@ -758,9 +807,15 @@
     }
 
     .send-button svg {
-      width: 17px;
-      height: 17px;
+      width: 16px;
+      height: 16px;
       stroke: currentColor;
+    }
+
+    .send-label {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.01em;
     }
 
     /* =========================
@@ -768,6 +823,7 @@
     ========================= */
 
     @media (max-width: 620px) {
+
       .header {
         padding-left: 12px;
         padding-right: 12px;
@@ -799,8 +855,42 @@
       .selection-toolbar {
         margin-left: 10px;
         margin-right: 10px;
-
         width: auto;
+      }
+
+      .input-shell {
+        min-height: 48px;
+        padding-left: 12px;
+      }
+
+      .input-icon {
+        display: none;
+      }
+
+      .send-button {
+        min-width: 50px;
+        width: 50px;
+        padding: 0;
+      }
+
+      .send-label {
+        display: none;
+      }
+    }
+
+    @media (max-width: 380px) {
+
+      .composer {
+        gap: 7px;
+      }
+
+      .send-button {
+        width: 47px;
+        min-width: 47px;
+      }
+
+      .message-input {
+        font-size: 13.5px;
       }
     }
   </style>
@@ -811,6 +901,7 @@
   <div class="app">
 
     <!-- HEADER -->
+
     <header class="header">
 
       <div class="header-inner">
@@ -877,8 +968,10 @@
         class="selection-toolbar"
         id="selectionToolbar"
       >
+
         <div class="selection-info">
           <span class="selection-dot"></span>
+
           <span
             class="selection-count"
             id="selectionCount"
@@ -916,6 +1009,7 @@
           </button>
 
         </div>
+
       </div>
 
     </header>
@@ -943,11 +1037,21 @@
 
         <div class="input-shell">
 
+          <div class="input-icon">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke-width="1.7"
+            >
+              <path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5 7.8 7.8 0 0 1-3.3-.7L4 20l1.7-4.6A7.4 7.4 0 0 1 5 11.5 7.5 7.5 0 1 1 20 11.5Z"></path>
+            </svg>
+          </div>
+
           <textarea
             class="message-input"
             id="messageInput"
             rows="1"
-            placeholder="Write a message..."
+            placeholder="Type a message..."
             autocomplete="off"
           ></textarea>
 
@@ -960,6 +1064,7 @@
           aria-label="Send message"
           title="Send message"
         >
+
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -968,6 +1073,11 @@
             <path d="M21 3 10.5 13.5"></path>
             <path d="m21 3-6.5 18-4-7.5L3 9.5 21 3Z"></path>
           </svg>
+
+          <span class="send-label">
+            Send
+          </span>
+
         </button>
 
       </form>
@@ -1102,7 +1212,8 @@
     function isMine(message) {
       return (
         currentUser &&
-        message.sender_id === currentUser.id
+        message.sender_id ===
+          currentUser.id
       );
     }
 
@@ -1176,19 +1287,31 @@
       let html = "";
       let previousDate = null;
 
-      for (let i = 0; i < messages.length; i++) {
+      for (
+        let i = 0;
+        i < messages.length;
+        i++
+      ) {
 
         const message = messages[i];
 
-        const mine = isMine(message);
-        const deleted = Boolean(
-          message.deleted_at
-        );
+        const mine =
+          isMine(message);
+
+        const deleted =
+          Boolean(
+            message.deleted_at
+          );
 
         const currentDate =
-          dateKey(message.created_at);
+          dateKey(
+            message.created_at
+          );
 
-        if (currentDate !== previousDate) {
+        if (
+          currentDate !==
+          previousDate
+        ) {
 
           html += `
             <div class="date-divider">
@@ -1202,7 +1325,8 @@
             </div>
           `;
 
-          previousDate = currentDate;
+          previousDate =
+            currentDate;
         }
 
         const previous =
@@ -1214,21 +1338,24 @@
           previous &&
           previous.sender_id ===
             message.sender_id &&
-          dateKey(previous.created_at) ===
-            currentDate;
+          dateKey(
+            previous.created_at
+          ) === currentDate;
 
         const selected =
-          selectedIds.has(message.id);
+          selectedIds.has(
+            message.id
+          );
 
         const rowClass = [
           "message-row",
           mine ? "mine" : "theirs",
           grouped
             ? (
-              mine
-                ? "grouped-mine"
-                : "grouped-theirs"
-            )
+                mine
+                  ? "grouped-mine"
+                  : "grouped-theirs"
+              )
             : "",
           selected
             ? "selected"
@@ -1237,27 +1364,32 @@
           .filter(Boolean)
           .join(" ");
 
-        const deletedHtml = deleted
-          ? `
-            <span class="deleted-label">
-              Deleted
-            </span>
-          `
-          : "";
+        const deletedHtml =
+          deleted
+            ? `
+              <span class="deleted-label">
+                Deleted
+              </span>
+            `
+            : "";
 
-        const contentClass = deleted
-          ? "deleted-content"
-          : "message-text";
+        const contentClass =
+          deleted
+            ? "deleted-content"
+            : "message-text";
 
-        const statusHtml = mine
-          ? `
-            <span class="message-status">
-              ${escapeHtml(
-                messageStatus(message)
-              )}
-            </span>
-          `
-          : "";
+        const statusHtml =
+          mine
+            ? `
+              <span class="message-status">
+                ${escapeHtml(
+                  messageStatus(
+                    message
+                  )
+                )}
+              </span>
+            `
+            : "";
 
         const menuHtml =
           mine && !deleted
@@ -1319,13 +1451,16 @@
 
                 ${deletedHtml}
 
-                <span class="${contentClass}">
+                <span
+                  class="${contentClass}"
+                >
                   ${escapeHtml(
                     message.content
                   )}
                 </span>
 
                 <div class="message-meta">
+
                   <span>
                     ${escapeHtml(
                       timeLabel(
@@ -1335,6 +1470,7 @@
                   </span>
 
                   ${statusHtml}
+
                 </div>
 
                 ${menuHtml}
@@ -1347,7 +1483,8 @@
         `;
       }
 
-      messagesEl.innerHTML = html;
+      messagesEl.innerHTML =
+        html;
 
       updateSelectionToolbar();
     }
@@ -1358,18 +1495,30 @@
 
     function enterSelection(id) {
       selectionMode = true;
-      selectedIds.add(Number(id));
+      selectedIds.add(
+        Number(id)
+      );
+
       updateSelectionToolbar();
     }
 
     function toggleSelection(id) {
 
-      const numericId = Number(id);
+      const numericId =
+        Number(id);
 
-      if (selectedIds.has(numericId)) {
-        selectedIds.delete(numericId);
+      if (
+        selectedIds.has(
+          numericId
+        )
+      ) {
+        selectedIds.delete(
+          numericId
+        );
       } else {
-        selectedIds.add(numericId);
+        selectedIds.add(
+          numericId
+        );
       }
 
       if (!selectedIds.size) {
@@ -1381,9 +1530,12 @@
     }
 
     function exitSelection() {
+
       selectionMode = false;
       selectedIds.clear();
+
       closeMenus();
+
       updateSelectionToolbar();
 
       document
@@ -1476,15 +1628,10 @@
             }
           );
 
-      /*
-        Fallback in case the newer columns
-        are unavailable.
-      */
-
       if (result.error) {
 
         console.warn(
-          "Extended message query failed. Falling back.",
+          "Extended message query failed.",
           result.error
         );
 
@@ -1558,10 +1705,14 @@
         await client
           .from("messages")
           .insert({
-            space_id: SPACE_ID,
+            space_id:
+              SPACE_ID,
+
             sender_id:
               currentUser.id,
-            content: value
+
+            content:
+              value
           });
 
       sendButton.disabled = false;
@@ -1573,13 +1724,16 @@
           error
         );
 
-        alert(error.message);
+        alert(
+          error.message
+        );
 
         return;
       }
 
       input.value = "";
-      input.style.height = "40px";
+      input.style.height =
+        "40px";
 
       await loadMessages(true);
 
@@ -1596,9 +1750,10 @@
         return;
       }
 
-      const ids = Array.from(
-        selectedIds
-      );
+      const ids =
+        Array.from(
+          selectedIds
+        );
 
       deleteButton.disabled = true;
 
@@ -1609,7 +1764,9 @@
           const message =
             messages.find(
               (item) =>
-                Number(item.id) ===
+                Number(
+                  item.id
+                ) ===
                 Number(id)
             );
 
@@ -1619,7 +1776,7 @@
 
           if (
             message.sender_id !==
-              currentUser.id
+            currentUser.id
           ) {
             continue;
           }
@@ -1656,7 +1813,8 @@
 
       } finally {
 
-        deleteButton.disabled = false;
+        deleteButton.disabled =
+          false;
       }
     }
 
@@ -1688,7 +1846,9 @@
                 `space_id=eq.${SPACE_ID}`
             },
             async () => {
-              await loadMessages(true);
+              await loadMessages(
+                true
+              );
             }
           )
           .on(
@@ -1701,7 +1861,9 @@
                 `space_id=eq.${SPACE_ID}`
             },
             async () => {
-              await loadMessages(false);
+              await loadMessages(
+                false
+              );
             }
           )
           .subscribe();
@@ -1779,14 +1941,14 @@
             return;
           }
 
-          const open =
+          const wasOpen =
             menu.classList.contains(
               "open"
             );
 
           closeMenus();
 
-          if (!open) {
+          if (!wasOpen) {
             menu.classList.add(
               "open"
             );
@@ -1835,8 +1997,9 @@
         const message =
           messages.find(
             (item) =>
-              Number(item.id) ===
-              id
+              Number(
+                item.id
+              ) === id
           );
 
         if (
@@ -1900,10 +2063,6 @@
       }
     );
 
-    /* ==========================================
-       AUTH + START
-    ========================================== */
-
     client.auth.onAuthStateChange(
       (event, session) => {
 
@@ -1917,9 +2076,16 @@
       }
     );
 
+    /* ==========================================
+       START
+    ========================================== */
+
     async function start() {
 
-      const { data, error } =
+      const {
+        data,
+        error
+      } =
         await client.auth.getSession();
 
       if (error) {
@@ -1954,6 +2120,8 @@
       await loadMessages(true);
 
       subscribeRealtime();
+
+      input.focus();
     }
 
     start();
@@ -1961,4 +2129,4 @@
 
 </body>
 </html>
-
+```
