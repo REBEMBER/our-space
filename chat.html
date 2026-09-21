@@ -1473,7 +1473,10 @@
                 space_id,
                 sender_id,
                 content,
-                created_at
+                created_at,
+                deleted_at,
+                deleted_by,
+                seen_at
               `
             )
             .eq(
@@ -1595,12 +1598,26 @@
 
         if (error) throw error;
 
+        const { data: deletedRow, error: verifyError } = await client
+          .from("messages")
+          .select("id, deleted_at, deleted_by")
+          .eq("id", message.id)
+          .maybeSingle();
+
+        if (verifyError) throw verifyError;
+
+        if (!deletedRow?.deleted_at) {
+          throw new Error(
+            "The message was not deleted in the database. Please run the latest supabase_push_setup.sql in Supabase."
+          );
+        }
+
         const local = messages.find(
           (item) => Number(item.id) === Number(message.id)
         );
         if (local) {
-          local.deleted_at = local.deleted_at || new Date().toISOString();
-          local.deleted_by = currentUser.id;
+          local.deleted_at = deletedRow.deleted_at;
+          local.deleted_by = deletedRow.deleted_by || currentUser.id;
         }
         renderMessages();
       } catch (error) {
@@ -1609,6 +1626,51 @@
       }
     }
 
+    let syncInProgress = false;
+
+    async function syncMessagesSilently() {
+      if (!currentUser || syncInProgress) return;
+      syncInProgress = true;
+      try {
+        const { data, error } = await client
+          .from("messages")
+          .select("id, space_id, sender_id, content, created_at, deleted_at, deleted_by, seen_at")
+          .eq("space_id", SPACE_ID)
+          .order("created_at", { ascending: true });
+
+        if (error) throw error;
+        const nextMessages = data || [];
+        const changed =
+          nextMessages.length !== messages.length ||
+          nextMessages.some((next, index) => {
+            const current = messages[index];
+            return !current ||
+              Number(current.id) !== Number(next.id) ||
+              current.content !== next.content ||
+              current.deleted_at !== next.deleted_at ||
+              current.deleted_by !== next.deleted_by ||
+              current.seen_at !== next.seen_at;
+          });
+
+        if (changed) {
+          const wasNearBottom =
+            messagesScroll.scrollHeight -
+            messagesScroll.scrollTop -
+            messagesScroll.clientHeight < 80;
+          messages = nextMessages;
+          renderMessages();
+          if (wasNearBottom) {
+            requestAnimationFrame(() => {
+              messagesScroll.scrollTop = messagesScroll.scrollHeight;
+            });
+          }
+        }
+      } catch (error) {
+        console.warn("Background message sync failed:", error);
+      } finally {
+        syncInProgress = false;
+      }
+    }
     /* ==========================================
        REALTIME
     ========================================== */
@@ -1921,6 +1983,9 @@
       }
 
       subscribeRealtime();
+
+      // Keep both accounts synchronized even if a realtime event is delayed.
+      setInterval(syncMessagesSilently, 1500);
 
       input.focus();
     }
