@@ -5,13 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#F8F0EC">
   <title>Our Space — Settings</title>
-  <script>
-    (() => {
-      document.documentElement.dataset.theme =
-        localStorage.getItem("our_space_theme") || "warm";
-    })();
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root{--bg:#F8F0EC;--navy:#152B46;--navy-light:#1D3B60;--peach:#F3B29F;--blue:#DCEAF5;--white:#FFF;--text:#26313D;--muted:#7A8794;--border:rgba(21,43,70,.10);--surface-soft:rgba(255,255,255,.72);--success:#356C59;--danger:#A94F4F}
     html[data-theme="dark"]{--bg:#101722;--navy:#EAF1F7;--navy-light:#CFE0EE;--peach:#E7A58F;--blue:#24394E;--white:#182231;--text:#EAF1F7;--muted:#9EADBB;--border:rgba(234,241,247,.11);--surface-soft:rgba(24,34,49,.82);--success:#78B69B;--danger:#E58F8F}
@@ -133,8 +127,7 @@
     const SUPABASE_URL="https://ywflohxufmfydkpkkqly.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY="sb_publishable_qTMUO8KxerEQBDQ-A7Huyg_8N2Tqpmr";
     const DEFAULT_CALCULATOR_CODE="0000";
-    const THEME_KEY="our_space_theme";
-    const CALCULATOR_KEY="our_space_calculator_code";
+
 
     const client=supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
     const allowedThemes=new Set(["warm","dark","ocean","forest"]);
@@ -142,7 +135,6 @@
     function applyTheme(theme){
       const safeTheme=allowedThemes.has(theme)?theme:"warm";
       document.documentElement.dataset.theme=safeTheme;
-      localStorage.setItem(THEME_KEY,safeTheme);
       document.querySelectorAll("[data-theme-option]").forEach((button)=>{
         button.classList.toggle("active",button.dataset.themeOption===safeTheme);
       });
@@ -153,7 +145,7 @@
       element.className="status "+type;
     }
 
-    applyTheme(localStorage.getItem(THEME_KEY)||"warm");
+    applyTheme("warm");
 
     document.getElementById("backButton").addEventListener("click",()=>{window.location.href="index.html";});
 
@@ -181,7 +173,6 @@
       if(code!==confirm){setStatus(status,"The codes do not match.","error");return;}
       const {error}=await client.auth.updateUser({data:{calculator_code:code}});
       if(error){console.error("Calculator code error:",error);setStatus(status,error.message||"Could not save the calculator code.","error");return;}
-      localStorage.setItem(CALCULATOR_KEY,code);
       document.getElementById("calculatorCode").value="";
       document.getElementById("calculatorCodeConfirm").value="";
       setStatus(status,"Calculator code updated.","success");
@@ -191,7 +182,6 @@
       const status=document.getElementById("calculatorStatus");
       const {error}=await client.auth.updateUser({data:{calculator_code:DEFAULT_CALCULATOR_CODE}});
       if(error){console.error("Calculator reset error:",error);setStatus(status,error.message||"Could not reset the code.","error");return;}
-      localStorage.setItem(CALCULATOR_KEY,DEFAULT_CALCULATOR_CODE);
       document.getElementById("calculatorCode").value="";
       document.getElementById("calculatorCodeConfirm").value="";
       setStatus(status,"Calculator code reset to the default.","success");
@@ -226,8 +216,7 @@
       document.getElementById("accountEmail").textContent=user.email||"Private account";
       const metadataTheme=user.user_metadata?.our_space_theme;
       if(metadataTheme&&allowedThemes.has(metadataTheme))applyTheme(metadataTheme);
-      const metadataCode=user.user_metadata?.calculator_code||localStorage.getItem(CALCULATOR_KEY)||DEFAULT_CALCULATOR_CODE;
-      localStorage.setItem(CALCULATOR_KEY,metadataCode);
+
     }
     start();
   </script>
