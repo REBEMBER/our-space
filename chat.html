@@ -211,7 +211,7 @@
       flex-direction: column;
       justify-content: flex-start;
       padding:
-        24px 17px 150px;
+        24px 17px 96px;
     }
 
     /* =========================
@@ -758,7 +758,7 @@
       }
 
       .messages-container {
-        padding-bottom: 150px;
+        padding-bottom: 96px;
       }
 
       .message-content {
@@ -1355,7 +1355,6 @@
       );
       if (local) {
         local.seen_at = new Date().toISOString();
-        renderMessages();
       }
     }
 
@@ -1492,10 +1491,7 @@
       renderMessages();
 
       if (shouldScroll) {
-        // Wait for the browser to finish layout, then place the
-        // scroll viewport at the absolute bottom of the chat.
         requestAnimationFrame(() => {
-          messagesScroll.scrollTop = messagesScroll.scrollHeight;
           requestAnimationFrame(() => {
             messagesScroll.scrollTop = messagesScroll.scrollHeight;
           });
@@ -1616,11 +1612,31 @@
               );
 
               if (index !== -1) {
+                const current = messages[index];
                 messages[index] = {
-                  ...messages[index],
+                  ...current,
                   ...updated
                 };
-                renderMessages();
+
+                const seenOnlyUpdate =
+                  current.content === updated.content &&
+                  current.deleted_at === updated.deleted_at &&
+                  current.seen_at !== updated.seen_at;
+
+                if (!seenOnlyUpdate) {
+                  const wasNearBottom =
+                    messagesScroll.scrollHeight -
+                    messagesScroll.scrollTop -
+                    messagesScroll.clientHeight < 80;
+
+                  renderMessages();
+
+                  if (wasNearBottom) {
+                    requestAnimationFrame(() => {
+                      messagesScroll.scrollTop = messagesScroll.scrollHeight;
+                    });
+                  }
+                }
               } else {
                 await loadMessages(false);
               }
