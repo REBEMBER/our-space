@@ -1,13 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script>
-    (() => {
-      const theme = localStorage.getItem("our_space_theme") || "warm";
-      document.documentElement.dataset.theme = theme;
-    })();
-  </script>
-    <meta charset="UTF-8" />
+<meta charset="UTF-8" />
 
   <meta
     name="viewport"
@@ -1617,13 +1611,10 @@
         user;
 
       const savedTheme =
-        user.user_metadata?.our_space_theme ||
-        localStorage.getItem("our_space_theme");
+        user.user_metadata?.our_space_theme || "warm";
 
-      if (savedTheme) {
-        document.documentElement.dataset.theme = savedTheme;
-        localStorage.setItem("our_space_theme", savedTheme);
-      }
+      document.documentElement.dataset.theme =
+        savedTheme;
 
       return true;
     }
