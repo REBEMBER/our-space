@@ -218,7 +218,7 @@ async function session(){
 }
 
 async function loadChats(){
-  const {data,error}=await client.from("ai_chats").select("id,title,created_at,updated_at").order("updated_at",{ascending:false}).limit(200);
+  const {data,error}=await client.from("ai_chats").select("id,title,created_at,updated_at").order("updated_at",{ascending:false}) .limit(1000);
   if(error){console.error(error);return}
   chats=data||[];
   renderChats();
@@ -372,7 +372,6 @@ async function init(){
   window.OurSpaceTheme?.apply?.(window.OurSpaceTheme.getCookie?.()||"warm");
   await loadChats();
   if(chats.length)await selectChat(chats[0].id);else renderMessages();
-  bindChips();
 }
 client.auth.onAuthStateChange((event,sessionValue)=>{if(event==="SIGNED_OUT"||!sessionValue)location.href="login.html"});
 init();
