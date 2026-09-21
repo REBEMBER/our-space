@@ -112,3 +112,30 @@ $$;
 
 revoke all on function public.mark_message_seen(bigint) from public;
 grant execute on function public.mark_message_seen(bigint) to authenticated;
+
+
+create or replace function public.delete_message_for_everyone(p_message_id bigint)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  update public.messages m
+  set deleted_at = coalesce(m.deleted_at, now()),
+      deleted_by = auth.uid(),
+      content = ''
+  where m.id = p_message_id
+    and m.sender_id = auth.uid()
+    and m.deleted_at is null
+    and exists (
+      select 1
+      from public.space_members sm
+      where sm.space_id = m.space_id
+        and sm.user_id = auth.uid()
+    );
+end;
+$$;
+
+revoke all on function public.delete_message_for_everyone(bigint) from public;
+grant execute on function public.delete_message_for_everyone(bigint) to authenticated;
