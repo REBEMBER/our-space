@@ -17,30 +17,26 @@ create table if not exists public.push_subscriptions (
 
 alter table public.push_subscriptions enable row level security;
 
-drop policy if exists "Users can read own push subscriptions"
-on public.push_subscriptions;
+drop policy if exists "Users can read own push subscriptions" on public.push_subscriptions;
 create policy "Users can read own push subscriptions"
 on public.push_subscriptions for select to authenticated
-using (auth.uid() = user_id);
+using ((select auth.uid()) = user_id);
 
-drop policy if exists "Users can create own push subscriptions"
-on public.push_subscriptions;
+drop policy if exists "Users can create own push subscriptions" on public.push_subscriptions;
 create policy "Users can create own push subscriptions"
 on public.push_subscriptions for insert to authenticated
-with check (auth.uid() = user_id);
+with check ((select auth.uid()) = user_id);
 
-drop policy if exists "Users can update own push subscriptions"
-on public.push_subscriptions;
+drop policy if exists "Users can update own push subscriptions" on public.push_subscriptions;
 create policy "Users can update own push subscriptions"
 on public.push_subscriptions for update to authenticated
-using (auth.uid() = user_id)
-with check (auth.uid() = user_id);
+using ((select auth.uid()) = user_id)
+with check ((select auth.uid()) = user_id);
 
-drop policy if exists "Users can delete own push subscriptions"
-on public.push_subscriptions;
+drop policy if exists "Users can delete own push subscriptions" on public.push_subscriptions;
 create policy "Users can delete own push subscriptions"
 on public.push_subscriptions for delete to authenticated
-using (auth.uid() = user_id);
+using ((select auth.uid()) = user_id);
 
 create index if not exists push_subscriptions_user_id_idx
 on public.push_subscriptions(user_id);
@@ -55,8 +51,7 @@ begin
 end;
 $$;
 
-drop trigger if exists push_subscriptions_touch
-on public.push_subscriptions;
+drop trigger if exists push_subscriptions_touch on public.push_subscriptions;
 
 create trigger push_subscriptions_touch
 before update on public.push_subscriptions
@@ -91,12 +86,10 @@ $$;
 
 alter table public.messages replica identity full;
 
--- Realtime Postgres Changes authorizes subscribers through SELECT RLS.
--- Both members of the space must be able to read message rows.
 grant select on public.messages to authenticated;
 
-drop policy if exists "Our Space members can read messages"
-on public.messages;
+drop policy if exists "Our Space members can read messages" on public.messages;
+drop policy if exists "Our Space message access" on public.messages;
 
 create policy "Our Space members can read messages"
 on public.messages
@@ -107,27 +100,26 @@ using (
     select 1
     from public.space_members sm
     where sm.space_id = messages.space_id
-      and sm.user_id = auth.uid()
+      and sm.user_id = (select auth.uid())
   )
 );
 
--- Sending messages remains restricted to a member sending as themselves.
 grant insert on public.messages to authenticated;
 
-drop policy if exists "Our Space members can send messages"
-on public.messages;
+drop policy if exists "Our Space members can send messages" on public.messages;
+drop policy if exists "Our Space message insert" on public.messages;
 
 create policy "Our Space members can send messages"
 on public.messages
 for insert
 to authenticated
 with check (
-  sender_id = auth.uid()
+  sender_id = (select auth.uid())
   and exists (
     select 1
     from public.space_members sm
     where sm.space_id = messages.space_id
-      and sm.user_id = auth.uid()
+      and sm.user_id = (select auth.uid())
   )
 );
 
@@ -137,9 +129,7 @@ with check (
 
 drop function if exists public.mark_message_seen(bigint);
 
-create or replace function public.mark_message_seen(
-  p_message_id bigint
-)
+create function public.mark_message_seen(p_message_id bigint)
 returns boolean
 language plpgsql
 security definer
@@ -151,12 +141,12 @@ begin
   update public.messages m
   set seen_at = coalesce(m.seen_at, now())
   where m.id = p_message_id
-    and m.sender_id <> auth.uid()
+    and m.sender_id <> (select auth.uid())
     and exists (
       select 1
       from public.space_members sm
       where sm.space_id = m.space_id
-        and sm.user_id = auth.uid()
+        and sm.user_id = (select auth.uid())
     );
 
   changed := found;
@@ -164,7 +154,7 @@ begin
 end;
 $$;
 
-revoke all on function public.mark_message_seen(bigint) from public;
+revoke all on function public.mark_message_seen(bigint) from public, anon;
 grant execute on function public.mark_message_seen(bigint) to authenticated;
 
 -- ============================================================
@@ -173,9 +163,7 @@ grant execute on function public.mark_message_seen(bigint) to authenticated;
 
 drop function if exists public.delete_message_for_everyone(bigint);
 
-create or replace function public.delete_message_for_everyone(
-  p_message_id bigint
-)
+create function public.delete_message_for_everyone(p_message_id bigint)
 returns boolean
 language plpgsql
 security definer
@@ -187,15 +175,21 @@ begin
   update public.messages m
   set
     deleted_at = coalesce(m.deleted_at, now()),
-    deleted_by = auth.uid()
+    deleted_by = (select auth.uid())
   where m.id = p_message_id
-    and m.sender_id = auth.uid()
-    and m.deleted_at is null;
+    and m.sender_id = (select auth.uid())
+    and m.deleted_at is null
+    and exists (
+      select 1
+      from public.space_members sm
+      where sm.space_id = m.space_id
+        and sm.user_id = (select auth.uid())
+    );
 
   changed := found;
   return changed;
 end;
 $$;
 
-revoke all on function public.delete_message_for_everyone(bigint) from public;
+revoke all on function public.delete_message_for_everyone(bigint) from public, anon;
 grant execute on function public.delete_message_for_everyone(bigint) to authenticated;
