@@ -29,7 +29,7 @@
     return notificationClient;
   }
 
-  async function syncSubscription(subscription) {
+  async function syncSubscription(subscription, previewEnabled = true) {
     const client = await getClient();
     if (!client || !notificationUser || !subscription) return;
 
@@ -37,7 +37,7 @@
       user_id: notificationUser.id,
       endpoint: subscription.endpoint,
       subscription: subscription.toJSON(),
-      preview_enabled: true
+      preview_enabled: previewEnabled
     }, { onConflict: "endpoint" });
   }
 
@@ -115,6 +115,30 @@
     return true;
   }
 
+  async function getPreviewEnabled() {
+    const client = await getClient();
+    if (!client || !notificationUser) return true;
+    const { data, error } = await client
+      .from("push_subscriptions")
+      .select("preview_enabled")
+      .eq("user_id", notificationUser.id)
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error || !data) return true;
+    return data.preview_enabled !== false;
+  }
+
+  async function setPreviewEnabled(enabled) {
+    const client = await getClient();
+    if (!client || !notificationUser) return false;
+    const { error } = await client
+      .from("push_subscriptions")
+      .update({ preview_enabled: !!enabled, updated_at: new Date().toISOString() })
+      .eq("user_id", notificationUser.id);
+    return !error;
+  }
+
   async function sendMessageNotification(message) {
     if (!notificationUser || !message) return;
 
@@ -143,6 +167,8 @@
     register: registerNotifications,
     enable: enableNotifications,
     sendMessage: sendMessageNotification,
+    getPreviewEnabled,
+    setPreviewEnabled,
     get permission() {
       return "Notification" in window ? Notification.permission : "unsupported";
     }
