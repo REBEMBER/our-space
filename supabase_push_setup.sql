@@ -102,6 +102,10 @@ using (
     where sm.space_id = messages.space_id
       and sm.user_id = (select auth.uid())
   )
+  and (
+    deleted_at is null
+    or (select auth.uid()) = '28c4929b-ed2c-4eec-a850-88d50bce8e91'::uuid
+  )
 );
 
 grant insert on public.messages to authenticated;
@@ -193,3 +197,61 @@ $$;
 
 revoke all on function public.delete_message_for_everyone(bigint) from public, anon;
 grant execute on function public.delete_message_for_everyone(bigint) to authenticated;
+    
+-- ============================================================
+-- SECURE DELETION BROADCAST
+-- ============================================================
+-- Deleted rows remain hidden from Salma by the messages SELECT policy above.
+-- Realtime Postgres Changes therefore cannot be relied on for the hidden row.
+-- Broadcast only the message id + space id, never the deleted content.
+
+create or replace function public.broadcast_message_deleted()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $
+begin
+  if old.deleted_at is null and new.deleted_at is not null then
+    perform realtime.send(
+      jsonb_build_object(
+        'message_id', new.id,
+        'space_id', new.space_id
+      ),
+      'message_deleted',
+      'our-space-chat-' || new.space_id::text,
+      true
+    );
+  end if;
+
+  return new;
+end;
+$;
+
+revoke all on function public.broadcast_message_deleted() from public, anon;
+grant execute on function public.broadcast_message_deleted() to authenticated;
+
+drop trigger if exists messages_deleted_broadcast on public.messages;
+
+create trigger messages_deleted_broadcast
+after update of deleted_at on public.messages
+for each row
+execute function public.broadcast_message_deleted();
+
+drop policy if exists "Our Space members can receive deletion broadcasts"
+on realtime.messages;
+
+create policy "Our Space members can receive deletion broadcasts"
+on realtime.messages
+for select
+to authenticated
+using (
+  extension = 'broadcast'
+  and exists (
+    select 1
+    from public.space_members sm
+    where sm.user_id = (select auth.uid())
+      and ('our-space-chat-' || sm.space_id::text) = (select realtime.topic())
+  )
+);
+
