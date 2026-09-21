@@ -176,10 +176,10 @@
 
     .messages-scroll {
       position: absolute;
-      top: 0;
+      top: var(--header-height, 0px);
       left: 0;
       right: 0;
-      bottom: 0;
+      bottom: var(--composer-height, 100px);
       overflow-y: auto;
 
       -webkit-overflow-scrolling: touch;
@@ -1057,64 +1057,17 @@
 
       const apply = () => {
         syncComposerHeight();
-
-        const lastRow =
-          messagesEl.querySelector("[data-row]:last-of-type");
-
-        if (!lastRow) {
-          messagesScroll.scrollTop = 0;
-          return;
-        }
-
-        const composerArea =
-          document.querySelector(".composer-area");
-
-        const composerHeight =
-          composerArea
-            ? composerArea.getBoundingClientRect().height
-            : 0;
-
-        const scrollRect =
-          messagesScroll.getBoundingClientRect();
-
-        // The bottom of the last bubble should sit just above the
-        // fixed composer, with the same 8px breathing room used by
-        // the scroll area's bottom padding.
-        const desiredBottom =
-          scrollRect.bottom - composerHeight - 8;
-
-        const lastRect =
-          lastRow.getBoundingClientRect();
-
-        const delta =
-          lastRect.bottom - desiredBottom;
-
-        const maxScroll =
-          Math.max(
-            0,
-            messagesScroll.scrollHeight -
-            messagesScroll.clientHeight
-          );
-
-        messagesScroll.scrollTop =
-          Math.min(
-            maxScroll,
-            Math.max(
-              0,
-              messagesScroll.scrollTop + delta
-            )
-          );
+        messagesScroll.scrollTop = Math.max(
+          0,
+          messagesScroll.scrollHeight - messagesScroll.clientHeight
+        );
       };
 
-      // Two frames let innerHTML, fonts, textarea/composer height and
-      // the browser's layout all settle before measuring the last row.
+      // Wait for DOM insertion and final layout before measuring scrollHeight.
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           apply();
-
-          requestAnimationFrame(() => {
-            apply();
-          });
+          requestAnimationFrame(apply);
         });
       });
     }
@@ -1160,52 +1113,17 @@
       if (!composerArea) return;
 
       const height = composerArea.getBoundingClientRect().height;
+      const header = document.querySelector(".header");
+      const headerHeight = header ? header.getBoundingClientRect().height : 0;
 
-      document.documentElement.style.setProperty(
-        "--composer-height",
-        `${height}px`
-      );
+      document.documentElement.style.setProperty("--composer-height", height + "px");
+      document.documentElement.style.setProperty("--header-height", headerHeight + "px");
 
-      // Keep the real scrollable bottom exactly above the fixed composer.
-      // Do this directly on the container so scrolling never depends on
-      // CSS-variable/ResizeObserver timing.
-      if (messagesEl) {
-        messagesEl.style.paddingBottom = `${height + 8}px`;
-      }
-    }
+      // The scroll viewport itself ends above the fixed composer.
+      messagesScroll.style.top = headerHeight + "px";
+      messagesScroll.style.bottom = height + "px";
 
-    const composerResizeObserver = new ResizeObserver(() => {
-      syncComposerHeight();
-    });
-
-    composerResizeObserver.observe(document.querySelector(".composer-area"));
-    syncComposerHeight();
-
-    function scrollBottom() {
-      requestAnimationFrame(() => {
-        messagesScroll.scrollTop = messagesScroll.scrollHeight;
-      });
-    }
-
-    function renderError(message) {
-      messagesEl.innerHTML = `
-        <div class="error-card">
-          <strong>Unable to load the chat</strong>
-          ${escapeHtml(message)}
-        </div>
-      `;
-    }
-
-    /* ==========================================
-       STATUS
-    ========================================== */
-
-    function messageStatus(message) {
-      if (message.seen_at) {
-        return "Seen";
-      }
-
-      return "Sent";
+      if (messagesEl) messagesEl.style.paddingBottom = "8px";
     }
 
     /* ==========================================
