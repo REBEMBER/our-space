@@ -126,15 +126,8 @@ begin
       deleted_by = auth.uid()
   where m.id = p_message_id
     and m.sender_id = auth.uid()
-    and m.deleted_at is null
-    and exists (
-      select 1
-      from public.space_members sm
-      where sm.space_id = m.space_id
-        and sm.user_id = auth.uid()
-    );
+    and m.deleted_at is null;
 end;
 $$;
-
 revoke all on function public.delete_message_for_everyone(bigint) from public;
 grant execute on function public.delete_message_for_everyone(bigint) to authenticated;
