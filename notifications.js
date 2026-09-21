@@ -96,16 +96,21 @@
     if (!notificationUser || !message) return;
 
     try {
-      await fetch("/api/notify-message", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      const client = await getClient();
+      if (!client) return;
+
+      const { error } = await client.functions.invoke("notify-message", {
+        body: {
           message_id: message.id,
           space_id: message.space_id,
           sender_id: notificationUser.id,
           content: message.content
-        })
+        }
       });
+
+      if (error) {
+        console.warn("Message notification request failed:", error);
+      }
     } catch (error) {
       console.warn("Message notification request failed:", error);
     }
