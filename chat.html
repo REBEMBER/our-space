@@ -176,10 +176,10 @@
 
     .messages-scroll {
       position: absolute;
-      top: 0;
+      top: var(--header-height, 0px);
       left: 0;
       right: 0;
-      bottom: 0;
+      bottom: var(--composer-height, 100px);
       overflow-y: auto;
 
       -webkit-overflow-scrolling: touch;
@@ -212,14 +212,7 @@
       flex-direction: column;
       justify-content: flex-start;
       padding:
-        24px 17px 0;
-    }
-
-    .chat-bottom-spacer {
-      flex: 0 0 auto;
-      width: 100%;
-      height: calc(var(--composer-height, 100px) + 8px);
-      pointer-events: none;
+        24px 17px 8px;
     }
 
     /* =========================
@@ -766,7 +759,7 @@
       }
 
       .messages-container {
-        padding-bottom: 0;
+        padding-bottom: 8px;
       }
 
       .message-content {
@@ -1059,30 +1052,35 @@
     // Put the last message itself at the visual bottom of the chat,
     // not merely at the scroll container's mathematical bottom.
     // This is important because the composer is fixed over the scroll area.
+    function isAtBottom() {
+      const distance =
+        messagesScroll.scrollHeight -
+        messagesScroll.clientHeight -
+        messagesScroll.scrollTop;
+
+      return distance <= 12;
+    }
+
+    let scrollRequestFrame = 0;
+    let scrollRequestFrame2 = 0;
+
     function scrollToLatest() {
-      syncComposerHeight();
+      if (scrollRequestFrame || scrollRequestFrame2) return;
 
-      const apply = () => {
-        if (!messagesEl.querySelector("[data-row]")) {
-          messagesScroll.scrollTop = 0;
-          return;
-        }
+      scrollRequestFrame = requestAnimationFrame(() => {
+        scrollRequestFrame = 0;
 
-        const maxScroll =
-          Math.max(
-            0,
-            messagesScroll.scrollHeight -
-            messagesScroll.clientHeight
-          );
+        scrollRequestFrame2 = requestAnimationFrame(() => {
+          scrollRequestFrame2 = 0;
 
-        messagesScroll.scrollTop = maxScroll;
-      };
+          const maxScroll =
+            Math.max(
+              0,
+              messagesScroll.scrollHeight -
+              messagesScroll.clientHeight
+            );
 
-      requestAnimationFrame(() => {
-        apply();
-
-        requestAnimationFrame(() => {
-          apply();
+          messagesScroll.scrollTop = maxScroll;
         });
       });
     }
@@ -1123,66 +1121,56 @@
         });
     }
 
-    function isNearBottom() {
-      const distance =
-        messagesScroll.scrollHeight -
-        messagesScroll.scrollTop -
-        messagesScroll.clientHeight;
+    function syncLayoutMetrics() {
+      const header = document.querySelector(".header");
+      const composerArea = document.querySelector(".composer-area");
 
-      return distance <= 80;
+      if (header) {
+        document.documentElement.style.setProperty(
+          "--header-height",
+          `${header.getBoundingClientRect().height}px`
+        );
+      }
+
+      if (composerArea) {
+        document.documentElement.style.setProperty(
+          "--composer-height",
+          `${composerArea.getBoundingClientRect().height}px`
+        );
+      }
     }
 
-    let keepMessagesAtBottom = true;
-
-    messagesScroll.addEventListener(
-      "scroll",
-      () => {
-        keepMessagesAtBottom = isNearBottom();
-      },
-      { passive: true }
-    );
-
-    function syncComposerHeight() {
-      const composerArea =
-        document.querySelector(".composer-area");
-
-      if (!composerArea) return;
-
-      const height =
-        composerArea.getBoundingClientRect().height;
-
-      document.documentElement.style.setProperty(
-        "--composer-height",
-        `${height}px`
-      );
-    }
+    const headerResizeObserver = new ResizeObserver(() => {
+      syncLayoutMetrics();
+    });
 
     const composerResizeObserver = new ResizeObserver(() => {
-      const shouldStick =
-        keepMessagesAtBottom || isNearBottom();
+      const wasAtBottom = isAtBottom();
 
-      syncComposerHeight();
+      syncLayoutMetrics();
 
-      if (shouldStick) {
-        requestAnimationFrame(() => {
-          scrollToLatest();
-        });
+      if (wasAtBottom) {
+        scrollToLatest();
       }
     });
 
-    composerResizeObserver.observe(
-      document.querySelector(".composer-area")
-    );
+    const headerElement =
+      document.querySelector(".header");
 
-    syncComposerHeight();
+    const composerAreaElement =
+      document.querySelector(".composer-area");
 
-    function scrollBottom() {
-      requestAnimationFrame(() => {
-        messagesScroll.scrollTop = messagesScroll.scrollHeight;
-      });
+    if (headerElement) {
+      headerResizeObserver.observe(headerElement);
     }
 
-    function renderError(message) {
+    if (composerAreaElement) {
+      composerResizeObserver.observe(composerAreaElement);
+    }
+
+    syncLayoutMetrics();
+
+function renderError(message) {
       messagesEl.innerHTML = `
         <div class="error-card">
           <strong>Unable to load the chat</strong>
@@ -1422,13 +1410,6 @@
         `;
       }
 
-      html += `
-        <div
-          class="chat-bottom-spacer"
-          aria-hidden="true"
-        ></div>
-      `;
-
       messagesEl.innerHTML =
         html;
 
@@ -1657,7 +1638,7 @@
       input.value = "";
       input.style.height =
         "40px";
-      syncComposerHeight();
+      syncLayoutMetrics();
 
       await loadMessages(true);
 
@@ -1976,7 +1957,7 @@
             130
           ) + "px";
 
-        syncComposerHeight();
+        syncLayoutMetrics();
       }
     );
 
