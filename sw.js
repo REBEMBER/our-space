@@ -23,7 +23,7 @@ self.addEventListener("push", (event) => {
 
     const previewEnabled = data.preview_enabled !== false;
     const title = previewEnabled
-      ? (data.sender_name || "Salma")
+      ? (data.sender_name || "Our Space")
       : "Calculation time";
 
     const body = previewEnabled

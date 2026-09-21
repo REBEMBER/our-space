@@ -4,59 +4,22 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS"
+  "Access-Control-Allow-Methods": "POST, OPTIONS"
 };
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const VAPID_PUBLIC_KEY = Deno.env.get("VAPID_PUBLIC_KEY")!;
+const VAPID_PRIVATE_KEY = Deno.env.get("VAPID_PRIVATE_KEY")!;
+const VAPID_SUBJECT = Deno.env.get("VAPID_SUBJECT") || "mailto:ourspace@example.com";
+
+webpush.setVapidDetails(
+  VAPID_SUBJECT,
+  VAPID_PUBLIC_KEY,
+  VAPID_PRIVATE_KEY
+);
+
 const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
-
-async function getSecret(name: string) {
-  const { data, error } = await admin.rpc("get_push_secret", { p_name: name });
-  if (error) throw error;
-  return data as string | null;
-}
-
-async function ensureVapidKeys() {
-  let publicKey = await getSecret("our_space_vapid_public");
-  let privateKey = await getSecret("our_space_vapid_private");
-  let subject = await getSecret("our_space_vapid_subject");
-
-  if (!publicKey || !privateKey) {
-    const keys = webpush.generateVAPIDKeys();
-    publicKey = keys.publicKey;
-    privateKey = keys.privateKey;
-
-    await admin.rpc("set_push_secret", {
-      p_name: "our_space_vapid_public",
-      p_value: publicKey
-    });
-    await admin.rpc("set_push_secret", {
-      p_name: "our_space_vapid_private",
-      p_value: privateKey
-    });
-  }
-
-  if (!subject) {
-    subject = "mailto:ourspace@example.com";
-    await admin.rpc("set_push_secret", {
-      p_name: "our_space_vapid_subject",
-      p_value: subject
-    });
-  }
-
-  return { publicKey, privateKey, subject };
-}
-
-async function getAuthenticatedUser(req: Request) {
-  const authHeader = req.headers.get("Authorization") || "";
-  const token = authHeader.replace(/^Bearer\s+/i, "");
-  if (!token) return null;
-
-  const { data, error } = await admin.auth.getUser(token);
-  if (error || !data.user) return null;
-  return data.user;
-}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -64,19 +27,22 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const user = await getAuthenticatedUser(req);
-    if (!user) {
+    const authHeader = req.headers.get("Authorization") || "";
+    const token = authHeader.replace(/^Bearer\s+/i, "");
+    if (!token) {
       return new Response("Unauthorized", {
         status: 401,
         headers: corsHeaders
       });
     }
 
-    const vapid = await ensureVapidKeys();
+    const { data: userData, error: userError } =
+      await admin.auth.getUser(token);
 
-    if (req.method === "GET") {
-      return new Response(JSON.stringify({ publicKey: vapid.publicKey }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
+    if (userError || !userData.user) {
+      return new Response("Unauthorized", {
+        status: 401,
+        headers: corsHeaders
       });
     }
 
@@ -90,21 +56,20 @@ Deno.serve(async (req) => {
       });
     }
 
-    if (sender_id !== user.id) {
+    if (sender_id !== userData.user.id) {
       return new Response("Forbidden", {
         status: 403,
         headers: corsHeaders
       });
     }
 
-    const { data: message, error: messageError } =
-      await admin
-        .from("messages")
-        .select("id, space_id, sender_id, content")
-        .eq("id", message_id)
-        .eq("space_id", space_id)
-        .eq("sender_id", sender_id)
-        .maybeSingle();
+    const { data: message, error: messageError } = await admin
+      .from("messages")
+      .select("id, space_id, sender_id, content")
+      .eq("id", message_id)
+      .eq("space_id", space_id)
+      .eq("sender_id", sender_id)
+      .maybeSingle();
 
     if (messageError || !message) {
       return new Response("Message not found", {
@@ -119,7 +84,9 @@ Deno.serve(async (req) => {
       .eq("space_id", space_id)
       .neq("user_id", sender_id);
 
-    if (membersError) throw membersError;
+    if (membersError) {
+      throw membersError;
+    }
 
     const recipientIds = (members || []).map((row) => row.user_id);
     if (!recipientIds.length) {
@@ -133,18 +100,14 @@ Deno.serve(async (req) => {
       .select("id, user_id, endpoint, subscription, preview_enabled")
       .in("user_id", recipientIds);
 
-    if (subscriptionError) throw subscriptionError;
+    if (subscriptionError) {
+      throw subscriptionError;
+    }
 
     const senderName =
-      user.user_metadata?.display_name ||
-      user.user_metadata?.name ||
+      userData.user.user_metadata?.display_name ||
+      userData.user.user_metadata?.name ||
       "Our Space";
-
-    webpush.setVapidDetails(
-      vapid.subject,
-      vapid.publicKey,
-      vapid.privateKey
-    );
 
     let sent = 0;
 

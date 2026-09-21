@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+  <meta charset="UTF-8">
 
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -15,218 +15,607 @@
   <link rel="manifest" href="manifest.json">
 
   <style>
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html, body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#F7F9FC; color:#26313D; font-family:Arial,Helvetica,sans-serif; }
-    body { display:flex; align-items:center; justify-content:center; }
-    .calculator { width:min(390px,100vw); height:min(820px,100vh); padding:24px 18px; display:flex; flex-direction:column; justify-content:flex-end; }
-    .display { width:100%; min-height:145px; margin-bottom:18px; padding:24px 20px; display:flex; align-items:flex-end; justify-content:flex-end; background:#152B46; border-radius:24px; color:#EEF5FA; font-size:52px; font-weight:400; letter-spacing:1px; overflow:hidden; word-break:break-all; box-shadow:0 12px 30px rgba(21,43,70,.12); }
-    .buttons { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
-    button { border:none; outline:none; height:76px; border-radius:20px; font-size:25px; font-weight:500; cursor:pointer; user-select:none; transition:transform .08s ease,filter .08s ease; }
-    button:active { transform:scale(.94); filter:brightness(.94); }
-    .number,.function { background:#DCEAF5; color:#152B46; }
-    .operator { background:#F3B29F; color:#152B46; }
-    .zero { grid-column:span 2; }
-    :root { --bg:#F8F0EC; --navy:#152B46; --navy-light:#1D3B60; --peach:#F3B29F; --blue:#DCEAF5; --white:#FFFFFF; --text:#26313D; --muted:#7A8794; --border:rgba(21,43,70,.09); }
-    html,body { background:var(--bg); color:var(--text); font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif; }
-    .calculator { width:min(430px,calc(100vw - 24px)); height:min(840px,calc(100vh - 24px)); padding:18px; justify-content:flex-end; }
-    .display { min-height:155px; margin-bottom:14px; padding:22px 20px; border-radius:24px; background:radial-gradient(160px 130px at 90% 0%,rgba(243,178,159,.17),transparent 72%),linear-gradient(145deg,#152B46,#1D3B60); border:1px solid rgba(255,255,255,.08); color:#fff; font-size:clamp(44px,11vw,58px); letter-spacing:-.035em; box-shadow:0 22px 46px rgba(21,43,70,.16); }
-    .buttons { gap:10px; }
-    button { height:72px; border-radius:17px; font-size:23px; border:1px solid transparent; box-shadow:0 5px 14px rgba(21,43,70,.04); }
-    button:hover { filter:brightness(.985); }
-    .number { background:#fff; color:var(--navy); border-color:rgba(21,43,70,.08); }
-    .function { background:var(--blue); color:var(--navy); border-color:rgba(21,43,70,.05); }
-    .operator { background:var(--peach); color:var(--navy); border-color:rgba(21,43,70,.04); }
-    button:focus-visible { outline:none; box-shadow:0 0 0 4px rgba(220,234,245,.95),0 5px 14px rgba(21,43,70,.06); }
-    body { background:var(--bg)!important; color:var(--text)!important; }
-    button { font-family:inherit; }
-    html[data-theme="dark"] body { background:#0B121B!important; color:#EDF3F7!important; }
-    html[data-theme="dark"] .calculator { background:#172331!important; border-color:rgba(237,243,247,.12); box-shadow:0 24px 60px rgba(0,0,0,.24); }
-    html[data-theme="dark"] .display { background:linear-gradient(145deg,#1A2A3A,#2B455D)!important; color:#F3F7FA!important; }
-    html[data-theme="dark"] .number { background:#26394D!important; color:#F3F7FA!important; border-color:rgba(237,243,247,.10)!important; }
-    html[data-theme="dark"] .function { background:#304960!important; color:#F3F7FA!important; border-color:rgba(237,243,247,.10)!important; }
-    html[data-theme="dark"] .operator { background:#EFA58C!important; color:#21140F!important; }
-    html[data-theme="ocean"] body { background:#ECF7FC!important; color:#193547!important; }
-    html[data-theme="ocean"] .calculator { background:#fff!important; }
-    html[data-theme="ocean"] .display { background:linear-gradient(145deg,#0E4266,#1E638F)!important; }
-    html[data-theme="ocean"] .number { background:#fff!important; color:#0E4266!important; }
-    html[data-theme="ocean"] .function { background:#D3EDF8!important; color:#0E4266!important; }
-    html[data-theme="ocean"] .operator { background:#72CAE6!important; color:#08324D!important; }
-    html[data-theme="forest"] body { background:#EEF6F1!important; color:#253A32!important; }
-    html[data-theme="forest"] .calculator { background:#fff!important; }
-    html[data-theme="forest"] .display { background:linear-gradient(145deg,#164638,#286554)!important; }
-    html[data-theme="forest"] .number { background:#fff!important; color:#164638!important; }
-    html[data-theme="forest"] .function { background:#D7EAE1!important; color:#164638!important; }
-    html[data-theme="forest"] .operator { background:#DDA187!important; color:#3B2116!important; }
-    html[data-theme="blush"] body { background:#FFF1F5!important; color:#3D2731!important; }
-    html[data-theme="blush"] .calculator { background:#fff!important; }
-    html[data-theme="blush"] .display { background:linear-gradient(145deg,#762B49,#9B3F62)!important; }
-    html[data-theme="blush"] .number { background:#fff!important; color:#762B49!important; }
-    html[data-theme="blush"] .function { background:#FADCE7!important; color:#762B49!important; }
-    html[data-theme="blush"] .operator { background:#F3A2BC!important; color:#4C1730!important; }
-    html[data-theme="sunset"] body { background:#FFF4EC!important; color:#3E2A22!important; }
-    html[data-theme="sunset"] .calculator { background:#fff!important; }
-    html[data-theme="sunset"] .display { background:linear-gradient(145deg,#71381F,#9B583B)!important; }
-    html[data-theme="sunset"] .number { background:#fff!important; color:#71381F!important; }
-    html[data-theme="sunset"] .function { background:#FBE0D1!important; color:#71381F!important; }
-    html[data-theme="sunset"] .operator { background:#F4A77E!important; color:#4C2414!important; }
-    html[data-theme="warm"] .display { background:linear-gradient(145deg,#152B46,#1D3B60)!important; }
-    html[data-theme="warm"] .operator { background:#F3B29F!important; color:#152B46!important; }
-    @media(max-height:650px){ .calculator{padding:12px;border-radius:24px;} .display{min-height:105px;margin-bottom:10px;} button{height:58px;border-radius:15px;} }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #F7F9FC;
+      color: #26313D;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .calculator {
+      width: min(390px, 100vw);
+      height: min(820px, 100vh);
+      padding: 24px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    .display {
+      width: 100%;
+      min-height: 145px;
+      margin-bottom: 18px;
+      padding: 24px 20px;
+
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+
+      background: var(--bg) !important;
+      border-radius: 24px;
+
+      color: #EEF5FA;
+      font-size: 52px;
+      font-weight: 400;
+      letter-spacing: 1px;
+
+      overflow: hidden;
+      word-break: break-all;
+
+      box-shadow: 0 12px 30px rgba(21, 43, 70, 0.12);
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    button {
+      border: none;
+      outline: none;
+      height: 76px;
+      border-radius: 20px;
+
+      font-size: 25px;
+      font-weight: 500;
+
+      cursor: pointer;
+      user-select: none;
+
+      transition: transform 0.08s ease, filter 0.08s ease;
+    }
+
+    button:active {
+      transform: scale(0.94);
+      filter: brightness(0.94);
+    }
+
+    .number {
+      background: #DCEAF5;
+      color: #152B46;
+    }
+
+    .function {
+      background: var(--bg) !important;
+      color: #FFFFFF;
+    }
+
+    .operator {
+      background: #F3B29F;
+      color: #152B46;
+    }
+
+    .zero {
+      grid-column: span 2;
+    }
+
+    @media (max-height: 650px) {
+      .calculator {
+        padding: 12px;
+      }
+
+      .display {
+        min-height: 105px;
+        margin-bottom: 10px;
+        font-size: 42px;
+      }
+
+      .buttons {
+        gap: 8px;
+      }
+
+      button {
+        height: 58px;
+        border-radius: 16px;
+      }
+    }
+
+    :root {
+      --os-bg: #F8F0EC;
+      --os-navy: #152B46;
+      --os-peach: #F3B29F;
+      --os-blue: #DCEAF5;
+      --os-text: #26313D;
+    }
+
+    html,
+    body {
+      background:
+        radial-gradient(
+          480px 300px at 92% 4%,
+          rgba(243,178,159,0.22),
+          transparent 70%
+        ),
+        radial-gradient(
+          480px 320px at 6% 96%,
+          rgba(220,234,245,0.58),
+          transparent 68%
+        ),
+        var(--os-bg);
+      color: var(--os-text);
+      font-family:
+        Inter,
+        ui-sans-serif,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+    }
+
+    .calculator {
+      width: min(420px, calc(100vw - 24px));
+      height: min(840px, calc(100vh - 24px));
+      padding: 18px;
+      justify-content: flex-end;
+    }
+
+    .display {
+      min-height: 155px;
+      margin-bottom: 14px;
+      padding: 22px 20px;
+      border-radius: 24px;
+      background:
+        radial-gradient(
+          160px 130px at 90% 0%,
+          rgba(243,178,159,0.17),
+          transparent 72%
+        ),
+        linear-gradient(145deg, #152B46, #1D3B60);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #FFFFFF;
+      font-size: clamp(44px, 11vw, 58px);
+      letter-spacing: -0.035em;
+      box-shadow:
+        0 22px 46px rgba(21,43,70,0.16);
+    }
+
+    .buttons {
+      gap: 10px;
+    }
+
+    button {
+      height: 72px;
+      border-radius: 17px;
+      font-size: 23px;
+      border: 1px solid transparent;
+      box-shadow:
+        0 5px 14px rgba(21,43,70,0.04);
+    }
+
+    button:hover {
+      filter: brightness(0.985);
+    }
+
+    .number {
+      background: #FFFFFF;
+      color: var(--os-navy);
+      border-color: rgba(21,43,70,0.08);
+    }
+
+    .function {
+      background: var(--os-blue);
+      color: var(--os-navy);
+      border-color: rgba(21,43,70,0.05);
+    }
+
+    .operator {
+      background: var(--os-peach);
+      color: var(--os-navy);
+      border-color: rgba(21,43,70,0.04);
+    }
+
+    button:focus-visible {
+      outline: none;
+      box-shadow:
+        0 0 0 4px rgba(220,234,245,0.95),
+        0 5px 14px rgba(21,43,70,0.06);
+    }
+
+    @media (max-height: 650px) {
+      .calculator {
+        padding: 12px;
+      }
+
+      .display {
+        min-height: 105px;
+        margin-bottom: 10px;
+      }
+
+      button {
+        height: 58px;
+        border-radius: 15px;
+      }
+    }
+
+  
+    /* ===== STRONG VISUAL REFRESH ===== */
+    html, body {
+      background: var(--bg) !important;
+      color:#26313D;
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    body {
+      background:
+        radial-gradient(560px 360px at 100% 0%, rgba(243,178,159,.22), transparent 65%),
+        radial-gradient(540px 380px at 0% 100%, rgba(220,234,245,.16), transparent 68%),
+        #152B46;
+    }
+    .calculator {
+      width:min(430px,100vw);
+      height:min(850px,100vh);
+      padding:16px;
+      background:rgba(248,240,236,.98);
+      border-radius:34px;
+      box-shadow:0 30px 90px rgba(0,0,0,.28);
+      border:1px solid rgba(255,255,255,.10);
+      justify-content:flex-end;
+    }
+    .calculator::before {
+      content:"OUR SPACE";
+      display:block;
+      position:absolute;
+      top:12px; left:28px;
+      color:#152B46;
+      font-size:10px;
+      font-weight:850;
+      letter-spacing:.16em;
+    }
+    .calculator { position:relative; }
+    .display {
+      min-height:164px;
+      margin-bottom:14px;
+      padding:24px 20px;
+      border-radius:24px;
+      background:
+        radial-gradient(160px 130px at 92% 0%, rgba(243,178,159,.18), transparent 72%),
+        linear-gradient(145deg,#152B46,#1D3B60);
+      box-shadow:0 20px 48px rgba(21,43,70,.22);
+      border:1px solid rgba(255,255,255,.08);
+      font-size:clamp(46px,11vw,60px);
+    }
+    .buttons{gap:10px;}
+    button{
+      height:72px;
+      border-radius:18px;
+      font-size:23px;
+      font-weight:650;
+      box-shadow:0 7px 18px rgba(21,43,70,.06);
+    }
+    .number{background:#fff;color:#152B46;border:1px solid rgba(21,43,70,.07);}
+    .function{background:#DCEAF5;color:#152B46;border:1px solid rgba(21,43,70,.05);}
+    .operator{background:#F3B29F;color:#152B46;border:1px solid rgba(21,43,70,.04);}
+    button:hover{filter:brightness(.98);}
+    @media(max-height:650px){
+      .calculator{padding:12px;border-radius:24px;}
+      .display{min-height:105px;margin-bottom:10px;}
+      button{height:58px;border-radius:15px;}
+    }
+
+  
+    /* ==========================================
+       OUR SPACE — SHARED COLOR SYSTEM
+       Matches chat.html exactly
+    ========================================== */
+    :root {
+      --bg: #F8F0EC;
+      --navy: #152B46;
+      --navy-light: #1D3B60;
+      --peach: #F3B29F;
+      --blue: #DCEAF5;
+      --white: #FFFFFF;
+      --text: #26313D;
+      --muted: #7A8794;
+      --border: rgba(21, 43, 70, 0.09);
+    }
+
+    body {
+      background: var(--bg) !important;
+      color: var(--text) !important;
+    }
+
+    input,
+    textarea {
+      color: var(--text);
+    }
+
+    button {
+      font-family: inherit;
+    }
+
   </style>
 </head>
 
 <body>
+
   <main class="calculator">
+
     <div class="display" id="display">0</div>
+
     <div class="buttons">
+
       <button class="function" onclick="clearDisplay()">AC</button>
       <button class="function" onclick="deleteLast()">⌫</button>
       <button class="function" onclick="percent()">%</button>
       <button class="operator" onclick="pressOperator('÷')">÷</button>
+
       <button class="number" onclick="pressNumber('7')">7</button>
       <button class="number" onclick="pressNumber('8')">8</button>
       <button class="number" onclick="pressNumber('9')">9</button>
       <button class="operator" onclick="pressOperator('×')">×</button>
+
       <button class="number" onclick="pressNumber('4')">4</button>
       <button class="number" onclick="pressNumber('5')">5</button>
       <button class="number" onclick="pressNumber('6')">6</button>
       <button class="operator" onclick="pressOperator('−')">−</button>
+
       <button class="number" onclick="pressNumber('1')">1</button>
       <button class="number" onclick="pressNumber('2')">2</button>
       <button class="number" onclick="pressNumber('3')">3</button>
       <button class="operator" onclick="pressOperator('+')">+</button>
+
       <button class="number zero" onclick="pressNumber('0')">0</button>
       <button class="number" onclick="pressNumber('.')">.</button>
       <button class="operator" onclick="calculate()">=</button>
+
     </div>
+
   </main>
 
-  <!-- Required before calculator.js logic: the page uses supabase.createClient(). -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <script>
-    const SUPABASE_URL = "https://ywflohxufmfydkpkkqly.supabase.co";
-    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_qTMUO8KxerEQBDQ-A7Huyg_8N2Tqpmr";
-    const DEFAULT_UNLOCK_CODE = "0000";
-
-    const authClient = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_PUBLISHABLE_KEY,
-      { auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true } }
-    );
-
-    let unlockCode = DEFAULT_UNLOCK_CODE;
-
-    const allowedThemes = new Set(["warm","dark","ocean","forest","blush","sunset"]);
-
-    async function loadAccountSettings() {
-      try {
-        const { data:{ user }, error } = await authClient.auth.getUser();
-        if (error || !user) return;
-
-        const savedTheme = user.user_metadata?.our_space_theme || "warm";
-        document.documentElement.dataset.theme = allowedThemes.has(savedTheme) ? savedTheme : "warm";
-
-        const remoteCode = user.user_metadata?.calculator_code;
-        if (/^\d{4,12}$/.test(remoteCode || "")) unlockCode = remoteCode;
-      } catch (error) {
-        console.error("Account settings error:", error);
-      }
-    }
-
-    loadAccountSettings();
+    const UNLOCK_CODE = "0000";
 
     const display = document.getElementById("display");
+
     let currentInput = "";
     let previousInput = "";
     let operator = null;
     let justCalculated = false;
 
-    function updateDisplay(value){ display.textContent = value || "0"; }
+    function updateDisplay(value) {
+      display.textContent = value || "0";
+    }
 
-    function pressNumber(number){
-      if (justCalculated){ currentInput=""; justCalculated=false; }
-      if (number==="0"){ currentInput+="0"; updateDisplay(currentInput); return; }
-      if (number==="."){
-        if (currentInput.includes(".")) return;
-        currentInput = currentInput==="" ? "0." : currentInput+".";
-        updateDisplay(currentInput); return;
+    function pressNumber(number) {
+
+      if (justCalculated) {
+        currentInput = "";
+        justCalculated = false;
       }
+
+      /*
+       * Keep leading zeros visible.
+       * This is important because 0000 must remain 0000.
+       */
+      if (number === "0") {
+        currentInput += "0";
+        updateDisplay(currentInput);
+        return;
+      }
+
+      if (number === ".") {
+        if (currentInput.includes(".")) {
+          return;
+        }
+
+        if (currentInput === "") {
+          currentInput = "0.";
+        } else {
+          currentInput += ".";
+        }
+
+        updateDisplay(currentInput);
+        return;
+      }
+
       currentInput += number;
       updateDisplay(currentInput);
     }
 
-    function pressOperator(selectedOperator){
-      if (currentInput==="") return;
-      previousInput=currentInput;
-      currentInput="";
-      operator=selectedOperator;
-      justCalculated=false;
+    function pressOperator(selectedOperator) {
+
+      if (currentInput === "") {
+        return;
+      }
+
+      previousInput = currentInput;
+      currentInput = "";
+      operator = selectedOperator;
+      justCalculated = false;
+
       updateDisplay(selectedOperator);
     }
 
-    function calculate(){
-      if (currentInput===unlockCode && previousInput==="" && operator===null){
-        window.location.href="index.html";
+    function calculate() {
+
+      /*
+       * SECRET UNLOCK
+       *
+       * The code is checked ONLY when "=" is pressed.
+       *
+       * 0 → 0 → 0 → 0 → =
+       */
+      if (
+        currentInput === UNLOCK_CODE &&
+        previousInput === "" &&
+        operator === null
+      ) {
+        window.location.href = "index.html";
         return;
       }
-      if (previousInput==="" || currentInput==="" || operator===null) return;
 
-      const a=parseFloat(previousInput);
-      const b=parseFloat(currentInput);
-      let result;
-
-      if(operator==="+") result=a+b;
-      if(operator==="−") result=a-b;
-      if(operator==="×") result=a*b;
-      if(operator==="÷"){
-        if(b===0){
-          updateDisplay("Error");
-          currentInput=""; previousInput=""; operator=null; justCalculated=true;
-          return;
-        }
-        result=a/b;
+      /*
+       * Normal calculator behavior.
+       */
+      if (
+        previousInput === "" ||
+        currentInput === "" ||
+        operator === null
+      ) {
+        return;
       }
 
-      if(Number.isInteger(result)) result=String(result);
-      else result=result.toFixed(8).replace(/0+$/,"").replace(/\.$/,"");
+      const a = parseFloat(previousInput);
+      const b = parseFloat(currentInput);
 
-      currentInput=result;
-      previousInput="";
-      operator=null;
-      justCalculated=true;
+      let result;
+
+      if (operator === "+") {
+        result = a + b;
+      }
+
+      if (operator === "−") {
+        result = a - b;
+      }
+
+      if (operator === "×") {
+        result = a * b;
+      }
+
+      if (operator === "÷") {
+        if (b === 0) {
+          updateDisplay("Error");
+
+          currentInput = "";
+          previousInput = "";
+          operator = null;
+          justCalculated = true;
+
+          return;
+        }
+
+        result = a / b;
+      }
+
+      if (Number.isInteger(result)) {
+        result = String(result);
+      } else {
+        result = result
+          .toFixed(8)
+          .replace(/0+$/, "")
+          .replace(/\.$/, "");
+      }
+
+      currentInput = result;
+      previousInput = "";
+      operator = null;
+      justCalculated = true;
+
       updateDisplay(result);
     }
 
-    function clearDisplay(){
-      currentInput=""; previousInput=""; operator=null; justCalculated=false;
+    function clearDisplay() {
+      currentInput = "";
+      previousInput = "";
+      operator = null;
+      justCalculated = false;
+
       updateDisplay("0");
     }
 
-    function deleteLast(){
-      if(justCalculated){ clearDisplay(); return; }
-      currentInput=currentInput.slice(0,-1);
+    function deleteLast() {
+
+      if (justCalculated) {
+        clearDisplay();
+        return;
+      }
+
+      currentInput = currentInput.slice(0, -1);
+
       updateDisplay(currentInput);
     }
 
-    function percent(){
-      if(currentInput==="") return;
-      currentInput=String(parseFloat(currentInput)/100);
+    function percent() {
+
+      if (currentInput === "") {
+        return;
+      }
+
+      currentInput = String(parseFloat(currentInput) / 100);
+
       updateDisplay(currentInput);
     }
 
-    document.addEventListener("keydown",function(event){
-      const key=event.key;
-      if(/^[0-9]$/.test(key)){ pressNumber(key); return; }
-      if(key==="."){ pressNumber("."); return; }
-      if(key==="+"){ pressOperator("+"); return; }
-      if(key==="-"){ pressOperator("−"); return; }
-      if(key==="*"){ pressOperator("×"); return; }
-      if(key==="/"){ event.preventDefault(); pressOperator("÷"); return; }
-      if(key==="Enter" || key==="="){ calculate(); return; }
-      if(key==="Escape"){ clearDisplay(); return; }
-      if(key==="Backspace"){ deleteLast(); }
+    /*
+     * Keyboard support
+     */
+    document.addEventListener("keydown", function(event) {
+
+      const key = event.key;
+
+      if (/^[0-9]$/.test(key)) {
+        pressNumber(key);
+        return;
+      }
+
+      if (key === ".") {
+        pressNumber(".");
+        return;
+      }
+
+      if (key === "+") {
+        pressOperator("+");
+        return;
+      }
+
+      if (key === "-") {
+        pressOperator("−");
+        return;
+      }
+
+      if (key === "*") {
+        pressOperator("×");
+        return;
+      }
+
+      if (key === "/") {
+        event.preventDefault();
+        pressOperator("÷");
+        return;
+      }
+
+      if (key === "Enter" || key === "=") {
+        calculate();
+        return;
+      }
+
+      if (key === "Escape") {
+        clearDisplay();
+        return;
+      }
+
+      if (key === "Backspace") {
+        deleteLast();
+      }
     });
   </script>
+
 </body>
 </html>

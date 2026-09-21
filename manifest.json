@@ -1,8 +1,8 @@
 {
-  "name": "Our Space",
-  "short_name": "Our Space",
-  "description": "Private space for two",
-  "start_url": "/index.html",
+  "name": "Calculator",
+  "short_name": "Calculator",
+  "description": "Calculator",
+  "start_url": "/calculator.html",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
