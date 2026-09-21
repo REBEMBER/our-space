@@ -1909,6 +1909,22 @@ function renderError(message) {
               current.seen_at !== next.seen_at;
           });
 
+        if (
+          hasNewMessage &&
+          currentUser?.id === MOHAMMAD_USER_ID
+        ) {
+          const latestNextMessage =
+            nextMessages[nextMessages.length - 1];
+
+          if (
+            latestNextMessage &&
+            latestNextMessage.sender_id !== currentUser.id &&
+            !latestNextMessage.deleted_at
+          ) {
+            clearReplySuggestion();
+          }
+        }
+
         if (changed) {
           const wasNearBottom =
             messagesScroll.scrollHeight -
