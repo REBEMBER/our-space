@@ -58,6 +58,7 @@
 
       font-family:
         Inter,
+        ui-sans-serif,
         -apple-system,
         BlinkMacSystemFont,
         "Segoe UI",
@@ -809,6 +810,186 @@
         gap: 12px;
       }
     }
+
+    /* ==========================================
+       OUR SPACE DESIGN SYSTEM — 2026
+    ========================================== */
+
+    body {
+      background:
+        radial-gradient(
+          560px 320px at 92% 2%,
+          rgba(243, 178, 159, 0.22),
+          transparent 68%
+        ),
+        radial-gradient(
+          520px 360px at 4% 96%,
+          rgba(220, 234, 245, 0.56),
+          transparent 66%
+        ),
+        var(--background);
+    }
+
+    .topbar {
+      padding-top: 10px;
+    }
+
+    .brand-mark {
+      background: var(--navy);
+      border: 1px solid rgba(255,255,255,0.10);
+      box-shadow:
+        0 10px 24px rgba(21, 43, 70, 0.18);
+    }
+
+    .icon-button {
+      background: rgba(255,255,255,0.88);
+      border-color: rgba(21,43,70,0.10);
+      box-shadow: 0 8px 20px rgba(21,43,70,0.05);
+    }
+
+    .hero {
+      min-height: 500px;
+      background:
+        radial-gradient(
+          340px 280px at 92% 0%,
+          rgba(243,178,159,0.30),
+          transparent 70%
+        ),
+        linear-gradient(
+          135deg,
+          #152B46 0%,
+          #1B3857 52%,
+          #234662 100%
+        );
+      border-color: rgba(21,43,70,0.12);
+      box-shadow:
+        0 24px 70px rgba(21,43,70,0.16);
+    }
+
+    .hero::after {
+      width: 360px;
+      height: 360px;
+      right: -150px;
+      top: -150px;
+      background: var(--peach);
+      opacity: 0.18;
+      filter: blur(2px);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      left: -120px;
+      bottom: -150px;
+      border-radius: 50%;
+      background: var(--blue);
+      opacity: 0.10;
+      filter: blur(4px);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      background: rgba(255,255,255,0.09);
+      border: 1px solid rgba(255,255,255,0.13);
+      color: #FFFFFF;
+      backdrop-filter: blur(10px);
+    }
+
+    .hero-title,
+    .hero-description,
+    .welcome-user,
+    .welcome-user strong {
+      color: #FFFFFF;
+    }
+
+    .hero-description {
+      color: rgba(255,255,255,0.74);
+    }
+
+    .open-chat-button {
+      background: #FFFFFF;
+      color: var(--navy);
+      border: 1px solid rgba(255,255,255,0.35);
+      box-shadow:
+        0 14px 32px rgba(0,0,0,0.16);
+    }
+
+    .open-chat-button:hover {
+      background: var(--background);
+      color: var(--navy);
+      box-shadow:
+        0 18px 38px rgba(0,0,0,0.20);
+    }
+
+    .info-card {
+      background: #FFFFFF;
+      border-color: rgba(21,43,70,0.09);
+      box-shadow:
+        0 12px 36px rgba(21,43,70,0.06);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .info-card.peach,
+    .info-card.blue {
+      background: #FFFFFF;
+    }
+
+    .info-card::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 5px;
+      height: 100%;
+    }
+
+    .info-card.peach::before {
+      background: var(--peach);
+    }
+
+    .info-card.blue::before {
+      background: #AFCFE2;
+    }
+
+    .info-label {
+      color: var(--navy);
+    }
+
+    .footer {
+      color: var(--muted);
+    }
+
+    .modal-layer {
+      background: rgba(21,43,70,0.34);
+    }
+
+    .modal {
+      border: 1px solid rgba(21,43,70,0.10);
+      box-shadow:
+        0 30px 90px rgba(21,43,70,0.24);
+    }
+
+    .close-button {
+      border: 1px solid rgba(21,43,70,0.07);
+    }
+
+    @media (max-width: 760px) {
+      .hero {
+        min-height: 540px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .icon-button,
+      .icon-button svg,
+      .open-chat-button {
+        transition: none;
+      }
+    }
+
   </style>
 </head>
 
