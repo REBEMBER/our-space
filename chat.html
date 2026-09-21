@@ -1974,10 +1974,21 @@
               filter:
                 `space_id=eq.${SPACE_ID}`
             },
-            async () => {
-              await loadMessages(
-                false
+            async (payload) => {
+              const updated = payload.new;
+              const index = messages.findIndex(
+                (item) => Number(item.id) === Number(updated.id)
               );
+
+              if (index !== -1) {
+                messages[index] = {
+                  ...messages[index],
+                  ...updated
+                };
+                renderMessages();
+              } else {
+                await loadMessages(false);
+              }
             }
           )
           .subscribe();
