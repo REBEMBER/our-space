@@ -8,10 +8,7 @@
     content="width=device-width, initial-scale=1.0"
   />
 
-  <meta
-    name="theme-color"
-    content="#F8F0EC"
-  />
+  <meta name="theme-color" content="#F8F0EC" />
 
   <title>Our Space</title>
 
@@ -992,7 +989,7 @@
 
   
     /* ===== STRONG VISUAL REFRESH ===== */
-    html, body { background:#F6F1EE; }
+    html, body { background: var(--bg) !important; }
     body {
       font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background:
@@ -1030,7 +1027,7 @@
       background:
         radial-gradient(380px 300px at 92% 6%, rgba(243,178,159,.23), transparent 70%),
         radial-gradient(340px 250px at -4% 104%, rgba(220,234,245,.12), transparent 70%),
-        linear-gradient(135deg,#102238 0%,#152B46 52%,#20435F 100%);
+        linear-gradient(135deg,#152B46 0%,#152B46 52%,#152B46 100%);
       box-shadow:0 30px 90px rgba(21,43,70,.20);
       border:1px solid rgba(255,255,255,.08);
     }
@@ -1068,7 +1065,7 @@
       padding:0 24px;
       border-radius:17px;
       background:#fff;
-      color:#152B46;
+      color: var(--navy);
       font-size:14px;
       box-shadow:0 16px 34px rgba(0,0,0,.20);
     }
@@ -1104,6 +1101,37 @@
       .hero{padding:32px 24px; min-height:520px;}
       .hero-title{font-size:48px;}
       .hero-bottom{margin-top:52px;}
+    }
+
+  
+    /* ==========================================
+       OUR SPACE — SHARED COLOR SYSTEM
+       Matches chat.html exactly
+    ========================================== */
+    :root {
+      --bg: #F8F0EC;
+      --navy: #152B46;
+      --navy-light: #1D3B60;
+      --peach: #F3B29F;
+      --blue: #DCEAF5;
+      --white: #FFFFFF;
+      --text: #26313D;
+      --muted: #7A8794;
+      --border: rgba(21, 43, 70, 0.09);
+    }
+
+    body {
+      background: var(--bg) !important;
+      color: var(--text) !important;
+    }
+
+    input,
+    textarea {
+      color: var(--text);
+    }
+
+    button {
+      font-family: inherit;
     }
 
   </style>
