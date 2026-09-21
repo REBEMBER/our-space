@@ -2827,7 +2827,20 @@ function renderError(message) {
       currentUser =
         user;
 
-      if (currentUser.id === MOHAMMAD_USER_ID) {
+      // Gate the reply coach by the canonical profile username, not only by
+      // a hard-coded UUID. This keeps the UI aligned with the same identity
+      // rule enforced by the AI Edge Function.
+      const { data: profile, error: profileError } = await client
+        .from("user_profiles")
+        .select("username")
+        .eq("user_id", currentUser.id)
+        .maybeSingle();
+
+      const isMohammadAccount =
+        !profileError &&
+        String(profile?.username || "").toLowerCase() === "mohammad";
+
+      if (isMohammadAccount) {
         bestReplyButton.classList.add("visible");
       } else {
         bestReplyButton.classList.remove("visible");
