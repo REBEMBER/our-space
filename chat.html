@@ -1209,10 +1209,14 @@
             `
             : "";
 
-        const contentClass =
-          deleted
-            ? "deleted-content"
-            : "message-text";
+        const contentHtml =
+          deleted && !mine
+            ? ""
+            : `
+              <span class="message-text">
+                ${escapeHtml(message.content)}
+              </span>
+            `;
 
         const statusHtml =
           mine
@@ -1287,13 +1291,7 @@
 
                 ${deletedHtml}
 
-                <span
-                  class="${contentClass}"
-                >
-                  ${escapeHtml(
-                    message.content
-                  )}
-                </span>
+                ${contentHtml}
 
                 <div class="message-meta">
 
