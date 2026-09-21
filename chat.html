@@ -2167,10 +2167,12 @@ function renderError(message) {
     async function start() {
 
       const {
-        data,
+        data: {
+          user
+        },
         error
       } =
-        await client.auth.getSession();
+        await client.auth.getUser();
 
       if (error) {
 
@@ -2184,10 +2186,7 @@ function renderError(message) {
         return;
       }
 
-      if (
-        !data.session ||
-        !data.session.user
-      ) {
+      if (!user) {
 
         window.location.href =
           "login.html";
@@ -2196,7 +2195,7 @@ function renderError(message) {
       }
 
       currentUser =
-        data.session.user;
+        user;
 
       const savedTheme =
         currentUser.user_metadata?.our_space_theme || "warm";
