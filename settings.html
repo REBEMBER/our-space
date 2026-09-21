@@ -130,9 +130,9 @@
     </section>
 
     <section class="section">
-      <div class="section-head"><h2 class="section-title">Calculator code</h2><p class="section-description">Use 4–12 digits for the private calculator unlock.</p></div>
+      <div class="section-head"><h2 class="section-title">Calculator code</h2><p class="section-description">Use exactly 4 digits for the private calculator unlock.</p></div>
       <div class="form-grid">
-        <div class="field"><label for="calculatorCode">New calculator code</label><input id="calculatorCode" type="password" inputmode="numeric" autocomplete="new-password" minlength="4" maxlength="12" placeholder="••••"></div>
+        <div class="field"><label for="calculatorCode">New calculator code</label><input id="calculatorCode" type="text" inputmode="numeric" autocomplete="off" minlength="4" maxlength="4" pattern="[0-9]{4}" placeholder="••••"></div>
         <div class="field"><label for="calculatorCodeConfirm">Confirm code</label><input id="calculatorCodeConfirm" type="password" inputmode="numeric" autocomplete="new-password" minlength="4" maxlength="12" placeholder="••••"></div>
       </div>
       <div class="action-row"><button class="primary-button" id="saveCalculatorCode" type="button">Save calculator code</button><button class="secondary-button" id="resetCalculatorCode" type="button">Reset to default</button></div>
@@ -214,7 +214,7 @@
       const code=document.getElementById("calculatorCode").value.trim();
       const confirm=document.getElementById("calculatorCodeConfirm").value.trim();
       const status=document.getElementById("calculatorStatus");
-      if(!/^\\d{4,12}$/.test(code)){setStatus(status,"Use 4–12 digits.","error");return;}
+      if(!/^\\d{4}$/.test(code)){setStatus(status,"Use exactly 4 digits.","error");return;}
       if(code!==confirm){setStatus(status,"The codes do not match.","error");return;}
       const {error}=await client.auth.updateUser({data:{calculator_code:code}});
       if(error){console.error("Calculator code error:",error);setStatus(status,error.message||"Could not save the calculator code.","error");return;}
