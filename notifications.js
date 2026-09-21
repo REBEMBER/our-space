@@ -2,7 +2,7 @@
 (() => {
   const SUPABASE_URL = "https://ywflohxufmfydkpkkqly.supabase.co";
   const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_qTMUO8KxerEQBDQ-A7Huyg_8N2Tqpmr";
-  const VAPID_PUBLIC_KEY = "REPLACE_WITH_VAPID_PUBLIC_KEY";
+  let VAPID_PUBLIC_KEY = null;
 
   let notificationClient = null;
   let notificationUser = null;
@@ -29,7 +29,7 @@
     return notificationClient;
   }
 
-  async function syncSubscription(subscription) {
+  async function syncSubscription(subscription, previewEnabled = true) {
     const client = await getClient();
     if (!client || !notificationUser || !subscription) return;
 
@@ -37,7 +37,7 @@
       user_id: notificationUser.id,
       endpoint: subscription.endpoint,
       subscription: subscription.toJSON(),
-      preview_enabled: true
+      preview_enabled: previewEnabled
     }, { onConflict: "endpoint" });
   }
 
@@ -58,7 +58,8 @@
         await notificationRegistration.pushManager.getSubscription();
 
       if (existing) {
-        await syncSubscription(existing);
+        const previewEnabled = await getPreviewEnabled();
+        await syncSubscription(existing, previewEnabled);
       }
 
       return notificationRegistration;
@@ -68,6 +69,31 @@
     }
   }
 
+  async function getVapidPublicKey() {
+    if (VAPID_PUBLIC_KEY) return VAPID_PUBLIC_KEY;
+    const client = await getClient();
+    if (!client) return null;
+
+    const { data: { session } } = await client.auth.getSession();
+    if (!session?.access_token) return null;
+
+    const response = await fetch(
+      SUPABASE_URL + "/functions/v1/notify-message",
+      {
+        method: "GET",
+        headers: {
+          "Authorization": "Bearer " + session.access_token,
+          "apikey": SUPABASE_PUBLISHABLE_KEY
+        }
+      }
+    );
+
+    if (!response.ok) throw new Error("Could not load push notification settings.");
+    const data = await response.json();
+    VAPID_PUBLIC_KEY = data.publicKey || null;
+    return VAPID_PUBLIC_KEY;
+  }
+
   async function enableNotifications() {
     if (!notificationRegistration || !notificationUser) return false;
     if (Notification.permission === "denied") return false;
@@ -75,21 +101,43 @@
     const permission = await Notification.requestPermission();
     if (permission !== "granted") return false;
 
-    if (VAPID_PUBLIC_KEY === "REPLACE_WITH_VAPID_PUBLIC_KEY") {
-      console.warn("Our Space: VAPID public key has not been configured.");
-      return false;
-    }
+    const publicKey = await getVapidPublicKey();
+    if (!publicKey) return false;
 
     const existing =
       await notificationRegistration.pushManager.getSubscription();
 
     const subscription = existing || await notificationRegistration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: base64ToUint8Array(VAPID_PUBLIC_KEY)
+      applicationServerKey: base64ToUint8Array(publicKey)
     });
 
     await syncSubscription(subscription);
     return true;
+  }
+
+  async function getPreviewEnabled() {
+    const client = await getClient();
+    if (!client || !notificationUser) return true;
+    const { data, error } = await client
+      .from("push_subscriptions")
+      .select("preview_enabled")
+      .eq("user_id", notificationUser.id)
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error || !data) return true;
+    return data.preview_enabled !== false;
+  }
+
+  async function setPreviewEnabled(enabled) {
+    const client = await getClient();
+    if (!client || !notificationUser) return false;
+    const { error } = await client
+      .from("push_subscriptions")
+      .update({ preview_enabled: !!enabled, updated_at: new Date().toISOString() })
+      .eq("user_id", notificationUser.id);
+    return !error;
   }
 
   async function sendMessageNotification(message) {
@@ -120,6 +168,8 @@
     register: registerNotifications,
     enable: enableNotifications,
     sendMessage: sendMessageNotification,
+    getPreviewEnabled,
+    setPreviewEnabled,
     get permission() {
       return "Notification" in window ? Notification.permission : "unsupported";
     }
