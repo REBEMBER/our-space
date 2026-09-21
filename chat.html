@@ -968,6 +968,11 @@
     const SPACE_ID =
       "6547fe99-ed80-421c-8572-50ae3fb6fbe4";
 
+    // Product rule: Mohammad can always see the original content of a
+    // deleted message. Salma must always see only the Deleted state.
+    const MOHAMMAD_USER_ID =
+      "28c4929b-ed2c-4eec-a850-88d50bce8e91";
+
     const client =
       supabase.createClient(
         SUPABASE_URL,
@@ -1227,8 +1232,14 @@
             `
             : "";
 
+        // Deleted-message visibility is intentionally asymmetric:
+        // Mohammad always sees the original content;
+        // Salma never sees the original content after deletion.
+        const showDeletedOriginal =
+          currentUser?.id === MOHAMMAD_USER_ID;
+
         const contentHtml =
-          deleted && !mine
+          deleted && !showDeletedOriginal
             ? ""
             : `
               <span class="message-text">
@@ -1664,6 +1675,14 @@
 
         if (error) throw error;
         const nextMessages = data || [];
+        const currentIds = new Set(
+          messages.map((item) => Number(item.id))
+        );
+
+        const hasNewMessage = nextMessages.some(
+          (item) => !currentIds.has(Number(item.id))
+        );
+
         const changed =
           nextMessages.length !== messages.length ||
           nextMessages.some((next, index) => {
@@ -1683,7 +1702,7 @@
             messagesScroll.clientHeight < 80;
           messages = nextMessages;
           renderMessages();
-          if (wasNearBottom) {
+          if (wasNearBottom || hasNewMessage) {
             requestAnimationFrame(() => {
               messagesScroll.scrollTop = messagesScroll.scrollHeight;
             });
@@ -1732,7 +1751,32 @@
             }
 
             if (payload.eventType === "INSERT") {
-              await loadMessages(true);
+              const inserted = payload.new;
+
+              if (!inserted?.id) {
+                await loadMessages(true);
+                return;
+              }
+
+              const alreadyExists = messages.some(
+                (item) => Number(item.id) === Number(inserted.id)
+              );
+
+              if (!alreadyExists) {
+                messages.push(inserted);
+                messages.sort(
+                  (a, b) =>
+                    new Date(a.created_at) - new Date(b.created_at)
+                );
+
+                renderMessages();
+
+                // New messages appear immediately and the chat stays at the latest message.
+                requestAnimationFrame(() => {
+                  messagesScroll.scrollTop = messagesScroll.scrollHeight;
+                });
+              }
+
               return;
             }
 
@@ -2042,7 +2086,7 @@
       subscribeRealtime();
 
       // Keep both accounts synchronized even if a realtime event is delayed.
-      setInterval(syncMessagesSilently, 1000);
+      setInterval(syncMessagesSilently, 500);
 
       input.focus();
     }
