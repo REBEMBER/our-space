@@ -184,6 +184,7 @@
 
       -webkit-overflow-scrolling: touch;
       overscroll-behavior: contain;
+      overflow-anchor: none;
 
       scrollbar-width: thin;
       scrollbar-color: rgba(21, 43, 70, 0.12) transparent;
@@ -1048,19 +1049,46 @@
       );
     }
 
-    // Always position the conversation on the actual last message.
-    // scrollHeight alone can be one frame behind after a render, especially
-    // when a message changes the document height or the composer resizes.
+    // Put the last message itself at the visual bottom of the chat,
+    // not merely at the scroll container's mathematical bottom.
+    // This is important because the composer is fixed over the scroll area.
     function scrollToLatest() {
       syncComposerHeight();
 
       const apply = () => {
         syncComposerHeight();
 
-        // The scroll container extends behind the fixed composer. Its
-        // bottom padding is the exact amount of space occupied by the
-        // composer, so max scroll places the last bubble immediately
-        // above the composer instead of merely somewhere near the bottom.
+        const lastRow =
+          messagesEl.querySelector("[data-row]:last-of-type");
+
+        if (!lastRow) {
+          messagesScroll.scrollTop = 0;
+          return;
+        }
+
+        const composerArea =
+          document.querySelector(".composer-area");
+
+        const composerHeight =
+          composerArea
+            ? composerArea.getBoundingClientRect().height
+            : 0;
+
+        const scrollRect =
+          messagesScroll.getBoundingClientRect();
+
+        // The bottom of the last bubble should sit just above the
+        // fixed composer, with the same 8px breathing room used by
+        // the scroll area's bottom padding.
+        const desiredBottom =
+          scrollRect.bottom - composerHeight - 8;
+
+        const lastRect =
+          lastRow.getBoundingClientRect();
+
+        const delta =
+          lastRect.bottom - desiredBottom;
+
         const maxScroll =
           Math.max(
             0,
@@ -1068,23 +1096,26 @@
             messagesScroll.clientHeight
           );
 
-        messagesScroll.scrollTop = maxScroll;
-
-        // Recalculate once more after layout settles (bubble height,
-        // fonts, and composer height can all change between frames).
-        requestAnimationFrame(() => {
-          syncComposerHeight();
-          messagesScroll.scrollTop =
+        messagesScroll.scrollTop =
+          Math.min(
+            maxScroll,
             Math.max(
               0,
-              messagesScroll.scrollHeight -
-              messagesScroll.clientHeight
-            );
-        });
+              messagesScroll.scrollTop + delta
+            )
+          );
       };
 
+      // Two frames let innerHTML, fonts, textarea/composer height and
+      // the browser's layout all settle before measuring the last row.
       requestAnimationFrame(() => {
-        requestAnimationFrame(apply);
+        requestAnimationFrame(() => {
+          apply();
+
+          requestAnimationFrame(() => {
+            apply();
+          });
+        });
       });
     }
 
