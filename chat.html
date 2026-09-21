@@ -1066,29 +1066,11 @@
           return;
         }
 
-        const composerArea =
-          document.querySelector(".composer-area");
-
-        const composerHeight =
-          composerArea
-            ? composerArea.getBoundingClientRect().height
-            : 0;
-
-        const scrollRect =
-          messagesScroll.getBoundingClientRect();
-
-        // The bottom of the last bubble should sit just above the
-        // fixed composer, with the same 8px breathing room used by
-        // the scroll area's bottom padding.
-        const desiredBottom =
-          scrollRect.bottom - composerHeight - 8;
-
-        const lastRect =
-          lastRow.getBoundingClientRect();
-
-        const delta =
-          lastRect.bottom - desiredBottom;
-
+        // The composer is fixed outside the scroll container. The message
+        // list itself already has bottom padding equal to the composer
+        // height, so the true latest position is the maximum scrollTop.
+        // Measuring a bubble against viewport coordinates here is fragile
+        // because the header/composer are independent overlays.
         const maxScroll =
           Math.max(
             0,
@@ -1096,29 +1078,27 @@
             messagesScroll.clientHeight
           );
 
-        messagesScroll.scrollTop =
-          Math.min(
-            maxScroll,
-            Math.max(
-              0,
-              messagesScroll.scrollTop + delta
-            )
-          );
+        messagesScroll.scrollTop = maxScroll;
       };
 
-      // Two frames let innerHTML, fonts, textarea/composer height and
-      // the browser's layout all settle before measuring the last row.
+      // Wait for DOM insertion, CSS layout, fonts and composer measurement
+      // to settle. The final frame is deliberately non-animated so a new
+      // message is visible immediately rather than easing to an intermediate
+      // position.
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           apply();
 
           requestAnimationFrame(() => {
             apply();
+
+            setTimeout(() => {
+              apply();
+            }, 0);
           });
         });
       });
     }
-
     function dateKey(value) {
       const d = new Date(value);
 
