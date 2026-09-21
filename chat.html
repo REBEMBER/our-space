@@ -1123,6 +1123,25 @@
         });
     }
 
+    function isNearBottom() {
+      const distance =
+        messagesScroll.scrollHeight -
+        messagesScroll.scrollTop -
+        messagesScroll.clientHeight;
+
+      return distance <= 80;
+    }
+
+    let keepMessagesAtBottom = true;
+
+    messagesScroll.addEventListener(
+      "scroll",
+      () => {
+        keepMessagesAtBottom = isNearBottom();
+      },
+      { passive: true }
+    );
+
     function syncComposerHeight() {
       const composerArea =
         document.querySelector(".composer-area");
@@ -1137,11 +1156,24 @@
         `${height}px`
       );
     }
+
     const composerResizeObserver = new ResizeObserver(() => {
+      const shouldStick =
+        keepMessagesAtBottom || isNearBottom();
+
       syncComposerHeight();
+
+      if (shouldStick) {
+        requestAnimationFrame(() => {
+          scrollToLatest();
+        });
+      }
     });
 
-    composerResizeObserver.observe(document.querySelector(".composer-area"));
+    composerResizeObserver.observe(
+      document.querySelector(".composer-area")
+    );
+
     syncComposerHeight();
 
     function scrollBottom() {
