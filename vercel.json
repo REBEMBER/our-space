@@ -5,5 +5,11 @@
       "destination": "/calculator.html",
       "permanent": false
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/functions/v1/our-space-ai",
+      "destination": "/api/ai"
+    }
   ]
 }
