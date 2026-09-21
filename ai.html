@@ -35,7 +35,7 @@ button,textarea{font:inherit}.app{height:100%;padding:10px}.shell{height:100%;ma
 </section>
 </div></div>
 <script>
-const STORE="our_space_ai_history_v1";const ENDPOINT="/functions/v1/our-space-ai";const $=id=>document.getElementById(id);
+const STORE="our_space_ai_history_v1";const ENDPOINT="/api/ai";const $=id=>document.getElementById(id);
 let history=[];let busy=false;
 function token(){for(const key of Object.keys(localStorage)){if(key.includes("auth-token")){try{const v=JSON.parse(localStorage.getItem(key));if(v?.access_token)return v.access_token}catch{}}}return ""}
 function save(){try{localStorage.setItem(STORE,JSON.stringify(history.slice(-30)))}catch{}}
