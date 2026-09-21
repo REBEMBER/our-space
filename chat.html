@@ -207,6 +207,9 @@
       margin: 0 auto;
 
       min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
       padding:
         24px 17px 150px;
     }
@@ -1077,10 +1080,29 @@
     }
 
     function scrollBottom() {
-      messagesScroll.scrollTop = messagesScroll.scrollHeight;
-      setTimeout(() => {
+      const lastMessage = messagesEl.querySelector("[data-row]:last-of-type");
+
+      if (lastMessage) {
+        lastMessage.scrollIntoView({
+          block: "end",
+          inline: "nearest",
+          behavior: "auto"
+        });
+      } else {
         messagesScroll.scrollTop = messagesScroll.scrollHeight;
-      }, 50);
+      }
+
+      setTimeout(() => {
+        if (lastMessage && document.body.contains(lastMessage)) {
+          lastMessage.scrollIntoView({
+            block: "end",
+            inline: "nearest",
+            behavior: "auto"
+          });
+        } else {
+          messagesScroll.scrollTop = messagesScroll.scrollHeight;
+        }
+      }, 100);
     }
 
     function renderError(message) {
