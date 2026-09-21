@@ -1013,11 +1013,35 @@
     .brand-subtitle { font-size:12px; color:#7A8794; }
 
     .top-actions { gap:10px; }
-    .icon-button {
-      width:46px; height:46px; border-radius:15px;
+    .settings-button {
+      min-height:46px;
+      padding:0 16px;
+      border-radius:15px;
       background:#FFFFFF;
       border:1px solid rgba(21,43,70,.09);
       box-shadow:0 10px 24px rgba(21,43,70,.06);
+      color:var(--navy);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:9px;
+      cursor:pointer;
+      font-size:13px;
+      font-weight:700;
+      transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+    .settings-button:hover {
+      background:#FFFFFF;
+      transform:translateY(-1px);
+      box-shadow:0 12px 28px rgba(21,43,70,.09);
+    }
+    .settings-button svg {
+      width:18px;
+      height:18px;
+      stroke-width:1.7;
+    }
+    .settings-button span {
+      line-height:1;
     }
 
     .hero {
@@ -1256,7 +1280,7 @@
         <div class="top-actions">
 
           <button
-            class="icon-button"
+            class="settings-button"
             id="settingsButton"
             type="button"
             aria-label="Settings"
@@ -1301,6 +1325,8 @@
                 "
               />
             </svg>
+
+            <span>Settings</span>
           </button>
 
         </div>
