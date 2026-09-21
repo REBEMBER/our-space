@@ -1313,48 +1313,7 @@
       messagesEl.innerHTML =
         html;
 
-      updateSelectionToolbar();
       setupVisibleMessageObserver();
-    }
-
-    /* ==========================================
-       SELECTION
-    ========================================== */
-
-    function enterSelection(id) {
-      selectionMode = true;
-      selectedIds.add(
-        Number(id)
-      );
-
-      updateSelectionToolbar();
-    }
-
-    function toggleSelection(id) {
-
-      const numericId =
-        Number(id);
-
-      if (
-        selectedIds.has(
-          numericId
-        )
-      ) {
-        selectedIds.delete(
-          numericId
-        );
-      } else {
-        selectedIds.add(
-          numericId
-        );
-      }
-
-      if (!selectedIds.size) {
-        exitSelection();
-        return;
-      }
-
-      updateSelectionToolbar();
     }
 
     /* ==========================================
