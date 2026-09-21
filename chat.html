@@ -172,91 +172,6 @@
     }
 
     /* =========================
-       SELECTION TOOLBAR
-    ========================= */
-
-    .selection-toolbar {
-      width: min(100%, 820px);
-      margin: 10px auto 0;
-
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-
-      padding: 8px 9px;
-
-      background: rgba(255, 255, 255, 0.90);
-      border: 1px solid rgba(243, 178, 159, 0.55);
-      border-radius: 15px;
-
-      box-shadow: 0 5px 18px rgba(21, 43, 70, 0.04);
-    }
-
-    .selection-toolbar.visible {
-      display: flex;
-    }
-
-    .selection-info {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding-left: 5px;
-    }
-
-    .selection-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--peach);
-    }
-
-    .selection-count {
-      color: var(--navy);
-      font-size: 11px;
-      font-weight: 800;
-    }
-
-    .selection-actions {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .toolbar-button {
-      height: 32px;
-      border: 0;
-      border-radius: 10px;
-      padding: 0 11px;
-
-      font-size: 10px;
-      font-weight: 800;
-    }
-
-    .toolbar-delete {
-      width: 32px;
-      padding: 0;
-
-      background: var(--navy);
-      color: var(--white);
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .toolbar-delete svg {
-      width: 14px;
-      height: 14px;
-      stroke: currentColor;
-    }
-
-    .toolbar-cancel {
-      background: var(--blue);
-      color: var(--navy);
-    }
-
-    /* =========================
        MESSAGES AREA
     ========================= */
 
@@ -850,11 +765,6 @@
         opacity: 0.42;
       }
 
-      .selection-toolbar {
-        margin-left: 10px;
-        margin-right: 10px;
-        width: auto;
-      }
 
       .input-shell {
         min-height: 48px;
@@ -954,56 +864,6 @@
               <path d="M14 8l4 4-4 4"></path>
               <path d="M9 12h9"></path>
             </svg>
-          </button>
-
-        </div>
-
-      </div>
-
-      <!-- SELECTION TOOLBAR -->
-
-      <div
-        class="selection-toolbar"
-        id="selectionToolbar"
-      >
-
-        <div class="selection-info">
-          <span class="selection-dot"></span>
-
-          <span
-            class="selection-count"
-            id="selectionCount"
-          >
-            0 selected
-          </span>
-        </div>
-
-        <div class="selection-actions">
-
-          <button
-            class="toolbar-button toolbar-delete"
-            id="deleteButton"
-            type="button"
-            aria-label="Delete"
-            title="Delete"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke-width="1.7"
-            >
-              <path d="M4 7h16"></path>
-              <path d="M9 7V4h6v3"></path>
-              <path d="M7 7l1 13h8l1-13"></path>
-            </svg>
-          </button>
-
-          <button
-            class="toolbar-button toolbar-cancel"
-            id="cancelSelectionButton"
-            type="button"
-          >
-            Cancel
           </button>
 
         </div>
@@ -1276,7 +1136,6 @@
           </div>
         `;
 
-        updateSelectionToolbar();
         return;
       }
 
@@ -1338,11 +1197,6 @@
             previous.created_at
           ) === currentDate;
 
-        const selected =
-          selectedIds.has(
-            message.id
-          );
-
         const rowClass = [
           "message-row",
           mine ? "mine" : "theirs",
@@ -1352,9 +1206,6 @@
                   ? "grouped-mine"
                   : "grouped-theirs"
               )
-            : "",
-          selected
-            ? "selected"
             : ""
         ]
           .filter(Boolean)
@@ -1423,7 +1274,7 @@
                   type="button"
                   data-delete-direct="${message.id}"
                 >
-                  Select
+                  Delete
                 </button>
               </div>
             `
@@ -1526,66 +1377,6 @@
       updateSelectionToolbar();
     }
 
-    function exitSelection() {
-
-      selectionMode = false;
-      selectedIds.clear();
-
-      closeMenus();
-
-      updateSelectionToolbar();
-
-      document
-        .querySelectorAll(
-          ".message-row.selected"
-        )
-        .forEach((row) => {
-          row.classList.remove(
-            "selected"
-          );
-        });
-    }
-
-    function updateSelectionToolbar() {
-
-      if (!selectionMode) {
-
-        selectionToolbar.classList.remove(
-          "visible"
-        );
-
-        return;
-      }
-
-      selectionToolbar.classList.add(
-        "visible"
-      );
-
-      selectionCount.textContent =
-        `${selectedIds.size} ${
-          selectedIds.size === 1
-            ? "message"
-            : "messages"
-        } selected`;
-
-      document
-        .querySelectorAll(
-          "[data-row]"
-        )
-        .forEach((row) => {
-
-          const id =
-            Number(
-              row.dataset.row
-            );
-
-          row.classList.toggle(
-            "selected",
-            selectedIds.has(id)
-          );
-        });
-    }
-
     /* ==========================================
        SEEN
     ========================================== */
@@ -1601,16 +1392,22 @@
       if (message.sender_id === currentUser.id) return;
       if (message.seen_at) return;
 
-      const { error } = await client
-        .from("messages")
-        .update({ seen_at: new Date().toISOString() })
-        .eq("id", messageId)
-        .eq("space_id", SPACE_ID)
-        .neq("sender_id", currentUser.id)
-        .is("seen_at", null);
+      const { error } = await client.rpc(
+        "mark_message_seen",
+        { p_message_id: message.id }
+      );
 
       if (error) {
         console.warn("Could not mark message as seen:", error);
+        return;
+      }
+
+      const local = messages.find(
+        (item) => Number(item.id) === Number(message.id)
+      );
+      if (local) {
+        local.seen_at = new Date().toISOString();
+        renderMessages();
       }
     }
 
@@ -1770,19 +1567,16 @@
 
       sendButton.disabled = true;
 
-      const { error } =
+      const { data: sentMessage, error } =
         await client
           .from("messages")
           .insert({
-            space_id:
-              SPACE_ID,
-
-            sender_id:
-              currentUser.id,
-
-            content:
-              value
-          });
+            space_id: SPACE_ID,
+            sender_id: currentUser.id,
+            content: value
+          })
+          .select("id, space_id, sender_id, content, created_at")
+          .single();
 
       sendButton.disabled = false;
 
@@ -1806,16 +1600,6 @@
 
       await loadMessages(true);
 
-      const { data: sentMessage } = await client
-        .from("messages")
-        .select("id, space_id, sender_id, content")
-        .eq("space_id", SPACE_ID)
-        .eq("sender_id", currentUser.id)
-        .eq("content", value)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
       if (sentMessage && window.OurSpaceNotifications) {
         await window.OurSpaceNotifications.sendMessage(sentMessage);
       }
@@ -1836,99 +1620,10 @@
 
         if (error) throw error;
 
-        // Update locally immediately; realtime UPDATE will reconcile the other client.
-        const local = messages.find(
-          (item) => Number(item.id) === Number(message.id)
-        );
-
-        if (local) {
-          local.deleted_at = new Date().toISOString();
-          local.deleted_by = currentUser.id;
-          local.content = "";
-        }
-
-        renderMessages();
+        await loadMessages(false);
       } catch (error) {
         console.error("Delete error:", error);
         alert(error.message || "Could not delete the message.");
-      }
-    }
-
-    /* ==========================================
-       DELETE
-    ========================================== */
-
-    async function deleteSelected() {
-
-      if (!selectedIds.size) {
-        return;
-      }
-
-      const ids =
-        Array.from(
-          selectedIds
-        );
-
-      deleteButton.disabled = true;
-
-      try {
-
-        for (const id of ids) {
-
-          const message =
-            messages.find(
-              (item) =>
-                Number(
-                  item.id
-                ) ===
-                Number(id)
-            );
-
-          if (!message) {
-            continue;
-          }
-
-          if (
-            message.sender_id !==
-            currentUser.id
-          ) {
-            continue;
-          }
-
-          const { error } =
-            await client.rpc(
-              "soft_delete_message",
-              {
-                p_message_id:
-                  id
-              }
-            );
-
-          if (error) {
-            throw error;
-          }
-        }
-
-        exitSelection();
-
-        await loadMessages();
-
-      } catch (error) {
-
-        console.error(
-          "Delete error:",
-          error
-        );
-
-        alert(
-          error.message ||
-          "Could not delete the message."
-        );
-
-      } finally {
-
-        deleteButton.disabled =
-          false;
       }
     }
 
@@ -1937,44 +1632,29 @@
     ========================================== */
 
     function subscribeRealtime() {
-
       if (realtimeChannel) {
-
-        client.removeChannel(
-          realtimeChannel
-        );
+        client.removeChannel(realtimeChannel);
       }
 
-      realtimeChannel =
-        client
-          .channel(
-            "our-space-chat"
-          )
-          .on(
-            "postgres_changes",
-            {
-              event: "INSERT",
-              schema: "public",
-              table: "messages",
-              filter:
-                `space_id=eq.${SPACE_ID}`
-            },
-            async () => {
-              await loadMessages(
-                true
-              );
+      const channelName = "our-space-chat-" + SPACE_ID;
+
+      realtimeChannel = client
+        .channel(channelName)
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "messages",
+            filter: `space_id=eq.${SPACE_ID}`
+          },
+          async (payload) => {
+            if (payload.eventType === "INSERT") {
+              await loadMessages(true);
+              return;
             }
-          )
-          .on(
-            "postgres_changes",
-            {
-              event: "UPDATE",
-              schema: "public",
-              table: "messages",
-              filter:
-                `space_id=eq.${SPACE_ID}`
-            },
-            async (payload) => {
+
+            if (payload.eventType === "UPDATE") {
               const updated = payload.new;
               const index = messages.findIndex(
                 (item) => Number(item.id) === Number(updated.id)
@@ -1989,9 +1669,29 @@
               } else {
                 await loadMessages(false);
               }
+              return;
             }
-          )
-          .subscribe();
+
+            if (payload.eventType === "DELETE") {
+              const deletedId = Number(payload.old?.id);
+              messages = messages.filter(
+                (item) => Number(item.id) !== deletedId
+              );
+              renderMessages();
+            }
+          }
+        )
+        .subscribe((status) => {
+          console.log("Our Space realtime:", status);
+
+          if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+            setTimeout(() => {
+              if (document.visibilityState === "visible") {
+                subscribeRealtime();
+              }
+            }, 1500);
+          }
+        });
     }
 
     /* ==========================================
@@ -2108,39 +1808,7 @@
           return;
         }
 
-        if (!selectionMode) {
-          return;
-        }
-
-        const row =
-          event.target.closest(
-            "[data-row]"
-          );
-
-        if (!row) {
-          return;
-        }
-
-        const id =
-          Number(
-            row.dataset.row
-          );
-
-        const message =
-          messages.find(
-            (item) =>
-              Number(                item.id
-              ) === id
-          );
-
-        if (
-          message &&
-          message.sender_id ===
-            currentUser.id &&
-          !message.deleted_at
-        ) {
-          toggleSelection(id);
-        }
+        return;
       }
     );
 
@@ -2161,19 +1829,6 @@
       }
     );
 
-    cancelSelectionButton.addEventListener(
-      "click",
-      () => {
-        exitSelection();
-      }
-    );
-
-    deleteButton.addEventListener(
-      "click",
-      async () => {
-        await deleteSelected();
-      }
-    );
 
     homeButton.addEventListener(
       "click",
