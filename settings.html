@@ -151,7 +151,14 @@
     </section>
 
     <section class="section">
-      <div class="section-head"><h2 class="section-title">Notifications</h2><p class="section-description">Get a push notification when your partner sends a new message while Our Space is not open in the foreground.</p></div>
+      <div class="section-head"><h2 class="section-title">Notifications</h2><p class="section-description">Choose how your calculator notification appears when your partner sends a message.</p></div>
+      <div class="account-line" style="display:flex;align-items:center;justify-content:space-between;gap:14px;">
+        <div><div class="account-label">Notification</div><div class="account-value">Calculator</div></div>
+        <label style="display:flex;align-items:center;gap:9px;margin:0;cursor:pointer;">
+          <span id="calculatorNotificationState" style="font-size:11px;font-weight:800;color:var(--muted)">ON</span>
+          <input id="calculatorNotificationToggle" type="checkbox" checked style="width:20px;height:20px;accent-color:var(--navy);">
+        </label>
+      </div>
       <div class="action-row"><button class="primary-button" id="enableNotifications" type="button">Enable notifications</button></div>
       <div class="status" id="notificationStatus"></div>
     </section>
@@ -279,17 +286,41 @@
         await window.OurSpaceNotifications.register(user);
         const button=document.getElementById("enableNotifications");
         const status=document.getElementById("notificationStatus");
+        const toggle=document.getElementById("calculatorNotificationToggle");
+        const toggleState=document.getElementById("calculatorNotificationState");
         const permission=window.OurSpaceNotifications.permission;
+        const previewEnabled=await window.OurSpaceNotifications.getPreviewEnabled();
+        toggle.checked=previewEnabled;
+        toggleState.textContent=previewEnabled?"ON":"OFF";
 
         if(permission==="granted"){
           button.textContent="Notifications enabled";
-          setStatus(status,"Push notifications are enabled on this device.","success");
+          setStatus(status,"Calculator notifications are enabled on this device.","success");
         }else if(permission==="denied"){
           button.textContent="Notifications blocked";
           setStatus(status,"Notifications are blocked in your browser settings.","error");
         }
       }
     }
+
+    document.getElementById("calculatorNotificationToggle").addEventListener("change",async(event)=>{
+      const toggle=event.target;
+      const state=document.getElementById("calculatorNotificationState");
+      const status=document.getElementById("notificationStatus");
+      const enabled=toggle.checked;
+      state.textContent=enabled?"ON":"OFF";
+      try{
+        const synced=await window.OurSpaceNotifications.setPreviewEnabled(enabled);
+        if(!synced){
+          setStatus(status,"Enable notifications first, then this choice will sync.","error");
+        }else{
+          setStatus(status,enabled?"Calculator notifications will show Salma and the message.":"Calculator notifications will hide the message preview.","success");
+        }
+      }catch(error){
+        console.error("Notification preference error:",error);
+        setStatus(status,error.message||"Could not save the notification choice.","error");
+      }
+    });
 
     document.getElementById("enableNotifications").addEventListener("click",async()=>{
       const button=document.getElementById("enableNotifications");
@@ -300,8 +331,9 @@
       try{
         const enabled=await window.OurSpaceNotifications.enable();
         if(enabled){
+          await window.OurSpaceNotifications.setPreviewEnabled(document.getElementById("calculatorNotificationToggle").checked);
           button.textContent="Notifications enabled";
-          setStatus(status,"Push notifications are enabled on this device.","success");
+          setStatus(status,"Calculator notifications are enabled on this device.","success");
         }else{
           button.textContent="Enable notifications";
           setStatus(status,"Notifications were not enabled. Check your browser permission.","error");
