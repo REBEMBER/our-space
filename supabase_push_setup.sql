@@ -69,3 +69,46 @@ on public.push_subscriptions;
 create trigger push_subscriptions_touch
 before update on public.push_subscriptions
 for each row execute function public.touch_push_subscription();
+
+
+-- Chat realtime + secure seen-status updates
+-- Run this in Supabase SQL Editor as well.
+
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_publication_tables
+    where pubname = 'supabase_realtime'
+      and schemaname = 'public'
+      and tablename = 'messages'
+  ) then
+    execute 'alter publication supabase_realtime add table public.messages';
+  end if;
+end
+$$;
+
+alter table public.messages replica identity full;
+
+create or replace function public.mark_message_seen(p_message_id bigint)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  update public.messages m
+  set seen_at = coalesce(m.seen_at, now())
+  where m.id = p_message_id
+    and m.sender_id <> auth.uid()
+    and exists (
+      select 1
+      from public.space_members sm
+      where sm.space_id = m.space_id
+        and sm.user_id = auth.uid()
+    );
+end;
+$$;
+
+revoke all on function public.mark_message_seen(bigint) from public;
+grant execute on function public.mark_message_seen(bigint) to authenticated;
