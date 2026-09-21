@@ -312,11 +312,6 @@
       border-top-left-radius: 12px;
     }
 
-    .message-row.selected .message-bubble {      border-color: var(--peach);
-      box-shadow:
-        0 0 0 2px rgba(243, 178, 159, 0.20),
-        var(--bubble-shadow);
-    }
 
     .message-text {
       display: block;
@@ -1000,19 +995,6 @@
     const headerSubtitle =
       document.getElementById("headerSubtitle");
 
-    const selectionToolbar =
-      document.getElementById("selectionToolbar");
-
-    const selectionCount =
-      document.getElementById("selectionCount");
-
-    const deleteButton =
-      document.getElementById("deleteButton");
-
-    const cancelSelectionButton =
-      document.getElementById(
-        "cancelSelectionButton"
-      );
 
     /* ==========================================
        STATE
@@ -1020,8 +1002,6 @@
 
     let currentUser = null;
     let messages = [];
-    let selectedIds = new Set();
-    let selectionMode = false;
     let realtimeChannel = null;
     let visibleMessageObserver = null;
     let isChatVisible = document.visibilityState === "visible";
