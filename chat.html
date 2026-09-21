@@ -1594,7 +1594,7 @@
 
       try {
         const { error } = await client.rpc(
-          "soft_delete_message",
+          "delete_message_for_everyone",
           { p_message_id: message.id }
         );
 
