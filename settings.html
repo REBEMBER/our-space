@@ -210,11 +210,24 @@
       });
     });
 
+    function normalizeCalculatorCode(value){
+      return String(value||"").trim()
+        .replace(/[٠-٩]/g,d=>String(d.charCodeAt(0)-0x0660))
+        .replace(/[۰-۹]/g,d=>String(d.charCodeAt(0)-0x06F0));
+    }
+
+    function isExactlyFourDigits(value){
+      return value.length===4 && [...value].every(char=>char>="0"&&char<="9");
+    }
+
     document.getElementById("saveCalculatorCode").addEventListener("click",async()=>{
-      const code=document.getElementById("calculatorCode").value.trim();
-      const confirm=document.getElementById("calculatorCodeConfirm").value.trim();
+      const code=normalizeCalculatorCode(document.getElementById("calculatorCode").value);
+      const confirm=normalizeCalculatorCode(document.getElementById("calculatorCodeConfirm").value);
       const status=document.getElementById("calculatorStatus");
-      if(!/^\d{4}$/.test(code)){setStatus(status,"Use exactly 4 digits.","error");return;}
+      if(!isExactlyFourDigits(code)){
+        setStatus(status,"Use exactly 4 digits (for example 1234).","error");
+        return;
+      }
       if(code!==confirm){setStatus(status,"The codes do not match.","error");return;}
       const {error}=await client.auth.updateUser({data:{calculator_code:code}});
       if(error){console.error("Calculator code error:",error);setStatus(status,error.message||"Could not save the calculator code.","error");return;}
