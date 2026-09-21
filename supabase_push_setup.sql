@@ -123,8 +123,7 @@ as $$
 begin
   update public.messages m
   set deleted_at = coalesce(m.deleted_at, now()),
-      deleted_by = auth.uid(),
-      content = ''
+      deleted_by = auth.uid()
   where m.id = p_message_id
     and m.sender_id = auth.uid()
     and m.deleted_at is null
