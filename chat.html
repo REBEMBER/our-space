@@ -989,41 +989,6 @@
 
         <div class="header-right">
 
-          <button
-            class="header-button"
-            id="settingsButton"
-            type="button"
-            aria-label="Settings"
-            title="Settings"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke-width="1.7"
-            >
-              <path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8"></path>
-              <path d="M12 2.75v2M12 19.25v2M21.25 12h-2M4.75 12h-2M18.54 5.46l-1.42 1.42M6.88 17.12l-1.42 1.42M18.54 18.54l-1.42-1.42M6.88 6.88 5.46 5.46"></path>
-            </svg>
-          </button>
-
-          <button
-            class="header-button"
-            id="logoutButton"
-            type="button"
-            aria-label="Log out"
-            title="Log out"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke-width="1.7"
-            >
-              <path d="M10 4H5.8A1.8 1.8 0 0 0 4 5.8v12.4A1.8 1.8 0 0 0 5.8 20H10"></path>
-              <path d="M14 8l4 4-4 4"></path>
-              <path d="M9 12h9"></path>
-            </svg>
-          </button>
-
         </div>
 
       </div>
@@ -1156,10 +1121,6 @@
 
     const homeButton =
       document.getElementById("homeButton");
-
-    const logoutButton =
-      document.getElementById("logoutButton");
-
     const headerSubtitle =
       document.getElementById("headerSubtitle");
 
@@ -2204,24 +2165,6 @@ function renderError(message) {
       () => {
         window.location.href =
           "index.html";
-      }
-    );
-
-    document.getElementById("settingsButton").addEventListener(
-      "click",
-      () => {
-        window.location.href = "settings.html";
-      }
-    );
-
-    logoutButton.addEventListener(
-      "click",
-      async () => {
-
-        await client.auth.signOut();
-
-        window.location.href =
-          "login.html";
       }
     );
 
