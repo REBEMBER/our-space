@@ -1080,29 +1080,7 @@
     }
 
     function scrollBottom() {
-      const lastMessage = messagesEl.querySelector("[data-row]:last-of-type");
-
-      if (lastMessage) {
-        lastMessage.scrollIntoView({
-          block: "end",
-          inline: "nearest",
-          behavior: "auto"
-        });
-      } else {
-        messagesScroll.scrollTop = messagesScroll.scrollHeight;
-      }
-
-      setTimeout(() => {
-        if (lastMessage && document.body.contains(lastMessage)) {
-          lastMessage.scrollIntoView({
-            block: "end",
-            inline: "nearest",
-            behavior: "auto"
-          });
-        } else {
-          messagesScroll.scrollTop = messagesScroll.scrollHeight;
-        }
-      }, 100);
+      messagesScroll.scrollTop = messagesScroll.scrollHeight;
     }
 
     function renderError(message) {
@@ -1514,7 +1492,14 @@
       renderMessages();
 
       if (shouldScroll) {
-        scrollBottom();
+        // Wait for the browser to finish layout, then place the
+        // scroll viewport at the absolute bottom of the chat.
+        requestAnimationFrame(() => {
+          messagesScroll.scrollTop = messagesScroll.scrollHeight;
+          requestAnimationFrame(() => {
+            messagesScroll.scrollTop = messagesScroll.scrollHeight;
+          });
+        });
       }
     }
 
