@@ -8,551 +8,468 @@
   />
   <meta name="theme-color" content="#F8F0EC" />
 
-  <title>Our Space — Login</title>
+  <title>Our Space — Sign in</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+  :root{
+    --bg:#F8F0EC;
+    --navy:#152B46;
+    --navy-light:#1D3B60;
+    --peach:#F3B29F;
+    --blue:#DCEAF5;
+    --white:#FFFFFF;
+    --text:#26313D;
+    --muted:#7A8794;
+    --border:rgba(21,43,70,.10);
+  }
 
-    body {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      font-family: Arial, Helvetica, sans-serif;
-      background: #f7f9fc;
-      color: #26313d;
-    }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 
-    .login-card {
-      width: 100%;
-      max-width: 390px;
-      background: #ffffff;
-      border-radius: 24px;
-      padding: 38px 30px 32px;
-      box-shadow:
-        0 12px 40px rgba(21, 43, 70, 0.10);
-      border: 1px solid #e7edf3;
-    }
+  html,body{
+    min-height:100%;
+  }
 
-    .logo {
-      width: 64px;
-      height: 64px;
-      margin: 0 auto 20px;
-      border-radius: 18px;
-      background: #152b46;
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 27px;
-      font-weight: 700;
-    }
+  body{
+    min-height:100vh;
+    padding:24px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(650px 500px at 100% 0%,rgba(243,178,159,.34),transparent 68%),
+      radial-gradient(620px 460px at 0% 100%,rgba(220,234,245,.72),transparent 68%),
+      var(--bg);
+  }
 
-    h1 {
-      text-align: center;
-      color: #152b46;
-      font-size: 28px;
-      margin-bottom: 8px;
-    }
+  .login-shell{
+    width:min(1040px,100%);
+    min-height:650px;
+    display:grid;
+    grid-template-columns:1.05fr .95fr;
+    overflow:hidden;
+    border:1px solid var(--border);
+    border-radius:34px;
+    background:rgba(255,255,255,.92);
+    box-shadow:0 34px 110px rgba(21,43,70,.16);
+    backdrop-filter:blur(14px);
+  }
 
-    .subtitle {
-      text-align: center;
-      color: #7a8794;
-      font-size: 14px;
-      margin-bottom: 30px;
-    }
+  .brand-panel{
+    position:relative;
+    padding:54px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    overflow:hidden;
+    background:
+      radial-gradient(360px 300px at 100% 0%,rgba(243,178,159,.24),transparent 72%),
+      linear-gradient(145deg,var(--navy),var(--navy-light));
+    color:var(--white);
+  }
 
-    .field {
-      margin-bottom: 18px;
-    }
+  .brand-panel::before{
+    content:"";
+    position:absolute;
+    width:300px;
+    height:300px;
+    right:-120px;
+    bottom:-150px;
+    border-radius:50%;
+    background:var(--blue);
+    opacity:.14;
+  }
 
-    label {
-      display: block;
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: #26313d;
-    }
+  .brand-panel::after{
+    content:"";
+    position:absolute;
+    width:220px;
+    height:220px;
+    left:-120px;
+    top:-110px;
+    border-radius:50%;
+    background:var(--peach);
+    opacity:.12;
+  }
 
-    .password-wrapper {
-      position: relative;
-    }
+  .brand-content,.brand-footer{
+    position:relative;
+    z-index:1;
+  }
 
-    input {
-      width: 100%;
-      height: 52px;
-      border: 1px solid #d9e2eb;
-      border-radius: 13px;
-      padding: 0 15px;
-      font-size: 16px;
-      color: #26313d;
-      background: #fbfcfe;
-      outline: none;
-      transition: 0.2s ease;
-    }
+  .brand-lockup{
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
 
-    input:focus {
-      border-color: #5c9bb2;
-      box-shadow:
-        0 0 0 3px rgba(92, 155, 178, 0.12);
-      background: #ffffff;
-    }
+  .brand-icon{
+    width:52px;
+    height:52px;
+    border-radius:17px;
+    display:grid;
+    place-items:center;
+    background:rgba(255,255,255,.10);
+    border:1px solid rgba(255,255,255,.14);
+  }
 
-    .password-wrapper input {
-      padding-right: 58px;
-    }
+  .brand-icon svg{
+    width:25px;
+    height:25px;
+    stroke-width:1.6;
+  }
 
-    .show-password {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      border: none;
-      background: transparent;
-      color: #5c7183;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 600;
-      padding: 8px;
-    }
+  .brand-wordmark{
+    font-size:14px;
+    font-weight:850;
+    letter-spacing:.15em;
+  }
 
-    .login-button {
-      width: 100%;
-      height: 52px;
-      margin-top: 8px;
-      border: none;
-      border-radius: 13px;
-      background: #152b46;
-      color: #ffffff;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.2s ease;
-    }
+  .brand-kicker{
+    margin-top:72px;
+    color:var(--peach);
+    font-size:11px;
+    font-weight:850;
+    letter-spacing:.13em;
+    text-transform:uppercase;
+  }
 
-    .login-button:hover {
-      background: #1d3b5e;
-    }
+  .brand-title{
+    max-width:470px;
+    margin-top:14px;
+    font-size:clamp(42px,5vw,68px);
+    line-height:.97;
+    letter-spacing:-.055em;
+    font-weight:850;
+  }
 
-    .login-button:disabled {
-      opacity: 0.65;
-      cursor: not-allowed;
-    }
+  .brand-copy{
+    max-width:430px;
+    margin-top:22px;
+    color:rgba(255,255,255,.70);
+    font-size:15px;
+    line-height:1.7;
+  }
 
-    .message {
-      min-height: 22px;
-      margin-top: 17px;
-      text-align: center;
-      font-size: 14px;
-      line-height: 1.4;
-    }
+  .brand-footer{
+    color:rgba(255,255,255,.50);
+    font-size:11px;
+    letter-spacing:.04em;
+  }
 
-    .message.error {
-      color: #c45c5c;
-    }
+  .form-panel{
+    padding:54px;
+    display:flex;
+    align-items:center;
+    background:var(--white);
+  }
 
-    .message.success {
-      color: #4f8a70;
-    }
+  .form-wrap{
+    width:min(100%,390px);
+    margin:0 auto;
+  }
 
-    .footer {
-      text-align: center;
-      margin-top: 25px;
-      color: #9aa5af;
-      font-size: 12px;
-    }
+  .form-eyebrow{
+    color:var(--navy);
+    font-size:11px;
+    font-weight:850;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+  }
 
-    @media (max-width: 420px) {
-      .login-card {
-        padding: 32px 22px 28px;
-      }
+  .form-title{
+    margin-top:11px;
+    color:var(--navy);
+    font-size:38px;
+    line-height:1;
+    letter-spacing:-.045em;
+    font-weight:850;
+  }
 
-      h1 {
-        font-size: 25px;
-      }
-    }
+  .subtitle{
+    margin-top:12px;
+    color:var(--muted);
+    font-size:14px;
+    line-height:1.6;
+  }
 
-    :root {
-      --os-bg: #F8F0EC;
-      --os-navy: #152B46;
-      --os-peach: #F3B29F;
-      --os-blue: #DCEAF5;
-      --os-text: #26313D;
-      --os-muted: #7A8794;
-      --os-border: rgba(21,43,70,0.10);
-    }
+  #loginForm{
+    margin-top:30px;
+  }
 
-    body {
-      font-family:
-        Inter,
-        ui-sans-serif,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Arial,
-        sans-serif;
-      background:
-        radial-gradient(
-          520px 340px at 88% 8%,
-          rgba(243,178,159,0.24),
-          transparent 68%
-        ),
-        radial-gradient(
-          520px 360px at 8% 92%,
-          rgba(220,234,245,0.58),
-          transparent 66%
-        ),
-        var(--os-bg);
-      color: var(--os-text);
-    }
+  .field{
+    margin-bottom:18px;
+  }
 
-    .login-card {
-      max-width: 420px;
-      padding: 42px 34px 30px;
-      position: relative;
-      overflow: hidden;
-      border-radius: 26px;
-      border: 1px solid var(--os-border);
-      box-shadow:
-        0 26px 80px rgba(21,43,70,0.13);
-    }
+  label{
+    display:block;
+    margin-bottom:8px;
+    color:var(--text);
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:.01em;
+  }
 
-    .login-card::before {
-      content: "";
-      position: absolute;
-      inset: 0 0 auto;
-      height: 4px;
-      background:
-        linear-gradient(90deg, var(--os-peach), #F7C5B5 46%, #BFD9E9);
-    }
+  .input-shell{
+    position:relative;
+  }
 
-    .logo {
-      width: 62px;
-      height: 62px;
-      border-radius: 18px;
-      background: var(--os-navy);
-      color: #FFFFFF;
-      box-shadow:
-        0 12px 25px rgba(21,43,70,0.18);
-    }
+  input{
+    width:100%;
+    height:56px;
+    padding:0 16px;
+    border:1px solid rgba(21,43,70,.13);
+    border-radius:16px;
+    outline:none;
+    background:#FBFCFE;
+    color:var(--text);
+    font:inherit;
+    font-size:15px;
+    transition:border-color .18s ease,box-shadow .18s ease,background .18s ease;
+  }
 
-    .logo svg {
-      width: 28px;
-      height: 28px;
-      stroke-width: 1.6;
-    }
+  input::placeholder{color:#9AA6B2}
 
-    h1 {
-      color: var(--os-navy);
-      font-size: 30px;
-      letter-spacing: -0.035em;
-      margin-bottom: 8px;
-    }
+  input:focus{
+    border-color:rgba(21,43,70,.34);
+    background:var(--white);
+    box-shadow:0 0 0 4px var(--blue);
+  }
 
-    .subtitle {
-      color: var(--os-muted);
-      font-size: 14px;
-      line-height: 1.5;
-      margin-bottom: 30px;
-    }
+  .password-wrapper input{padding-right:82px}
 
-    .field {
-      margin-bottom: 17px;
-    }
+  .show-password{
+    position:absolute;
+    top:50%;
+    right:8px;
+    transform:translateY(-50%);
+    min-width:62px;
+    height:38px;
+    padding:0 11px;
+    border:0;
+    border-radius:11px;
+    background:var(--blue);
+    color:var(--navy);
+    font:inherit;
+    font-size:11px;
+    font-weight:850;
+    cursor:pointer;
+  }
 
-    label {
-      color: var(--os-text);
-      font-size: 13px;
-      font-weight: 750;
-      letter-spacing: -0.01em;
-    }
+  .login-button{
+    width:100%;
+    height:58px;
+    margin-top:7px;
+    border:0;
+    border-radius:16px;
+    background:var(--navy);
+    color:var(--white);
+    font:inherit;
+    font-size:14px;
+    font-weight:850;
+    cursor:pointer;
+    box-shadow:0 16px 30px rgba(21,43,70,.18);
+    transition:transform .16s ease,background .16s ease,box-shadow .16s ease;
+  }
 
-    input {
-      height: 54px;
-      border: 1px solid rgba(21,43,70,0.14);
-      border-radius: 15px;
-      padding: 0 16px;
-      color: var(--os-text);
-      background: #FFFFFF;
-      transition:
-        border-color 0.18s ease,
-        box-shadow 0.18s ease,
-        transform 0.18s ease;
-    }
+  .login-button:hover{
+    background:var(--navy-light);
+    transform:translateY(-1px);
+    box-shadow:0 20px 36px rgba(21,43,70,.22);
+  }
 
-    input::placeholder {
-      color: #9AA6B2;
-    }
+  .login-button:active{transform:translateY(0) scale(.99)}
+  .login-button:disabled{opacity:.6;cursor:not-allowed}
 
-    input:focus {
-      border-color: rgba(21,43,70,0.34);
-      box-shadow:
-        0 0 0 4px rgba(220,234,245,0.95);
-      background: #FFFFFF;
-    }
+  .message{
+    min-height:22px;
+    margin-top:15px;
+    font-size:12px;
+    line-height:1.5;
+  }
 
-    .show-password {
-      color: var(--os-navy);
-      opacity: 0.72;
-    }
+  .message.error{color:#A94F4F}
+  .message.success{color:#356C59}
 
-    .show-password:hover {
-      opacity: 1;
-    }
+  .form-note{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    margin-top:22px;
+    color:var(--muted);
+    font-size:11px;
+    line-height:1.45;
+  }
 
-    .login-button {
-      height: 54px;
-      margin-top: 9px;
-      border-radius: 15px;
-      background: var(--os-navy);
-      box-shadow:
-        0 12px 24px rgba(21,43,70,0.15);
-      transition:
-        transform 0.16s ease,
-        background 0.16s ease,
-        box-shadow 0.16s ease;
-    }
+  .form-note::before{
+    content:"";
+    width:7px;
+    height:7px;
+    flex:none;
+    border-radius:50%;
+    background:var(--peach);
+  }
 
-    .login-button:hover {
-      background: #1D3B60;
-      transform: translateY(-1px);
-      box-shadow:
-        0 16px 30px rgba(21,43,70,0.19);
-    }
+  .footer{
+    margin-top:26px;
+    color:#98A2AC;
+    font-size:10px;
+    text-align:center;
+    letter-spacing:.02em;
+  }
 
-    .login-button:active {
-      transform: translateY(0) scale(0.985);
+  @media(max-width:840px){
+    body{padding:14px}
+    .login-shell{
+      min-height:0;
+      grid-template-columns:1fr;
     }
+    .brand-panel{
+      min-height:300px;
+      padding:34px 28px;
+    }
+    .brand-kicker{margin-top:42px}
+    .brand-title{font-size:46px}
+    .brand-copy{font-size:14px}
+    .brand-footer{margin-top:34px}
+    .form-panel{padding:36px 28px}
+    .form-wrap{max-width:440px}
+  }
 
-    .message.error {
-      color: #A94F4F;
-    }
+  @media(max-width:480px){
+    body{padding:10px}
+    .login-shell{border-radius:26px}
+    .brand-panel{min-height:255px;padding:26px 22px}
+    .brand-icon{width:46px;height:46px}
+    .brand-kicker{margin-top:32px}
+    .brand-title{font-size:38px}
+    .brand-copy{margin-top:16px;font-size:13px}
+    .form-panel{padding:30px 20px}
+    .form-title{font-size:32px}
+  }
 
-    .message.success {
-      color: #356C59;
-    }
-
-    .footer {
-      margin-top: 26px;
-      color: #8A96A2;
-    }
-
-    @media (max-width: 420px) {
-      .login-card {
-        padding: 38px 22px 28px;
-      }
-
-      h1 {
-        font-size: 27px;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      input,
-      .login-button {
-        transition: none;
-      }
-    }
-
-  
-    /* ===== STRONG VISUAL REFRESH ===== */
-    html, body { min-height:100%; }
-    body {
-      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      padding:18px;
-      background:
-        radial-gradient(620px 420px at 100% 0%, rgba(243,178,159,.24), transparent 68%),
-        radial-gradient(560px 420px at 0% 100%, rgba(220,234,245,.58), transparent 66%),
-        #F6F1EE;
-      position:relative;
-      overflow:hidden;
-    }
-    body::before {
-      content:"";
-      position:fixed;
-      width:460px; height:460px;
-      border-radius:50%;
-      background:#152B46;
-      left:-280px; top:-250px;
-      opacity:.08;
-      pointer-events:none;
-    }
-    .login-card {
-      max-width:450px;
-      padding:46px 40px 34px;
-      border-radius:30px;
-      background:rgba(255,255,255,.96);
-      border:1px solid rgba(21,43,70,.10);
-      box-shadow:0 30px 90px rgba(21,43,70,.16);
-      position:relative;
-      overflow:hidden;
-    }
-    .login-card::before {
-      content:"";
-      position:absolute; inset:0 0 auto 0; height:6px;
-      background:linear-gradient(90deg,#152B46 0 42%,#F3B29F 42% 72%,#B8D5E5 72%);
-    }
-    .logo {
-      width:68px; height:68px; border-radius:20px;
-      background:#152B46;
-      box-shadow:0 16px 34px rgba(21,43,70,.22);
-      margin-bottom:22px;
-    }
-    .logo svg{width:30px;height:30px;stroke-width:1.55;}
-    h1{font-size:32px;letter-spacing:-.04em;}
-    .subtitle{font-size:14px;line-height:1.6;margin-bottom:32px;}
-    .field{margin-bottom:16px;}
-    label{font-size:13px;font-weight:750;margin-bottom:8px;}
-    input{
-      height:56px; border-radius:16px;
-      border:1px solid rgba(21,43,70,.13);
-      background:#FBFCFE;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
-    }
-    input:focus{
-      border-color:rgba(21,43,70,.38);
-      box-shadow:0 0 0 4px rgba(220,234,245,.95), 0 8px 18px rgba(21,43,70,.05);
-    }
-    .show-password{
-      color:#152B46;font-weight:750;
-      background:#EEF4F8;
-      border-radius:10px;
-    }
-    .login-button{
-      height:56px; border-radius:16px;
-      margin-top:10px;
-      box-shadow:0 14px 28px rgba(21,43,70,.16);
-    }
-    .message{min-height:24px;margin-top:16px;}
-    .footer{margin-top:26px;}
-    @media(max-width:420px){
-      .login-card{padding:42px 22px 30px;}
-      h1{font-size:28px;}
-    }
-
-  
-    /* ==========================================
-       OUR SPACE — SHARED COLOR SYSTEM
-       Matches chat.html exactly
-    ========================================== */
-    :root {
-      --bg: #F8F0EC;
-      --navy: #152B46;
-      --navy-light: #1D3B60;
-      --peach: #F3B29F;
-      --blue: #DCEAF5;
-      --white: #FFFFFF;
-      --text: #26313D;
-      --muted: #7A8794;
-      --border: rgba(21, 43, 70, 0.09);
-    }
-
-    body {
-      background: var(--bg) !important;
-      color: var(--text) !important;
-    }
-
-    input,
-    textarea {
-      color: var(--text);
-    }
-
-    button {
-      font-family: inherit;
-    }
-
-  </style>
+  @media(prefers-reduced-motion:reduce){
+    input,.login-button{transition:none}
+  }
+</style>
 </head>
 
 <body>
 
-  <div class="login-card">
+  <main class="login-shell">
 
-    <div class="logo" aria-hidden="true">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-        stroke-linecap="round" stroke-linejoin="round">
-        <path d="M7 9h10"></path>
-        <path d="M7 13h6"></path>
-        <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8A2.5 2.5 0 0 1 17.5 16H11l-4.5 4v-4H6.5A2.5 2.5 0 0 1 4 13.5Z"></path>
-      </svg>
-    </div>
+    <section class="brand-panel">
+      <div class="brand-content">
 
-    <h1>Our Space</h1>
+        <div class="brand-lockup">
+          <div class="brand-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 9h10"></path>
+              <path d="M7 13h6"></path>
+              <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8A2.5 2.5 0 0 1 17.5 16H11l-4.5 4v-4H6.5A2.5 2.5 0 0 1 4 13.5Z"></path>
+            </svg>
+          </div>
+          <div class="brand-wordmark">OUR SPACE</div>
+        </div>
 
-    <p class="subtitle">
-      Your private space, just for two.
-    </p>
+        <div class="brand-kicker">Private space for two</div>
 
-    <form id="loginForm">
+        <h1 class="brand-title">
+          Come back to your space.
+        </h1>
 
-      <div class="field">
-        <label for="username">
-          Username
-        </label>
+        <p class="brand-copy">
+          A private place for the conversations, moments,
+          and little things that belong to the two of you.
+        </p>
 
-        <input
-          id="username"
-          type="text"
-          autocomplete="username"
-          placeholder="Enter your username"
-          required
-        />
       </div>
 
-      <div class="field">
-        <label for="password">
-          Password
-        </label>
+      <div class="brand-footer">
+        Personal. Private. Yours.
+      </div>
+    </section>
 
-        <div class="password-wrapper">
+    <section class="form-panel">
+      <div class="form-wrap">
 
-          <input
-            id="password"
-            type="password"
-            autocomplete="current-password"
-            placeholder="Enter your password"
-            required
-          />
+        <div class="form-eyebrow">Welcome back</div>
+
+        <h2 class="form-title">Sign in</h2>
+
+        <p class="subtitle">
+          Enter your account details to continue.
+        </p>
+
+        <form id="loginForm">
+
+          <div class="field">
+            <label for="username">Username</label>
+            <div class="input-shell">
+              <input
+                id="username"
+                type="text"
+                autocomplete="username"
+                placeholder="Your username"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="password">Password</label>
+
+            <div class="input-shell password-wrapper">
+              <input
+                id="password"
+                type="password"
+                autocomplete="current-password"
+                placeholder="Your password"
+                required
+              />
+
+              <button
+                type="button"
+                class="show-password"
+                id="showPassword"
+              >
+                Show
+              </button>
+            </div>
+          </div>
 
           <button
-            type="button"
-            class="show-password"
-            id="showPassword"
+            type="submit"
+            class="login-button"
+            id="loginButton"
           >
-            Show
+            Enter Our Space
           </button>
 
+          <div
+            id="message"
+            class="message"
+            aria-live="polite"
+          ></div>
+
+        </form>
+
+        <div class="form-note">
+          Your account opens the private space shared between you two.
         </div>
+
+        <div class="footer">
+          Our Space
+        </div>
+
       </div>
+    </section>
 
-      <button
-        type="submit"
-        class="login-button"
-        id="loginButton"
-      >
-        Login
-      </button>
-
-      <div
-        id="message"
-        class="message"
-        aria-live="polite"
-      ></div>
-
-    </form>
-
-    <div class="footer">
-      Private • Personal • Our Space
-    </div>
-
-  </div>
+  </main>
 
   <script>
     const SUPABASE_URL =
