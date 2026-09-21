@@ -1055,20 +1055,31 @@
       syncComposerHeight();
 
       const apply = () => {
-        const lastRow = messagesEl.querySelector("[data-row]:last-of-type");
+        syncComposerHeight();
 
-        if (lastRow) {
-          lastRow.scrollIntoView({
-            block: "end",
-            inline: "nearest",
-            behavior: "auto"
-          });
-        }
+        // The scroll container extends behind the fixed composer. Its
+        // bottom padding is the exact amount of space occupied by the
+        // composer, so max scroll places the last bubble immediately
+        // above the composer instead of merely somewhere near the bottom.
+        const maxScroll =
+          Math.max(
+            0,
+            messagesScroll.scrollHeight -
+            messagesScroll.clientHeight
+          );
 
-        messagesScroll.scrollTop = messagesScroll.scrollHeight;
+        messagesScroll.scrollTop = maxScroll;
 
+        // Recalculate once more after layout settles (bubble height,
+        // fonts, and composer height can all change between frames).
         requestAnimationFrame(() => {
-          messagesScroll.scrollTop = messagesScroll.scrollHeight;
+          syncComposerHeight();
+          messagesScroll.scrollTop =
+            Math.max(
+              0,
+              messagesScroll.scrollHeight -
+              messagesScroll.clientHeight
+            );
         });
       };
 
@@ -1116,10 +1127,20 @@
     function syncComposerHeight() {
       const composerArea = document.querySelector(".composer-area");
       if (!composerArea) return;
+
+      const height = composerArea.getBoundingClientRect().height;
+
       document.documentElement.style.setProperty(
         "--composer-height",
-        `${composerArea.getBoundingClientRect().height}px`
+        `${height}px`
       );
+
+      // Keep the real scrollable bottom exactly above the fixed composer.
+      // Do this directly on the container so scrolling never depends on
+      // CSS-variable/ResizeObserver timing.
+      if (messagesEl) {
+        messagesEl.style.paddingBottom = `${height + 8}px`;
+      }
     }
 
     const composerResizeObserver = new ResizeObserver(() => {
