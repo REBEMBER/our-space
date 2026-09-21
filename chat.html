@@ -179,7 +179,7 @@
       top: 0;
       left: 0;
       right: 0;
-      bottom: 0;
+      bottom: var(--composer-height, 100px);
       overflow-y: auto;
 
       -webkit-overflow-scrolling: touch;
@@ -212,7 +212,7 @@
       flex-direction: column;
       justify-content: flex-start;
       padding:
-        24px 17px calc(var(--composer-height, 100px) + 8px);
+        24px 17px 8px;
     }
 
     /* =========================
@@ -759,7 +759,7 @@
       }
 
       .messages-container {
-        padding-bottom: calc(var(--composer-height, 100px) + 8px);
+        padding-bottom: 8px;
       }
 
       .message-content {
@@ -1056,8 +1056,6 @@
       syncComposerHeight();
 
       const apply = () => {
-        syncComposerHeight();
-
         const lastRow =
           messagesEl.querySelector("[data-row]:last-of-type");
 
@@ -1066,11 +1064,9 @@
           return;
         }
 
-        // The composer is fixed outside the scroll container. The message
-        // list itself already has bottom padding equal to the composer
-        // height, so the true latest position is the maximum scrollTop.
-        // Measuring a bubble against viewport coordinates here is fragile
-        // because the header/composer are independent overlays.
+        // The scroll viewport itself ends at the top edge of the fixed
+        // composer. Therefore the mathematical bottom is also the visual
+        // chat bottom. The last row has only an 8px content inset there.
         const maxScroll =
           Math.max(
             0,
@@ -1081,21 +1077,13 @@
         messagesScroll.scrollTop = maxScroll;
       };
 
-      // Wait for DOM insertion, CSS layout, fonts and composer measurement
-      // to settle. The final frame is deliberately non-animated so a new
-      // message is visible immediately rather than easing to an intermediate
-      // position.
+      // Wait for the message DOM and layout to settle before measuring the
+      // final scroll range. A second frame catches textarea/composer changes.
       requestAnimationFrame(() => {
+        apply();
+
         requestAnimationFrame(() => {
           apply();
-
-          requestAnimationFrame(() => {
-            apply();
-
-            setTimeout(() => {
-              apply();
-            }, 0);
-          });
         });
       });
     }
@@ -1136,24 +1124,19 @@
     }
 
     function syncComposerHeight() {
-      const composerArea = document.querySelector(".composer-area");
+      const composerArea =
+        document.querySelector(".composer-area");
+
       if (!composerArea) return;
 
-      const height = composerArea.getBoundingClientRect().height;
+      const height =
+        composerArea.getBoundingClientRect().height;
 
       document.documentElement.style.setProperty(
         "--composer-height",
         `${height}px`
       );
-
-      // Keep the real scrollable bottom exactly above the fixed composer.
-      // Do this directly on the container so scrolling never depends on
-      // CSS-variable/ResizeObserver timing.
-      if (messagesEl) {
-        messagesEl.style.paddingBottom = `${height + 8}px`;
-      }
     }
-
     const composerResizeObserver = new ResizeObserver(() => {
       syncComposerHeight();
     });
