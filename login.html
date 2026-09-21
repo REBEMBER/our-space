@@ -6,10 +6,7 @@
     name="viewport"
     content="width=device-width, initial-scale=1.0"
   />
-  <meta
-    name="theme-color"
-    content="#F8F0EC"
-  />
+  <meta name="theme-color" content="#F8F0EC" />
 
   <title>Our Space — Login</title>
 
@@ -324,7 +321,7 @@
     }
 
     .login-button:hover {
-      background: #1D3B5D;
+      background: #1D3B60;
       transform: translateY(-1px);
       box-shadow:
         0 16px 30px rgba(21,43,70,0.19);
@@ -438,6 +435,37 @@
     @media(max-width:420px){
       .login-card{padding:42px 22px 30px;}
       h1{font-size:28px;}
+    }
+
+  
+    /* ==========================================
+       OUR SPACE — SHARED COLOR SYSTEM
+       Matches chat.html exactly
+    ========================================== */
+    :root {
+      --bg: #F8F0EC;
+      --navy: #152B46;
+      --navy-light: #1D3B60;
+      --peach: #F3B29F;
+      --blue: #DCEAF5;
+      --white: #FFFFFF;
+      --text: #26313D;
+      --muted: #7A8794;
+      --border: rgba(21, 43, 70, 0.09);
+    }
+
+    body {
+      background: var(--bg) !important;
+      color: var(--text) !important;
+    }
+
+    input,
+    textarea {
+      color: var(--text);
+    }
+
+    button {
+      font-family: inherit;
     }
 
   </style>
