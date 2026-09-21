@@ -257,15 +257,47 @@
       const newPassword=document.getElementById("newPassword").value;
       const confirmPassword=document.getElementById("confirmPassword").value;
       const status=document.getElementById("passwordStatus");
+      const button=document.getElementById("savePassword");
       if(newPassword.length<6){setStatus(status,"New password must be at least 6 characters.","error");return;}
       if(newPassword!==confirmPassword){setStatus(status,"The new passwords do not match.","error");return;}
       if(!currentPassword){setStatus(status,"Enter your current password first.","error");return;}
-      const {error}=await client.auth.updateUser({password:newPassword,current_password:currentPassword});
-      if(error){console.error("Password update error:",error);setStatus(status,error.message||"Could not change the password.","error");return;}
-      document.getElementById("currentPassword").value="";
-      document.getElementById("newPassword").value="";
-      document.getElementById("confirmPassword").value="";
-      setStatus(status,"Login password changed successfully.","success");
+
+      const {data:{user},error:userError}=await client.auth.getUser();
+      if(userError||!user?.email){
+        console.error("Password user lookup error:",userError);
+        setStatus(status,"Your session is no longer valid. Please log in again.","error");
+        return;
+      }
+
+      button.disabled=true;
+      button.textContent="Verifying...";
+      setStatus(status,"","");
+
+      try{
+        const {data:loginData,error:loginError}=await client.auth.signInWithPassword({
+          email:user.email,
+          password:currentPassword
+        });
+
+        if(loginError||!loginData.session){
+          throw new Error(loginError?.message||"The current password is incorrect.");
+        }
+
+        button.textContent="Changing...";
+        const {error:updateError}=await client.auth.updateUser({password:newPassword});
+        if(updateError)throw updateError;
+
+        document.getElementById("currentPassword").value="";
+        document.getElementById("newPassword").value="";
+        document.getElementById("confirmPassword").value="";
+        setStatus(status,"Login password changed successfully.","success");
+      }catch(error){
+        console.error("Password update error:",error);
+        setStatus(status,error.message||"Could not change the password.","error");
+      }finally{
+        button.disabled=false;
+        button.textContent="Change password";
+      }
     });
 
     document.getElementById("logoutButton").addEventListener("click",async()=>{
