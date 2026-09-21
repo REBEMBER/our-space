@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#F8F0EC">
+  <title>Our Space — Settings</title>
+  <script>
+    (() => {
+      document.documentElement.dataset.theme =
+        localStorage.getItem("our_space_theme") || "warm";
+    })();
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--bg:#F8F0EC;--navy:#152B46;--navy-light:#1D3B60;--peach:#F3B29F;--blue:#DCEAF5;--white:#FFF;--text:#26313D;--muted:#7A8794;--border:rgba(21,43,70,.10);--surface-soft:rgba(255,255,255,.72);--success:#356C59;--danger:#A94F4F}
+    html[data-theme="dark"]{--bg:#101722;--navy:#EAF1F7;--navy-light:#CFE0EE;--peach:#E7A58F;--blue:#24394E;--white:#182231;--text:#EAF1F7;--muted:#9EADBB;--border:rgba(234,241,247,.11);--surface-soft:rgba(24,34,49,.82);--success:#78B69B;--danger:#E58F8F}
+    html[data-theme="ocean"]{--bg:#EEF6FB;--navy:#123B5D;--navy-light:#1C557F;--peach:#8BCDE5;--blue:#D7ECF7;--white:#FFF;--text:#1F3445;--muted:#6E8798;--border:rgba(18,59,93,.11);--surface-soft:rgba(255,255,255,.80);--success:#377764;--danger:#A94F4F}
+    html[data-theme="forest"]{--bg:#EEF4F0;--navy:#173A31;--navy-light:#255447;--peach:#D8A58F;--blue:#D9E9E0;--white:#FFF;--text:#273932;--muted:#71817A;--border:rgba(23,58,49,.11);--surface-soft:rgba(255,255,255,.80);--success:#376C56;--danger:#A94F4F}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;color:var(--text);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(650px 420px at 100% 0%,color-mix(in srgb,var(--peach) 30%,transparent),transparent 70%),radial-gradient(620px 420px at 0% 100%,color-mix(in srgb,var(--blue) 78%,transparent),transparent 70%),var(--bg)}
+    button,input{font:inherit}
+    .page{width:min(980px,calc(100% - 28px));margin:0 auto;padding:22px 0 40px}
+    .topbar{display:flex;align-items:center;gap:14px;margin-bottom:20px}
+    .back-button{width:44px;height:44px;border:1px solid var(--border);border-radius:14px;background:var(--surface-soft);color:var(--navy);display:grid;place-items:center;cursor:pointer}
+    .back-button svg{width:18px;height:18px;stroke:currentColor}
+    .page-title{margin:0;color:var(--navy);font-size:22px;font-weight:850;letter-spacing:-.035em}
+    .page-subtitle{margin:4px 0 0;color:var(--muted);font-size:11px}
+    .hero{margin-bottom:16px;padding:30px;border:1px solid var(--border);border-radius:27px;background:linear-gradient(135deg,var(--navy),var(--navy-light));color:#fff;box-shadow:0 24px 60px color-mix(in srgb,var(--navy) 18%,transparent)}
+    .hero-kicker{color:var(--peach);font-size:10px;font-weight:850;letter-spacing:.13em;text-transform:uppercase}
+    .hero h2{margin:10px 0 0;max-width:600px;font-size:clamp(34px,6vw,54px);line-height:.98;letter-spacing:-.055em}
+    .hero p{margin:14px 0 0;max-width:590px;color:rgba(255,255,255,.70);font-size:13px;line-height:1.65}
+    .section{padding:23px;margin-top:14px;border:1px solid var(--border);border-radius:23px;background:var(--white);box-shadow:0 13px 35px color-mix(in srgb,var(--navy) 6%,transparent)}
+    .section-head{margin-bottom:18px}
+    .section-title{margin:0;color:var(--navy);font-size:17px;font-weight:850;letter-spacing:-.025em}
+    .section-description{margin:5px 0 0;color:var(--muted);font-size:11px;line-height:1.55}
+    .theme-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}
+    .theme-option{border:1px solid var(--border);border-radius:17px;padding:11px;background:var(--surface-soft);color:var(--text);cursor:pointer;text-align:left}
+    .theme-option.active{border-color:var(--navy);box-shadow:0 0 0 2px color-mix(in srgb,var(--navy) 12%,transparent)}
+    .theme-preview{height:74px;border-radius:12px;padding:9px;display:flex;justify-content:space-between;background:var(--preview-bg)}
+    .theme-preview-main{width:58%;height:100%;border-radius:9px;background:var(--preview-surface)}
+    .theme-preview-dot{width:24px;height:24px;border-radius:8px;background:var(--preview-accent)}
+    .theme-option[data-theme-option="warm"] .theme-preview{--preview-bg:#F8F0EC;--preview-surface:#152B46;--preview-accent:#F3B29F}
+    .theme-option[data-theme-option="dark"] .theme-preview{--preview-bg:#101722;--preview-surface:#EAF1F7;--preview-accent:#E7A58F}
+    .theme-option[data-theme-option="ocean"] .theme-preview{--preview-bg:#EEF6FB;--preview-surface:#123B5D;--preview-accent:#8BCDE5}
+    .theme-option[data-theme-option="forest"] .theme-preview{--preview-bg:#EEF4F0;--preview-surface:#173A31;--preview-accent:#D8A58F}
+    .theme-name{margin-top:9px;font-size:12px;font-weight:800;color:var(--navy)}
+    .theme-note{margin-top:3px;color:var(--muted);font-size:10px}
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .field{margin-top:14px}
+    label{display:block;margin-bottom:7px;color:var(--text);font-size:11px;font-weight:800}
+    input{width:100%;height:50px;border:1px solid var(--border);border-radius:14px;padding:0 14px;outline:none;background:var(--surface-soft);color:var(--text);font-size:14px}
+    input:focus{border-color:color-mix(in srgb,var(--navy) 40%,transparent);box-shadow:0 0 0 4px color-mix(in srgb,var(--blue) 88%,transparent)}
+    .action-row{display:flex;align-items:center;gap:9px;margin-top:16px}
+    .primary-button,.secondary-button,.danger-button{min-height:46px;padding:0 17px;border-radius:14px;font-size:12px;font-weight:850;cursor:pointer}
+    .primary-button{border:0;background:var(--navy);color:#fff}
+    .secondary-button{border:1px solid var(--border);background:var(--surface-soft);color:var(--navy)}
+    .danger-button{border:0;background:var(--danger);color:#fff}
+    button:active{transform:translateY(1px)}
+    .status{min-height:19px;margin-top:10px;font-size:11px;line-height:1.5}
+    .status.success{color:var(--success)} .status.error{color:var(--danger)}
+    .account-line{padding:13px 14px;border:1px solid var(--border);border-radius:15px;background:var(--surface-soft)}
+    .account-label{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:800}
+    .account-value{margin-top:3px;color:var(--navy);font-size:13px;font-weight:800;overflow-wrap:anywhere}
+    .danger-section{border-color:color-mix(in srgb,var(--danger) 18%,var(--border))}
+    @media(max-width:760px){.theme-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.form-grid{grid-template-columns:1fr}.hero{padding:24px}.section{padding:19px}}
+    @media(max-width:430px){.page{width:min(100% - 18px,980px);padding-top:12px}.theme-grid{gap:8px}.theme-option{padding:9px}.theme-preview{height:62px}.hero h2{font-size:35px}.action-row{flex-wrap:wrap}.primary-button,.secondary-button,.danger-button{width:100%}}
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <button class="back-button" id="backButton" type="button" aria-label="Back">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><path d="M15 5 8 12l7 7"></path></svg>
+      </button>
+      <div><h1 class="page-title">Settings</h1><p class="page-subtitle">Make Our Space yours</p></div>
+    </header>
+
+    <section class="hero">
+      <div class="hero-kicker">Your space</div>
+      <h2>Personalize the way it feels.</h2>
+      <p>Choose your visual theme, change the private calculator code, update your login password, or sign out of this account.</p>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2 class="section-title">Appearance</h2>
+        <p class="section-description">The selected theme is applied across the app.</p>
+      </div>
+      <div class="theme-grid">
+        <button class="theme-option" data-theme-option="warm" type="button"><div class="theme-preview"><div class="theme-preview-main"></div><div class="theme-preview-dot"></div></div><div class="theme-name">Warm</div><div class="theme-note">Original Our Space</div></button>
+        <button class="theme-option" data-theme-option="dark" type="button"><div class="theme-preview"><div class="theme-preview-main"></div><div class="theme-preview-dot"></div></div><div class="theme-name">Midnight</div><div class="theme-note">Dark & minimal</div></button>
+        <button class="theme-option" data-theme-option="ocean" type="button"><div class="theme-preview"><div class="theme-preview-main"></div><div class="theme-preview-dot"></div></div><div class="theme-name">Ocean</div><div class="theme-note">Cool blue</div></button>
+        <button class="theme-option" data-theme-option="forest" type="button"><div class="theme-preview"><div class="theme-preview-main"></div><div class="theme-preview-dot"></div></div><div class="theme-name">Forest</div><div class="theme-note">Deep green</div></button>
+      </div>
+      <div class="status" id="themeStatus"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2 class="section-title">Calculator code</h2><p class="section-description">Use 4–12 digits for the private calculator unlock.</p></div>
+      <div class="form-grid">
+        <div class="field"><label for="calculatorCode">New calculator code</label><input id="calculatorCode" type="password" inputmode="numeric" autocomplete="new-password" minlength="4" maxlength="12" placeholder="••••"></div>
+        <div class="field"><label for="calculatorCodeConfirm">Confirm code</label><input id="calculatorCodeConfirm" type="password" inputmode="numeric" autocomplete="new-password" minlength="4" maxlength="12" placeholder="••••"></div>
+      </div>
+      <div class="action-row"><button class="primary-button" id="saveCalculatorCode" type="button">Save calculator code</button><button class="secondary-button" id="resetCalculatorCode" type="button">Reset to default</button></div>
+      <div class="status" id="calculatorStatus"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2 class="section-title">Login password</h2><p class="section-description">Change the password used with your username. Minimum 6 characters.</p></div>
+      <div class="form-grid">
+        <div class="field"><label for="currentPassword">Current password</label><input id="currentPassword" type="password" autocomplete="current-password" placeholder="Current password"></div>
+        <div class="field"><label for="newPassword">New password</label><input id="newPassword" type="password" autocomplete="new-password" minlength="6" placeholder="At least 6 characters"></div>
+      </div>
+      <div class="field"><label for="confirmPassword">Confirm new password</label><input id="confirmPassword" type="password" autocomplete="new-password" minlength="6" placeholder="Repeat your new password"></div>
+      <div class="action-row"><button class="primary-button" id="savePassword" type="button">Change password</button></div>
+      <div class="status" id="passwordStatus"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2 class="section-title">Account</h2><p class="section-description">Your current signed-in account.</p></div>
+      <div class="account-line"><div class="account-label">Email</div><div class="account-value" id="accountEmail">Loading...</div></div>
+    </section>
+
+    <section class="section danger-section">
+      <div class="section-head"><h2 class="section-title">Sign out</h2><p class="section-description">End this session on this device.</p></div>
+      <button class="danger-button" id="logoutButton" type="button">Log out</button>
+      <div class="status" id="logoutStatus"></div>
+    </section>
+  </main>
+
+  <script>
+    const SUPABASE_URL="https://ywflohxufmfydkpkkqly.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY="sb_publishable_qTMUO8KxerEQBDQ-A7Huyg_8N2Tqpmr";
+    const DEFAULT_CALCULATOR_CODE="0000";
+    const THEME_KEY="our_space_theme";
+    const CALCULATOR_KEY="our_space_calculator_code";
+
+    const client=supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+    const allowedThemes=new Set(["warm","dark","ocean","forest"]);
+
+    function applyTheme(theme){
+      const safeTheme=allowedThemes.has(theme)?theme:"warm";
+      document.documentElement.dataset.theme=safeTheme;
+      localStorage.setItem(THEME_KEY,safeTheme);
+      document.querySelectorAll("[data-theme-option]").forEach((button)=>{
+        button.classList.toggle("active",button.dataset.themeOption===safeTheme);
+      });
+    }
+
+    function setStatus(element,text,type=""){
+      element.textContent=text;
+      element.className="status "+type;
+    }
+
+    applyTheme(localStorage.getItem(THEME_KEY)||"warm");
+
+    document.getElementById("backButton").addEventListener("click",()=>{window.location.href="index.html";});
+
+    document.querySelectorAll("[data-theme-option]").forEach((button)=>{
+      button.addEventListener("click",async()=>{
+        const theme=button.dataset.themeOption;
+        applyTheme(theme);
+        const status=document.getElementById("themeStatus");
+        setStatus(status,"Theme applied.","success");
+        const {error}=await client.auth.updateUser({data:{our_space_theme:theme}});
+        if(error){
+          console.error("Theme save error:",error);
+          setStatus(status,"Theme applied here, but could not sync to the account.","error");
+          return;
+        }
+        setStatus(status,"Theme saved.","success");
+      });
+    });
+
+    document.getElementById("saveCalculatorCode").addEventListener("click",async()=>{
+      const code=document.getElementById("calculatorCode").value.trim();
+      const confirm=document.getElementById("calculatorCodeConfirm").value.trim();
+      const status=document.getElementById("calculatorStatus");
+      if(!/^\\d{4,12}$/.test(code)){setStatus(status,"Use 4–12 digits.","error");return;}
+      if(code!==confirm){setStatus(status,"The codes do not match.","error");return;}
+      const {error}=await client.auth.updateUser({data:{calculator_code:code}});
+      if(error){console.error("Calculator code error:",error);setStatus(status,error.message||"Could not save the calculator code.","error");return;}
+      localStorage.setItem(CALCULATOR_KEY,code);
+      document.getElementById("calculatorCode").value="";
+      document.getElementById("calculatorCodeConfirm").value="";
+      setStatus(status,"Calculator code updated.","success");
+    });
+
+    document.getElementById("resetCalculatorCode").addEventListener("click",async()=>{
+      const status=document.getElementById("calculatorStatus");
+      const {error}=await client.auth.updateUser({data:{calculator_code:DEFAULT_CALCULATOR_CODE}});
+      if(error){console.error("Calculator reset error:",error);setStatus(status,error.message||"Could not reset the code.","error");return;}
+      localStorage.setItem(CALCULATOR_KEY,DEFAULT_CALCULATOR_CODE);
+      document.getElementById("calculatorCode").value="";
+      document.getElementById("calculatorCodeConfirm").value="";
+      setStatus(status,"Calculator code reset to the default.","success");
+    });
+
+    document.getElementById("savePassword").addEventListener("click",async()=>{
+      const currentPassword=document.getElementById("currentPassword").value;
+      const newPassword=document.getElementById("newPassword").value;
+      const confirmPassword=document.getElementById("confirmPassword").value;
+      const status=document.getElementById("passwordStatus");
+      if(newPassword.length<6){setStatus(status,"New password must be at least 6 characters.","error");return;}
+      if(newPassword!==confirmPassword){setStatus(status,"The new passwords do not match.","error");return;}
+      if(!currentPassword){setStatus(status,"Enter your current password first.","error");return;}
+      const {error}=await client.auth.updateUser({password:newPassword,current_password:currentPassword});
+      if(error){console.error("Password update error:",error);setStatus(status,error.message||"Could not change the password.","error");return;}
+      document.getElementById("currentPassword").value="";
+      document.getElementById("newPassword").value="";
+      document.getElementById("confirmPassword").value="";
+      setStatus(status,"Login password changed successfully.","success");
+    });
+
+    document.getElementById("logoutButton").addEventListener("click",async()=>{
+      const status=document.getElementById("logoutStatus");
+      const {error}=await client.auth.signOut({scope:"local"});
+      if(error){console.error("Logout error:",error);setStatus(status,error.message||"Could not log out.","error");return;}
+      window.location.href="login.html";
+    });
+
+    async function start(){
+      const {data:{user},error}=await client.auth.getUser();
+      if(error||!user){window.location.href="login.html";return;}
+      document.getElementById("accountEmail").textContent=user.email||"Private account";
+      const metadataTheme=user.user_metadata?.our_space_theme;
+      if(metadataTheme&&allowedThemes.has(metadataTheme))applyTheme(metadataTheme);
+      const metadataCode=user.user_metadata?.calculator_code||localStorage.getItem(CALCULATOR_KEY)||DEFAULT_CALCULATOR_CODE;
+      localStorage.setItem(CALCULATOR_KEY,metadataCode);
+    }
+    start();
+  </script>
+</body>
+</html>
