@@ -1,7 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <script>
+    (() => {
+      const theme = localStorage.getItem("our_space_theme") || "warm";
+      document.documentElement.dataset.theme = theme;
+    })();
+  </script>
+    <meta charset="UTF-8" />
 
   <meta
     name="viewport"
@@ -1134,6 +1140,59 @@
       font-family: inherit;
     }
 
+  
+    /* ==========================================
+       ACCOUNT THEME SYSTEM
+    ========================================== */
+    html[data-theme="dark"] {
+      --bg: #101722;
+      --navy: #EAF1F7;
+      --navy-light: #CFE0EE;
+      --peach: #E7A58F;
+      --blue: #24394E;
+      --white: #182231;
+      --text: #EAF1F7;
+      --muted: #9EADBB;
+      --border: rgba(234,241,247,.11);
+    }
+
+    html[data-theme="ocean"] {
+      --bg: #EEF6FB;
+      --navy: #123B5D;
+      --navy-light: #1C557F;
+      --peach: #8BCDE5;
+      --blue: #D7ECF7;
+      --white: #FFFFFF;
+      --text: #1F3445;
+      --muted: #6E8798;
+      --border: rgba(18,59,93,.11);
+    }
+
+    html[data-theme="forest"] {
+      --bg: #EEF4F0;
+      --navy: #173A31;
+      --navy-light: #255447;
+      --peach: #D8A58F;
+      --blue: #D9E9E0;
+      --white: #FFFFFF;
+      --text: #273932;
+      --muted: #71817A;
+      --border: rgba(23,58,49,.11);
+    }
+
+    html[data-theme="dark"] body {
+      background: #101722 !important;
+      color: #EAF1F7 !important;
+    }
+
+    html[data-theme="ocean"] body {
+      background: #EEF6FB !important;
+    }
+
+    html[data-theme="forest"] body {
+      background: #EEF4F0 !important;
+    }
+
   </style>
 </head>
 
@@ -1557,6 +1616,15 @@
       currentUser =
         user;
 
+      const savedTheme =
+        user.user_metadata?.our_space_theme ||
+        localStorage.getItem("our_space_theme");
+
+      if (savedTheme) {
+        document.documentElement.dataset.theme = savedTheme;
+        localStorage.setItem("our_space_theme", savedTheme);
+      }
+
       return true;
     }
 
@@ -1642,15 +1710,7 @@
       .addEventListener(
         "click",
         () => {
-
-          settingsModal.classList.add(
-            "open"
-          );
-
-          settingsModal.setAttribute(
-            "aria-hidden",
-            "false"
-          );
+          window.location.href = "settings.html";
         }
       );
 
