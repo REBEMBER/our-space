@@ -2,7 +2,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <script>
+    (() => {
+      const theme = localStorage.getItem("our_space_theme") || "warm";
+      document.documentElement.dataset.theme = theme;
+    })();
+  </script>
+    <meta charset="UTF-8">
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0, viewport-fit=cover"
@@ -811,6 +817,59 @@
         font-size: 13.5px;
       }
     }
+  
+    /* ==========================================
+       ACCOUNT THEME SYSTEM
+    ========================================== */
+    html[data-theme="dark"] {
+      --bg: #101722;
+      --navy: #EAF1F7;
+      --navy-light: #CFE0EE;
+      --peach: #E7A58F;
+      --blue: #24394E;
+      --white: #182231;
+      --text: #EAF1F7;
+      --muted: #9EADBB;
+      --border: rgba(234,241,247,.11);
+    }
+
+    html[data-theme="ocean"] {
+      --bg: #EEF6FB;
+      --navy: #123B5D;
+      --navy-light: #1C557F;
+      --peach: #8BCDE5;
+      --blue: #D7ECF7;
+      --white: #FFFFFF;
+      --text: #1F3445;
+      --muted: #6E8798;
+      --border: rgba(18,59,93,.11);
+    }
+
+    html[data-theme="forest"] {
+      --bg: #EEF4F0;
+      --navy: #173A31;
+      --navy-light: #255447;
+      --peach: #D8A58F;
+      --blue: #D9E9E0;
+      --white: #FFFFFF;
+      --text: #273932;
+      --muted: #71817A;
+      --border: rgba(23,58,49,.11);
+    }
+
+    html[data-theme="dark"] body {
+      background: #101722 !important;
+      color: #EAF1F7 !important;
+    }
+
+    html[data-theme="ocean"] body {
+      background: #EEF6FB !important;
+    }
+
+    html[data-theme="forest"] body {
+      background: #EEF4F0 !important;
+    }
+
   </style>
 </head>
 
@@ -857,6 +916,23 @@
         </div>
 
         <div class="header-right">
+
+          <button
+            class="header-button"
+            id="settingsButton"
+            type="button"
+            aria-label="Settings"
+            title="Settings"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke-width="1.7"
+            >
+              <path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8"></path>
+              <path d="M12 2.75v2M12 19.25v2M21.25 12h-2M4.75 12h-2M18.54 5.46l-1.42 1.42M6.88 17.12l-1.42 1.42M18.54 18.54l-1.42-1.42M6.88 6.88 5.46 5.46"></path>
+            </svg>
+          </button>
 
           <button
             class="header-button"
@@ -2059,6 +2135,13 @@ function renderError(message) {
       }
     );
 
+    document.getElementById("settingsButton").addEventListener(
+      "click",
+      () => {
+        window.location.href = "settings.html";
+      }
+    );
+
     logoutButton.addEventListener(
       "click",
       async () => {
@@ -2120,6 +2203,15 @@ function renderError(message) {
 
       currentUser =
         data.session.user;
+
+      const savedTheme =
+        currentUser.user_metadata?.our_space_theme ||
+        localStorage.getItem("our_space_theme");
+
+      if (savedTheme) {
+        document.documentElement.dataset.theme = savedTheme;
+        localStorage.setItem("our_space_theme", savedTheme);
+      }
 
       headerSubtitle.textContent =
         "Private chat";
