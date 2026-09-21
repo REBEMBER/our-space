@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#F8F0EC">
   <title>Our Space — Settings</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/notifications.js"></script>
   <style>
     :root{
       --bg:#F8F0EC;--navy:#152B46;--navy-light:#1D3B60;--peach:#F3B29F;--blue:#DCEAF5;
@@ -150,6 +151,12 @@
     </section>
 
     <section class="section">
+      <div class="section-head"><h2 class="section-title">Notifications</h2><p class="section-description">Get a push notification when your partner sends a new message while Our Space is not open in the foreground.</p></div>
+      <div class="action-row"><button class="primary-button" id="enableNotifications" type="button">Enable notifications</button></div>
+      <div class="status" id="notificationStatus"></div>
+    </section>
+
+    <section class="section">
       <div class="section-head"><h2 class="section-title">Account</h2><p class="section-description">Your current signed-in account.</p></div>
       <div class="account-line"><div class="account-label">Email</div><div class="account-value" id="accountEmail">Loading...</div></div>
     </section>
@@ -255,7 +262,45 @@
       const metadataTheme=user.user_metadata?.our_space_theme;
       if(metadataTheme&&allowedThemes.has(metadataTheme))applyTheme(metadataTheme);
 
+      if(window.OurSpaceNotifications){
+        await window.OurSpaceNotifications.register(user);
+        const button=document.getElementById("enableNotifications");
+        const status=document.getElementById("notificationStatus");
+        const permission=window.OurSpaceNotifications.permission;
+
+        if(permission==="granted"){
+          button.textContent="Notifications enabled";
+          setStatus(status,"Push notifications are enabled on this device.","success");
+        }else if(permission==="denied"){
+          button.textContent="Notifications blocked";
+          setStatus(status,"Notifications are blocked in your browser settings.","error");
+        }
+      }
     }
+
+    document.getElementById("enableNotifications").addEventListener("click",async()=>{
+      const button=document.getElementById("enableNotifications");
+      const status=document.getElementById("notificationStatus");
+      button.disabled=true;
+      button.textContent="Enabling...";
+
+      try{
+        const enabled=await window.OurSpaceNotifications.enable();
+        if(enabled){
+          button.textContent="Notifications enabled";
+          setStatus(status,"Push notifications are enabled on this device.","success");
+        }else{
+          button.textContent="Enable notifications";
+          setStatus(status,"Notifications were not enabled. Check your browser permission.","error");
+        }
+      }catch(error){
+        console.error("Notification setup error:",error);
+        button.textContent="Enable notifications";
+        setStatus(status,error.message||"Could not enable notifications.","error");
+      }finally{
+        button.disabled=false;
+      }
+    });
     start();
   </script>
 </body>
