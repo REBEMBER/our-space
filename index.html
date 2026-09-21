@@ -1360,6 +1360,27 @@
 
           <button
             class="settings-button"
+            id="aiButton"
+            type="button"
+            aria-label="AI"
+            title="AI"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M12 3v4M12 17v4M3 12h4M17 12h4" />
+              <circle cx="12" cy="12" r="4" />
+            </svg>
+            <span>AI</span>
+          </button>
+
+          <button
+            class="settings-button"
             id="settingsButton"
             type="button"
             aria-label="Settings"
@@ -1790,6 +1811,21 @@
           "chat.html";
       }
     );
+
+    /* ==========================================
+       AI
+    ========================================== */
+
+    document
+      .getElementById(
+        "aiButton"
+      )
+      .addEventListener(
+        "click",
+        () => {
+          window.location.href = "ai.html";
+        }
+      );
 
     /* ==========================================
        SETTINGS
