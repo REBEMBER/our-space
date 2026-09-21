@@ -68,6 +68,13 @@
       width: 100%;
       height: 100dvh;
       overflow: hidden;
+
+      /* The header and message viewport form the page's real layout.
+         The composer is fixed above this layout, so the viewport can
+         remain stable while its content reserves the composer's height. */
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
     }
 
     /* =========================
@@ -175,11 +182,10 @@
     ========================= */
 
     .messages-scroll {
-      position: absolute;
-      top: var(--header-height, 0px);
-      left: 0;
-      right: 0;
-      bottom: var(--composer-height, 100px);
+      position: relative;
+      flex: 1 1 auto;
+      min-height: 0;
+      width: 100%;
       overflow-y: auto;
 
       -webkit-overflow-scrolling: touch;
@@ -1057,17 +1063,29 @@
 
       const apply = () => {
         syncComposerHeight();
-        messagesScroll.scrollTop = Math.max(
-          0,
-          messagesScroll.scrollHeight - messagesScroll.clientHeight
-        );
+
+        // At this point the scroll viewport is the full area below the
+        // header, while the content has an explicit spacer equal to the
+        // fixed composer. Therefore max scroll places the final bubble
+        // immediately above the composer instead of underneath it.
+        messagesScroll.scrollTop =
+          messagesScroll.scrollHeight -
+          messagesScroll.clientHeight;
       };
 
-      // Wait for DOM insertion and final layout before measuring scrollHeight.
+      // Render/layout can settle over more than one frame, especially on
+      // mobile where the composer and viewport can change size together.
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           apply();
-          requestAnimationFrame(apply);
+
+          requestAnimationFrame(() => {
+            apply();
+
+            requestAnimationFrame(() => {
+              apply();
+            });
+          });
         });
       });
     }
@@ -1113,17 +1131,18 @@
       if (!composerArea) return;
 
       const height = composerArea.getBoundingClientRect().height;
-      const header = document.querySelector(".header");
-      const headerHeight = header ? header.getBoundingClientRect().height : 0;
 
-      document.documentElement.style.setProperty("--composer-height", height + "px");
-      document.documentElement.style.setProperty("--header-height", headerHeight + "px");
+      document.documentElement.style.setProperty(
+        "--composer-height",
+        height + "px"
+      );
 
-      // The scroll viewport itself ends above the fixed composer.
-      messagesScroll.style.top = headerHeight + "px";
-      messagesScroll.style.bottom = height + "px";
-
-      if (messagesEl) messagesEl.style.paddingBottom = "8px";
+      // The composer is fixed over the bottom of the viewport. Do not
+      // resize the scroll viewport around it; instead reserve exactly
+      // this much space after the last message.
+      if (messagesEl) {
+        messagesEl.style.paddingBottom = (height + 8) + "px";
+      }
     }
 
     /* ==========================================
@@ -2058,6 +2077,10 @@
 
       headerSubtitle.textContent =
         "Private chat";
+
+      // Establish the real composer height before the first render/scroll.
+      // This prevents the initial frame from using the fallback 100px spacer.
+      syncComposerHeight();
 
       await loadMessages(true);
 
