@@ -1823,6 +1823,37 @@
       input.focus();
     }
 
+    async function deleteMessageDirect(message) {
+      if (!message || !currentUser) return;
+      if (message.sender_id !== currentUser.id) return;
+      if (message.deleted_at) return;
+
+      try {
+        const { error } = await client.rpc(
+          "soft_delete_message",
+          { p_message_id: message.id }
+        );
+
+        if (error) throw error;
+
+        // Update locally immediately; realtime UPDATE will reconcile the other client.
+        const local = messages.find(
+          (item) => Number(item.id) === Number(message.id)
+        );
+
+        if (local) {
+          local.deleted_at = new Date().toISOString();
+          local.deleted_by = currentUser.id;
+          local.content = "";
+        }
+
+        renderMessages();
+      } catch (error) {
+        console.error("Delete error:", error);
+        alert(error.message || "Could not delete the message.");
+      }
+    }
+
     /* ==========================================
        DELETE
     ========================================== */
@@ -2000,7 +2031,7 @@
 
     messagesEl.addEventListener(
       "click",
-      (event) => {
+      async (event) => {
 
         const trigger =
           event.target.closest(
@@ -2040,21 +2071,28 @@
           return;
         }
 
-        const selectButton =
+        const deleteButton =
           event.target.closest(
-            "[data-select]"
+            "[data-delete-direct]"
           );
 
-        if (selectButton) {
-
+        if (deleteButton) {
           event.stopPropagation();
+          closeMenus();
 
-          enterSelection(
-            selectButton.dataset
-              .select
+          const id = Number(deleteButton.dataset.deleteDirect);
+          const message = messages.find(
+            (item) => Number(item.id) === id
           );
 
-          closeMenus();
+          if (
+            message &&
+            currentUser &&
+            message.sender_id === currentUser.id &&
+            !message.deleted_at
+          ) {
+            await deleteMessageDirect(message);
+          }
 
           return;
         }
