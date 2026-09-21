@@ -204,7 +204,7 @@
       margin: 0 auto;
 
       padding:
-        100px 17px 150px;
+        24px 17px 150px;
     }
 
     /* =========================
@@ -1074,10 +1074,7 @@
 
     function scrollBottom() {
       requestAnimationFrame(() => {
-        messagesScroll.scrollTo({
-          top: messagesScroll.scrollHeight,
-          behavior: "smooth"
-        });
+        messagesScroll.scrollTop = messagesScroll.scrollHeight;
       });
     }
 
