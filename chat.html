@@ -1,75 +1,50 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-
+  <meta charset="UTF-8">
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-  />
-
-  <meta
-    name="theme-color"
-    content="#F8F0EC"
-  />
-
+  >
   <title>Our Space — Chat</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     :root {
+      --bg: #F8F0EC;
       --navy: #152B46;
       --peach: #F3B29F;
       --blue: #DCEAF5;
-      --background: #F8F0EC;
-      --surface: #FFFFFF;
-      --soft-surface: #FFF8F5;
+      --white: #FFFFFF;
       --text: #26313D;
       --muted: #7A8794;
-      --border: rgba(21, 43, 70, 0.09);
-
-      --shadow:
-        0 18px 50px rgba(21, 43, 70, 0.08);
-
-      --radius-xl: 30px;
-      --radius-lg: 22px;
-      --radius-md: 17px;
+      --border: rgba(21, 43, 70, 0.10);
+      --shadow: 0 8px 24px rgba(21, 43, 70, 0.06);
     }
 
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
     }
 
     html,
     body {
+      margin: 0;
       width: 100%;
       height: 100%;
-    }
-
-    body {
-      min-height: 100dvh;
-
-      background:
-        radial-gradient(
-          circle at top right,
-          rgba(243, 178, 159, 0.16),
-          transparent 29%
-        ),
-        var(--background);
-
+      background: var(--bg);
       color: var(--text);
-
       font-family:
         Inter,
+        ui-sans-serif,
         -apple-system,
         BlinkMacSystemFont,
         "Segoe UI",
-        Arial,
         sans-serif;
+    }
 
+    body {
       overflow: hidden;
     }
 
@@ -79,3297 +54,837 @@
     }
 
     button {
-      border: none;
+      cursor: pointer;
     }
 
-    /* ==========================================
-       PAGE
-    ========================================== */
-
-    .page {
+    .app {
       width: 100%;
       height: 100dvh;
-
-      padding: 14px;
-
-      padding-top:
-        calc(
-          14px +
-          env(safe-area-inset-top)
-        );
-
-      padding-bottom:
-        calc(
-          14px +
-          env(safe-area-inset-bottom)
-        );
-    }
-
-    .chat-shell {
-      width: 100%;
-      max-width: 1000px;
-      height: 100%;
-
-      margin: 0 auto;
-
-      background: var(--surface);
-
-      border:
-        1px solid
-        var(--border);
-
-      border-radius:
-        var(--radius-xl);
-
-      box-shadow:
-        var(--shadow);
-
       display: flex;
       flex-direction: column;
-
-      overflow: hidden;
     }
 
-    /* ==========================================
-       HEADER
-    ========================================== */
+    /* HEADER */
 
-    .chat-header {
-      flex: 0 0 auto;
-
-      min-height: 78px;
-
+    .header {
+      flex-shrink: 0;
       padding:
-        14px
-        16px;
-
-      border-bottom:
-        1px solid
-        var(--border);
-
-      background:
-        rgba(
-          255,
-          255,
-          255,
-          0.97
-        );
-
-      display: flex;
-
-      align-items: center;
-
-      justify-content: space-between;
-
-      gap: 12px;
-
+        max(12px, env(safe-area-inset-top))
+        16px
+        12px;
+      background: rgba(248, 240, 236, 0.97);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(14px);
       position: relative;
-
-      z-index: 10;
-    }
-
-    .header-left {
-      display: flex;
-
-      align-items: center;
-
-      gap: 10px;
-
-      min-width: 0;
-    }
-
-    .back-button,
-    .header-button {
-      width: 44px;
-      height: 44px;
-
-      flex:
-        0 0 44px;
-
-      border-radius: 14px;
-
-      background:
-        var(--soft-surface);
-
-      color:
-        var(--navy);
-
-      display: grid;
-
-      place-items: center;
-
-      cursor: pointer;
-
-      transition:
-        background 0.18s ease,
-        transform 0.18s ease;
-    }
-
-    .back-button:hover,
-    .header-button:hover {
-      background:
-        var(--blue);
-
-      transform:
-        translateY(-1px);
-    }
-
-    .back-button svg,
-    .header-button svg {
-      width: 19px;
-      height: 19px;
-
-      stroke-width: 1.9;
-    }
-
-    .conversation-identity {
-      min-width: 0;
-    }
-
-    .conversation-title {
-      color:
-        var(--navy);
-
-      font-size:
-        16px;
-
-      font-weight:
-        800;
-
-      line-height:
-        1.15;
-    }
-
-    .conversation-subtitle {
-      margin-top:
-        4px;
-
-      color:
-        var(--muted);
-
-      font-size:
-        11px;
-    }
-
-    /* ==========================================
-       SELECTION TOOLBAR
-    ========================================== */
-
-    .selection-toolbar {
-      position: absolute;
-
-      inset: 0;
-
-      display: none;
-
-      align-items: center;
-
-      justify-content: space-between;
-
-      gap: 12px;
-
-      padding:
-        12px
-        16px;
-
-      background:
-        var(--surface);
-
       z-index: 20;
-
-      border-bottom:
-        1px solid
-        var(--border);
     }
 
-    .selection-toolbar.active {
+    .header-inner {
+      width: min(100%, 760px);
+      margin: 0 auto;
       display: flex;
-    }
-
-    .selection-left {
-      display: flex;
-
       align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
 
-      gap: 10px;
+    .header-left,
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
 
+    .icon-button {
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.8);
+      color: var(--navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .icon-button:active {
+      transform: scale(0.96);
+    }
+
+    .icon-button svg {
+      width: 17px;
+      height: 17px;
+      stroke: currentColor;
+    }
+
+    .heading {
       min-width: 0;
     }
 
-    .selection-count {
-      color:
-        var(--navy);
-
-      font-size:
-        15px;
-
-      font-weight:
-        800;
+    .title {
+      margin: 0;
+      color: var(--navy);
+      font-size: 15px;
+      line-height: 1.2;
+      font-weight: 750;
     }
 
-    .selection-cancel {
-      height: 38px;
-
-      padding:
-        0
-        12px;
-
-      border-radius:
-        11px;
-
-      background:
-        var(--soft-surface);
-
-      color:
-        var(--navy);
-
-      font-size:
-        12px;
-
-      font-weight:
-        700;
-
-      cursor:
-        pointer;
+    .subtitle {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.2;
     }
 
-    .selection-delete {
-      width: 40px;
-      height: 40px;
+    /* MESSAGES */
 
-      border-radius:
-        12px;
-
-      background:
-        var(--navy);
-
-      color:
-        var(--surface);
-
-      display:
-        grid;
-
-      place-items:
-        center;
-
-      cursor:
-        pointer;
+    .messages-scroll {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
     }
 
-    .selection-delete:disabled {
-      opacity:
-        0.45;
-
-      cursor:
-        not-allowed;
+    .messages {
+      width: min(100%, 760px);
+      margin: 0 auto;
+      padding: 20px 14px 18px;
     }
 
-    .selection-delete svg {
-      width:
-        17px;
-
-      height:
-        17px;
-
-      stroke-width:
-        1.9;
+    .message {
+      display: flex;
+      width: 100%;
+      margin: 6px 0;
     }
 
-    /* ==========================================
-       MESSAGE AREA
-    ========================================== */
-
-    .messages-area {
-      flex:
-        1 1 auto;
-
-      min-height:
-        0;
-
-      overflow-y:
-        auto;
-
-      padding:
-        24px
-        20px;
-
-      background:
-        linear-gradient(
-          180deg,
-          rgba(
-            248,
-            240,
-            236,
-            0.78
-          ),
-          rgba(
-            248,
-            240,
-            236,
-            0.97
-          )
-        );
-
-      overscroll-behavior:
-        contain;
-
-      scrollbar-width:
-        thin;
-
-      scrollbar-color:
-        rgba(
-          21,
-          43,
-          70,
-          0.15
-        )
-        transparent;
+    .message.mine {
+      justify-content: flex-end;
     }
 
-    .messages-area::-webkit-scrollbar {
-      width: 7px;
+    .message.theirs {
+      justify-content: flex-start;
     }
 
-    .messages-area::-webkit-scrollbar-track {
-      background:
-        transparent;
+    .bubble {
+      max-width: min(80%, 520px);
+      padding: 10px 13px 8px;
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      white-space: pre-wrap;
+      word-break: break-word;
     }
 
-    .messages-area::-webkit-scrollbar-thumb {
-      background:
-        rgba(
-          21,
-          43,
-          70,
-          0.13
-        );
-
-      border-radius:
-        999px;
+    .mine .bubble {
+      background: var(--navy);
+      color: var(--white);
+      border-bottom-right-radius: 7px;
     }
 
-    .message-list {
-      width:
-        100%;
-
-      max-width:
-        760px;
-
-      margin:
-        0 auto;
+    .theirs .bubble {
+      background: var(--white);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 7px;
     }
 
-    /* ==========================================
-       DATE
-    ========================================== */
-
-    .date-separator {
-      display:
-        flex;
-
-      align-items:
-        center;
-
-      gap:
-        12px;
-
-      margin:
-        10px
-        0
-        20px;
-
-      color:
-        var(--muted);
-
-      font-size:
-        10px;
-
-      font-weight:
-        700;
-
-      letter-spacing:
-        0.08em;
-
-      text-transform:
-        uppercase;
+    .message-text {
+      font-size: 14px;
+      line-height: 1.45;
     }
 
-    .date-separator::before,
-    .date-separator::after {
-      content:
-        "";
-
-      height:
-        1px;
-
-      flex:
-        1;
-
-      background:
-        rgba(
-          21,
-          43,
-          70,
-          0.08
-        );
-    }
-
-    /* ==========================================
-       MESSAGE
-    ========================================== */
-
-    .message-row {
-      display:
-        flex;
-
-      margin-bottom:
-        12px;
-
-      width:
-        100%;
-    }
-
-    .message-row.mine {
-      justify-content:
-        flex-end;
-    }
-
-    .message-row.theirs {
-      justify-content:
-        flex-start;
-    }
-
-    .message-content {
-      max-width:
-        min(
-          78%,
-          560px
-        );
-    }
-
-    .message-sender {
-      margin:
-        0
-        0
-        4px
-        5px;
-
-      color:
-        var(--muted);
-
-      font-size:
-        10px;
-
-      font-weight:
-        700;
-
-      letter-spacing:
-        0.04em;
-
-      text-transform:
-        uppercase;
-    }
-
-    .message-row.mine
-      .message-sender {
-      margin:
-        0
-        5px
-        4px
-        0;
-
-      text-align:
-        right;
-    }
-
-    .message-bubble-wrap {
-      position:
-        relative;
-    }
-
-    .message-bubble {
-      position:
-        relative;
-
-      padding:
-        11px
-        15px;
-
-      border-radius:
-        18px;
-
-      background:
-        var(--surface);
-
-      border:
-        1px solid
-        var(--border);
-
-      color:
-        var(--text);
-
-      font-size:
-        14px;
-
-      line-height:
-        1.55;
-
-      white-space:
-        pre-wrap;
-
-      overflow-wrap:
-        anywhere;
-
-      box-shadow:
-        0 6px 18px
-        rgba(
-          21,
-          43,
-          70,
-          0.035
-        );
-    }
-
-    .message-row.mine
-      .message-bubble {
-      background:
-        var(--navy);
-
-      border-color:
-        var(--navy);
-
-      color:
-        var(--surface);
-
-      border-bottom-right-radius:
-        6px;
-    }
-
-    .message-row.theirs
-      .message-bubble {
-      border-bottom-left-radius:
-        6px;
-    }
-
-    /* ==========================================
-       DELETED MESSAGE
-       Same normal bubble appearance.
-    ========================================== */
-
-    .message-bubble.deleted {
-      /* No gray, faded, or dashed styling. */
-      opacity:
-        1;
-
-      box-shadow:
-        0 6px 18px
-        rgba(
-          21,
-          43,
-          70,
-          0.035
-        );
-    }
-
-    .message-row.mine
-      .message-bubble.deleted {
-      background:
-        var(--navy);
-
-      border-color:
-        var(--navy);
-
-      color:
-        var(--surface);
-    }
-
-    .message-row.theirs
-      .message-bubble.deleted {
-      background:
-        var(--surface);
-
-      border:
-        1px solid
-        var(--border);
-
-      color:
-        var(--text);
+    .message-meta {
+      margin-top: 5px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 5px;
+      font-size: 9px;
+      line-height: 1;
+      opacity: 0.6;
     }
 
     .deleted-label {
-      display:
-        block;
-
-      margin-bottom:
-        4px;
-
-      color:
-        inherit;
-
-      opacity:
-        0.58;
-
-      font-size:
-        8px;
-
-      font-weight:
-        800;
-
-      letter-spacing:
-        0.08em;
-
-      text-transform:
-        uppercase;
+      display: block;
+      margin-bottom: 4px;
+      font-size: 8px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.62;
     }
 
     .deleted-content {
-      color:
-        inherit;
-
-      font-style:
-        normal;
+      font-style: normal;
     }
 
-    /* ==========================================
-       MESSAGE ACTION
-    ========================================== */
-
-    .message-action {
-      position:
-        absolute;
-
-      right:
-        7px;
-
-      top:
-        50%;
-
-      width:
-        26px;
-
-      height:
-        26px;
-
-      transform:
-        translateY(-50%);
-
-      border-radius:
-        9px;
-
-      background:
-        rgba(
-          255,
-          255,
-          255,
-          0.10
-        );
-
-      color:
-        rgba(
-          255,
-          255,
-          255,
-          0.72
-        );
-
-      display:
-        grid;
-
-      place-items:
-        center;
-
-      cursor:
-        pointer;
-
-      opacity:
-        0;
-
-      pointer-events:
-        none;
-
-      transition:
-        opacity 0.15s ease,
-        background 0.15s ease;
+    .date-separator {
+      display: flex;
+      justify-content: center;
+      margin: 19px 0 11px;
     }
 
-    .message-row.mine:hover
-      .message-action,
-    .message-row.mine:focus-within
-      .message-action {
-      opacity:
-        1;
-
-      pointer-events:
-        auto;
+    .date-separator span {
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 700;
     }
 
-    .message-action:hover {
-      background:
-        rgba(
-          255,
-          255,
-          255,
-          0.18
-        );
-    }
-
-    .message-action svg {
-      width:
-        15px;
-
-      height:
-        15px;
-
-      stroke-width:
-        2;
-    }
-
-    /* ==========================================
-       ACTION MENU
-    ========================================== */
-
-    .message-menu {
-      position:
-        absolute;
-
-      top:
-        calc(
-          100% +
-          7px
-        );
-
-      right:
-        0;
-
-      z-index:
-        30;
-
-      min-width:
-        110px;
-
-      padding:
-        5px;
-
-      border-radius:
-        13px;
-
-      background:
-        var(--surface);
-
-      border:
-        1px solid
-        var(--border);
-
-      box-shadow:
-        0 12px 35px
-        rgba(
-          21,
-          43,
-          70,
-          0.14
-        );
-
-      display:
-        none;
-    }
-
-    .message-menu.open {
-      display:
-        block;
-    }
-
-    .message-menu button {
-      width:
-        100%;
-
-      min-height:
-        38px;
-
-      padding:
-        0
-        10px;
-
-      border-radius:
-        9px;
-
-      background:
-        transparent;
-
-      color:
-        var(--navy);
-
-      text-align:
-        left;
-
-      font-size:
-        12px;
-
-      font-weight:
-        700;
-
-      cursor:
-        pointer;
-    }
-
-    .message-menu button:hover {
-      background:
-        var(--soft-surface);
-    }
-
-    /* ==========================================
-       SELECTED
-    ========================================== */
-
-    .message-row.selected
-      .message-bubble {
-      outline:
-        2px solid
-        var(--peach);
-
-      outline-offset:
-        3px;
-    }
-
-    /* ==========================================
-       META
-    ========================================== */
-
-    .message-meta {
-      display:
-        flex;
-
-      align-items:
-        center;
-
-      justify-content:
-        flex-end;
-
-      gap:
-        7px;
-
-      margin-top:
-        5px;
-
-      color:
-        var(--muted);
-
-      font-size:
-        9px;
-    }
-
-    .message-row.theirs
-      .message-meta {
-      justify-content:
-        flex-start;
-    }
-
-    .message-status {
-      font-weight:
-        700;
-
-      color:
-        var(--navy);
-    }
-
-    .message-status.seen {
-      color:
-        #5C7893;
-    }
-
-    /* ==========================================
-       EMPTY
-    ========================================== */
-
-    .empty-state {
-      min-height:
-        100%;
-
-      display:
-        flex;
-
-      align-items:
-        center;
-
-      justify-content:
-        center;
-
-      padding:
-        45px
-        25px;
+    .empty {
+      min-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 50px 20px;
     }
 
     .empty-card {
-      width:
-        100%;
-
-      max-width:
-        380px;
-
-      padding:
-        30px
-        24px;
-
-      border-radius:
-        22px;
-
-      background:
-        rgba(
-          255,
-          255,
-          255,
-          0.74
-        );
-
-      border:
-        1px solid
-        var(--border);
-
-      text-align:
-        center;
+      width: min(100%, 330px);
+      padding: 26px 22px;
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      text-align: center;
+      box-shadow: var(--shadow);
     }
 
-    .empty-icon {
-      width:
-        52px;
-
-      height:
-        52px;
-
-      margin:
-        0
-        auto
-        17px;
-
-      border-radius:
-        16px;
-
-      background:
-        var(--blue);
-
-      color:
-        var(--navy);
-
-      display:
-        grid;
-
-      place-items:
-        center;
+    .empty-card h2 {
+      margin: 0 0 8px;
+      color: var(--navy);
+      font-size: 17px;
     }
 
-    .empty-icon svg {
-      width:
-        22px;
-
-      height:
-        22px;
-
-      stroke-width:
-        1.7;
+    .empty-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
     }
 
-    .empty-title {
-      color:
-        var(--navy);
-
-      font-size:
-        17px;
-
-      font-weight:
-        800;
+    .error-card {
+      width: min(100%, 560px);
+      margin: 30px auto;
+      padding: 16px;
+      border-radius: 15px;
+      background: var(--white);
+      border: 1px solid rgba(150, 60, 55, 0.2);
+      color: #873C36;
+      font-size: 12px;
+      line-height: 1.5;
     }
 
-    .empty-description {
-      margin-top:
-        7px;
-
-      color:
-        var(--muted);
-
-      font-size:
-        13px;
-
-      line-height:
-        1.55;
+    .error-card strong {
+      display: block;
+      margin-bottom: 5px;
     }
 
-    /* ==========================================
-       COMPOSER
-    ========================================== */
+    /* COMPOSER */
 
     .composer-area {
-      flex:
-        0 0 auto;
-
+      flex-shrink: 0;
       padding:
-        13px
-        16px
-        16px;
-
-      background:
-        var(--surface);
-
-      border-top:
-        1px solid
-        var(--border);
+        9px 12px
+        max(12px, env(safe-area-inset-bottom));
+      background: rgba(248, 240, 236, 0.97);
+      border-top: 1px solid var(--border);
+      backdrop-filter: blur(14px);
     }
 
     .composer {
-      width:
-        100%;
-
-      max-width:
-        760px;
-
-      margin:
-        0 auto;
-
-      display:
-        flex;
-
-      align-items:
-        flex-end;
-
-      gap:
-        9px;
+      width: min(100%, 760px);
+      margin: 0 auto;
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
     }
 
     .input-wrap {
-      flex:
-        1;
-
-      min-width:
-        0;
-
-      position:
-        relative;
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: flex-end;
+      padding: 3px 6px 3px 12px;
+      border: 1px solid var(--border);
+      border-radius: 17px;
+      background: var(--white);
+      box-shadow: var(--shadow);
     }
 
-    .message-input {
-      display:
-        block;
-
-      width:
-        100%;
-
-      min-height:
-        48px;
-
-      max-height:
-        150px;
-
-      padding:
-        13px
-        46px
-        13px
-        15px;
-
-      border-radius:
-        16px;
-
-      border:
-        1px solid
-        var(--border);
-
-      outline:
-        none;
-
-      resize:
-        none;
-
-      overflow-y:
-        auto;
-
-      background:
-        var(--soft-surface);
-
-      color:
-        var(--text);
-
-      font-size:
-        14px;
-
-      line-height:
-        1.45;
+    textarea {
+      width: 100%;
+      min-height: 40px;
+      max-height: 130px;
+      margin: 0;
+      padding: 9px 3px;
+      border: 0;
+      outline: 0;
+      resize: none;
+      background: transparent;
+      color: var(--text);
+      line-height: 1.4;
+      font-size: 14px;
     }
 
-    .message-input:focus {
-      background:
-        var(--surface);
-
-      border-color:
-        rgba(
-          21,
-          43,
-          70,
-          0.20
-        );
-
-      box-shadow:
-        0 0 0 3px
-        rgba(
-          21,
-          43,
-          70,
-          0.05
-        );
-    }
-
-    .message-input::placeholder {
-      color:
-        #9CA6B0;
-    }
-
-    .input-hint {
-      position:
-        absolute;
-
-      right:
-        13px;
-
-      bottom:
-        12px;
-
-      color:
-        #A1ABB4;
-
-      font-size:
-        9px;
+    textarea::placeholder {
+      color: var(--muted);
     }
 
     .send-button {
-      width:
-        48px;
+      width: 44px;
+      height: 44px;
+      flex-shrink: 0;
+      border: 0;
+      border-radius: 14px;
+      background: var(--navy);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-      height:
-        48px;
-
-      flex:
-        0 0 48px;
-
-      border-radius:
-        16px;
-
-      background:
-        var(--navy);
-
-      color:
-        var(--surface);
-
-      display:
-        grid;
-
-      place-items:
-        center;
-
-      cursor:
-        pointer;
-
-      box-shadow:
-        0 10px 22px
-        rgba(
-          21,
-          43,
-          70,
-          0.15
-        );
+    .send-button:active {
+      transform: scale(0.96);
     }
 
     .send-button:disabled {
-      opacity:
-        0.55;
-
-      cursor:
-        not-allowed;
+      opacity: 0.55;
+      cursor: default;
     }
 
     .send-button svg {
-      width:
-        18px;
-
-      height:
-        18px;
-
-      stroke-width:
-        1.9;
+      width: 17px;
+      height: 17px;
+      stroke: currentColor;
     }
 
-    .composer-note {
-      width:
-        100%;
-
-      max-width:
-        760px;
-
-      margin:
-        7px
-        auto
-        0;
-
-      color:
-        #99A3AD;
-
-      font-size:
-        9px;
-    }
-
-    /* ==========================================
-       TOAST
-    ========================================== */
-
-    .toast {
-      position:
-        fixed;
-
-      left:
-        50%;
-
-      bottom:
-        22px;
-
-      z-index:
-        100;
-
-      width:
-        min(
-          520px,
-          calc(
-            100vw - 32px
-          )
-        );
-
-      padding:
-        12px
-        15px;
-
-      border-radius:
-        13px;
-
-      background:
-        var(--navy);
-
-      color:
-        var(--surface);
-
-      font-size:
-        12px;
-
-      font-weight:
-        600;
-
-      text-align:
-        center;
-
-      opacity:
-        0;
-
-      pointer-events:
-        none;
-
-      transform:
-        translate(
-          -50%,
-          12px
-        );
-
-      transition:
-        opacity 0.2s ease,
-        transform 0.2s ease;
-    }
-
-    .toast.show {
-      opacity:
-        1;
-
-      transform:
-        translate(
-          -50%,
-          0
-        );
-    }
-
-    /* ==========================================
-       MOBILE
-    ========================================== */
-
-    @media (max-width: 700px) {
-
-      .page {
-        padding:
-          env(safe-area-inset-top)
-          0
-          env(safe-area-inset-bottom)
-          0;
+    @media (max-width: 600px) {
+      .messages {
+        padding-left: 10px;
+        padding-right: 10px;
       }
 
-      .chat-shell {
-        width:
-          100%;
-
-        height:
-          100%;
-
-        max-width:
-          none;
-
-        border-radius:
-          0;
-
-        border:
-          none;
-
-        box-shadow:
-          none;
+      .bubble {
+        max-width: 86%;
       }
 
-      .chat-header {
-        min-height:
-          72px;
-
-        padding:
-          11px
-          12px;
-
-        padding-top:
-          calc(
-            11px +
-            env(safe-area-inset-top)
-          );
-      }
-
-      .messages-area {
-        padding:
-          16px
-          13px
-          18px;
-      }
-
-      .composer-area {
-        padding:
-          9px
-          11px;
-
-        padding-bottom:
-          calc(
-            9px +
-            env(safe-area-inset-bottom)
-          );
-      }
-
-      .message-content {
-        max-width:
-          86%;
-      }
-
-      .message-bubble {
-        font-size:
-          13px;
-      }
-
-      .message-action {
-        opacity:
-          1;
-
-        pointer-events:
-          auto;
-      }
-
-      .composer-note,
-      .input-hint {
-        display:
-          none;
-      }
-    }
-
-    @media (max-width: 430px) {
-
-      .back-button,
-      .header-button {
-        width:
-          41px;
-
-        height:
-          41px;
-
-        flex:
-          0 0 41px;
-
-        border-radius:
-          13px;
-      }
-
-      .message-input {
-        min-height:
-          46px;
-
-        padding:
-          12px
-          13px;
-      }
-
-      .send-button {
-        width:
-          46px;
-
-        height:
-          46px;
-
-        flex:
-          0 0 46px;
-
-        border-radius:
-          14px;
+      .message-text {
+        font-size: 13.5px;
       }
     }
   </style>
 </head>
 
 <body>
+  <div class="app">
 
-  <main class="page">
-
-    <section class="chat-shell">
-
-      <!-- HEADER -->
-
-      <header class="chat-header">
+    <header class="header">
+      <div class="header-inner">
 
         <div class="header-left">
-
           <button
-            class="back-button"
-            id="backButton"
+            class="icon-button"
+            id="homeButton"
             type="button"
-            aria-label="Back"
-            title="Back"
+            aria-label="Home"
+            title="Home"
           >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M19 12H5" />
-
-              <path
-                d="
-                  m11 18
-                  -6-6
-                  6-6
-                "
-              />
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7">
+              <path d="M4 10.5 12 4l8 6.5"></path>
+              <path d="M6.5 9.5V20h11V9.5"></path>
+              <path d="M10 20v-5h4v5"></path>
             </svg>
           </button>
 
-          <div class="conversation-identity">
-
-            <div class="conversation-title">
-              Our conversation
-            </div>
-
-            <div class="conversation-subtitle">
-              Private space for two
-            </div>
-
+          <div class="heading">
+            <p class="title">Our Space</p>
+            <p class="subtitle" id="subtitle">Private chat</p>
           </div>
+        </div>
 
+        <div class="header-right">
+          <button
+            class="icon-button"
+            id="logoutButton"
+            type="button"
+            aria-label="Log out"
+            title="Log out"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7">
+              <path d="M10 4H5.8A1.8 1.8 0 0 0 4 5.8v12.4A1.8 1.8 0 0 0 5.8 20H10"></path>
+              <path d="M14 8l4 4-4 4"></path>
+              <path d="M9 12h9"></path>
+            </svg>
+          </button>
+        </div>
+
+      </div>
+    </header>
+
+    <main class="messages-scroll" id="messagesScroll">
+      <div class="messages" id="messages"></div>
+    </main>
+
+    <div class="composer-area">
+      <form class="composer" id="composer">
+
+        <div class="input-wrap">
+          <textarea
+            id="messageInput"
+            rows="1"
+            placeholder="Write a message..."
+            autocomplete="off"
+          ></textarea>
         </div>
 
         <button
-          class="header-button"
-          id="homeButton"
-          type="button"
-          aria-label="Home"
-          title="Home"
+          class="send-button"
+          id="sendButton"
+          type="submit"
+          aria-label="Send"
+          title="Send"
         >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path
-              d="
-                m3 10
-                9-7
-                9 7
-              "
-            />
-
-            <path
-              d="
-                M5 9.5
-                V20
-                H19
-                V9.5
-              "
-            />
-
-            <path
-              d="
-                M9 20
-                V14
-                H15
-                V20
-              "
-            />
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+            <path d="M21 3 10.5 13.5"></path>
+            <path d="m21 3-6.5 18-4-7.5L3 9.5 21 3Z"></path>
           </svg>
         </button>
 
-        <!-- SELECTION TOOLBAR -->
-
-        <div
-          class="selection-toolbar"
-          id="selectionToolbar"
-        >
-
-          <div class="selection-left">
-
-            <button
-              class="selection-cancel"
-              id="selectionCancel"
-              type="button"
-            >
-              Cancel
-            </button>
-
-            <div
-              class="selection-count"
-              id="selectionCount"
-            >
-              0 selected
-            </div>
-
-          </div>
-
-          <button
-            class="selection-delete"
-            id="selectionDelete"
-            type="button"
-            aria-label="Delete selected message"
-            title="Delete selected message"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M4 7h16" />
-              <path d="M10 11v6" />
-              <path d="M14 11v6" />
-
-              <path
-                d="
-                  M6 7
-                  l1 14
-                  h10
-                  l1-14
-                "
-              />
-
-              <path
-                d="
-                  M9 7
-                  V4
-                  H15
-                  V7
-                "
-              />
-            </svg>
-          </button>
-
-        </div>
-
-      </header>
-
-      <!-- MESSAGES -->
-
-      <section
-        class="messages-area"
-        id="messagesArea"
-        aria-label="Conversation"
-      >
-
-        <div
-          class="message-list"
-          id="messageList"
-        ></div>
-
-      </section>
-
-      <!-- COMPOSER -->
-
-      <footer class="composer-area">
-
-        <form
-          class="composer"
-          id="messageForm"
-        >
-
-          <div class="input-wrap">
-
-            <textarea
-              class="message-input"
-              id="messageInput"
-              rows="1"
-              maxlength="4000"
-              placeholder="Write a message..."
-              autocomplete="off"
-              aria-label="Message"
-            ></textarea>
-
-            <span class="input-hint">
-              Enter
-            </span>
-
-          </div>
-
-          <button
-            class="send-button"
-            id="sendButton"
-            type="submit"
-            aria-label="Send message"
-            title="Send"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path
-                d="
-                  m22 2
-                  -7 20
-                  -4-9
-                  -9-4
-                  Z
-                "
-              />
-
-              <path
-                d="
-                  M22 2
-                  L11 13
-                "
-              />
-            </svg>
-          </button>
-
-        </form>
-
-        <div class="composer-note">
-          Shift + Enter for a new line
-        </div>
-
-      </footer>
-
-    </section>
-
-  </main>
-
-  <div
-    class="toast"
-    id="toast"
-    role="status"
-    aria-live="polite"
-  ></div>
+      </form>
+    </div>
+  </div>
 
   <script>
-    /* ==========================================
-       SUPABASE
-    ========================================== */
-
-    const SUPABASE_URL =
-      "https://ywflohxufmfydkpkkqly.supabase.co";
-
+    const SUPABASE_URL = "https://ywflohxufmfydkpkkqly.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY =
       "sb_publishable_qTMUO8KxerEQBDQ-A7Huyg_8N2Tqpmr";
 
     const SPACE_ID =
       "6547fe99-ed80-421c-8572-50ae3fb6fbe4";
 
-    const {
-      createClient
-    } = supabase;
-
-    const client =
-      createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY,
-        {
-          auth: {
-            persistSession: true,
-            autoRefreshToken: true,
-            detectSessionInUrl: true
-          }
+    const client = supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY,
+      {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true
         }
-      );
-
-    /* ==========================================
-       STATE
-    ========================================== */
-
-    let currentUser = null;
-    let currentUsername = "You";
-    let partnerName = "Other";
-
-    let realtimeChannel = null;
-    let toastTimer = null;
-    let isSending = false;
-
-    let selectedMessageIds =
-      new Set();
-
-    /* ==========================================
-       ELEMENTS
-    ========================================== */
-
-    const messageList =
-      document.getElementById(
-        "messageList"
-      );
-
-    const messagesArea =
-      document.getElementById(
-        "messagesArea"
-      );
-
-    const messageForm =
-      document.getElementById(
-        "messageForm"
-      );
-
-    const messageInput =
-      document.getElementById(
-        "messageInput"
-      );
-
-    const sendButton =
-      document.getElementById(
-        "sendButton"
-      );
-
-    const backButton =
-      document.getElementById(
-        "backButton"
-      );
-
-    const homeButton =
-      document.getElementById(
-        "homeButton"
-      );
-
-    const toast =
-      document.getElementById(
-        "toast"
-      );
-
-    const selectionToolbar =
-      document.getElementById(
-        "selectionToolbar"
-      );
-
-    const selectionCount =
-      document.getElementById(
-        "selectionCount"
-      );
-
-    const selectionCancel =
-      document.getElementById(
-        "selectionCancel"
-      );
-
-    const selectionDelete =
-      document.getElementById(
-        "selectionDelete"
-      );
-
-    /* ==========================================
-       HELPERS
-    ========================================== */
-
-    function showToast(
-      text,
-      long = false
-    ) {
-      clearTimeout(
-        toastTimer
-      );
-
-      toast.textContent =
-        text;
-
-      toast.classList.add(
-        "show"
-      );
-
-      toastTimer =
-        setTimeout(
-          () => {
-            toast.classList.remove(
-              "show"
-            );
-          },
-          long
-            ? 5000
-            : 2200
-        );
-    }
-
-    function formatTime(
-      timestamp
-    ) {
-      const date =
-        new Date(
-          timestamp
-        );
-
-      return date.toLocaleTimeString(
-        [],
-        {
-          hour:
-            "2-digit",
-
-          minute:
-            "2-digit"
-        }
-      );
-    }
-
-    function getDateKey(
-      timestamp
-    ) {
-      const date =
-        new Date(
-          timestamp
-        );
-
-      return [
-        date.getFullYear(),
-        date.getMonth(),
-        date.getDate()
-      ].join("-");
-    }
-
-    function formatDateLabel(
-      timestamp
-    ) {
-      const date =
-        new Date(
-          timestamp
-        );
-
-      const now =
-        new Date();
-
-      const yesterday =
-        new Date();
-
-      yesterday.setDate(
-        yesterday.getDate() - 1
-      );
-
-      if (
-        date.toDateString() ===
-        now.toDateString()
-      ) {
-        return "Today";
-      }
-
-      if (
-        date.toDateString() ===
-        yesterday.toDateString()
-      ) {
-        return "Yesterday";
-      }
-
-      return date.toLocaleDateString(
-        [],
-        {
-          day:
-            "numeric",
-
-          month:
-            "long",
-
-          year:
-            "numeric"
-        }
-      );
-    }
-
-    function autoResizeInput() {
-      messageInput.style.height =
-        "48px";
-
-      messageInput.style.height =
-        `${Math.min(
-          messageInput.scrollHeight,
-          150
-        )}px`;
-    }
-
-    function scrollToBottom(
-      smooth = true
-    ) {
-      requestAnimationFrame(
-        () => {
-          messagesArea.scrollTo({
-            top:
-              messagesArea.scrollHeight,
-
-            behavior:
-              smooth
-                ? "smooth"
-                : "auto"
-          });
-        }
-      );
-    }
-
-    /* ==========================================
-       SELECTION
-    ========================================== */
-
-    function updateSelectionUI() {
-
-      const count =
-        selectedMessageIds.size;
-
-      if (
-        count === 0
-      ) {
-
-        selectionToolbar.classList.remove(
-          "active"
-        );
-
-        selectionCount.textContent =
-          "0 selected";
-
-        selectionDelete.disabled =
-          true;
-
-        return;
-      }
-
-      selectionToolbar.classList.add(
-        "active"
-      );
-
-      selectionCount.textContent =
-        `${count} selected`;
-
-      selectionDelete.disabled =
-        false;
-    }
-
-    function enterSelection(
-      messageId,
-      row
-    ) {
-
-      const numericId =
-        Number(
-          messageId
-        );
-
-      selectedMessageIds.add(
-        numericId
-      );
-
-      row.classList.add(
-        "selected"
-      );
-
-      closeAllMessageMenus();
-
-      updateSelectionUI();
-    }
-
-    function exitSelection() {
-
-      selectedMessageIds.clear();
-
-      messageList
-        .querySelectorAll(
-          ".message-row.selected"
-        )
-        .forEach(
-          row => {
-            row.classList.remove(
-              "selected"
-            );
-          }
-        );
-
-      updateSelectionUI();
-    }
-
-    /* ==========================================
-       MESSAGE MENUS
-    ========================================== */
-
-    function closeAllMessageMenus() {
-
-      messageList
-        .querySelectorAll(
-          ".message-menu.open"
-        )
-        .forEach(
-          menu => {
-            menu.classList.remove(
-              "open"
-            );
-          }
-        );
-    }
-
-    function toggleMessageMenu(
-      menu
-    ) {
-
-      const wasOpen =
-        menu.classList.contains(
-          "open"
-        );
-
-      closeAllMessageMenus();
-
-      if (
-        !wasOpen
-      ) {
-        menu.classList.add(
-          "open"
-        );
-      }
-    }
-
-    document.addEventListener(
-      "click",
-      event => {
-
-        if (
-          !event.target.closest(
-            ".message-action"
-          ) &&
-          !event.target.closest(
-            ".message-menu"
-          )
-        ) {
-
-          closeAllMessageMenus();
-        }
-
       }
     );
 
-    /* ==========================================
-       AUTH
-    ========================================== */
+    const messagesEl = document.getElementById("messages");
+    const scrollEl = document.getElementById("messagesScroll");
+    const form = document.getElementById("composer");
+    const input = document.getElementById("messageInput");
+    const sendButton = document.getElementById("sendButton");
+    const homeButton = document.getElementById("homeButton");
+    const logoutButton = document.getElementById("logoutButton");
 
-    async function checkAuthentication() {
+    let currentUser = null;
+    let channel = null;
+    let messageRows = [];
 
-      const {
-        data: {
-          user
-        },
-        error
-      } =
-        await client.auth.getUser();
-
-      if (
-        error ||
-        !user
-      ) {
-
-        window.location.href =
-          "login.html";
-
-        return false;
-      }
-
-      currentUser =
-        user;
-
-      return true;
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
     }
 
-    /* ==========================================
-       PROFILE
-    ========================================== */
+    function formatTime(value) {
+      if (!value) return "";
 
-    async function loadProfile() {
-
-      const {
-        data,
-        error
-      } =
-        await client
-          .from(
-            "user_profiles"
-          )
-          .select(
-            "username"
-          )
-          .eq(
-            "user_id",
-            currentUser.id
-          )
-          .maybeSingle();
-
-      if (
-        !error &&
-        data?.username
-      ) {
-
-        currentUsername =
-          data.username;
-      }
-
-      const normalized =
-        currentUsername
-          .trim()
-          .toLowerCase();
-
-      if (
-        normalized ===
-        "mohammad"
-      ) {
-
-        partnerName =
-          "Salma";
-
-      } else if (
-        normalized ===
-        "salma"
-      ) {
-
-        partnerName =
-          "Mohammad";
-
-      } else {
-
-        partnerName =
-          "Other";
-      }
+      return new Date(value).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit"
+      });
     }
 
-    /* ==========================================
-       STATUS
-    ========================================== */
+    function getDateKey(value) {
+      const d = new Date(value);
 
-    function getMessageStatus(
-      message
-    ) {
-
-      if (
-        message.seen_at
-      ) {
-
-        return {
-          text:
-            "Seen",
-
-          className:
-            "seen"
-        };
-      }
-
-      if (
-        message.delivered_at
-      ) {
-
-        return {
-          text:
-            "Delivered",
-
-          className:
-            ""
-        };
-      }
-
-      return {
-        text:
-          "Sent",
-
-        className:
-          ""
-      };
+      return (
+        d.getFullYear() +
+        "-" +
+        String(d.getMonth() + 1).padStart(2, "0") +
+        "-" +
+        String(d.getDate()).padStart(2, "0")
+      );
     }
 
-    /* ==========================================
-       DATE SEPARATOR
-    ========================================== */
-
-    function createDateSeparator(
-      timestamp
-    ) {
-
-      const separator =
-        document.createElement(
-          "div"
-        );
-
-      separator.className =
-        "date-separator";
-
-      separator.dataset.date =
-        getDateKey(
-          timestamp
-        );
-
-      separator.textContent =
-        formatDateLabel(
-          timestamp
-        );
-
-      return separator;
+    function formatDate(value) {
+      return new Date(value).toLocaleDateString([], {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      });
     }
 
-    /* ==========================================
-       MESSAGE ACTION
-    ========================================== */
-
-    function createMessageAction(
-      messageId,
-      row
-    ) {
-
-      const wrapper =
-        document.createElement(
-          "div"
-        );
-
-      wrapper.style.position =
-        "relative";
-
-      const button =
-        document.createElement(
-          "button"
-        );
-
-      button.type =
-        "button";
-
-      button.className =
-        "message-action";
-
-      button.title =
-        "Message actions";
-
-      button.setAttribute(
-        "aria-label",
-        "Message actions"
-      );
-
-      button.innerHTML = `
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-        >
-          <circle
-            cx="5"
-            cy="12"
-            r="1"
-          />
-
-          <circle
-            cx="12"
-            cy="12"
-            r="1"
-          />
-
-          <circle
-            cx="19"
-            cy="12"
-            r="1"
-          />
-        </svg>
-      `;
-
-      const menu =
-        document.createElement(
-          "div"
-        );
-
-      menu.className =
-        "message-menu";
-
-      const selectButton =
-        document.createElement(
-          "button"
-        );
-
-      selectButton.type =
-        "button";
-
-      selectButton.textContent =
-        "Select";
-
-      selectButton.addEventListener(
-        "click",
-        event => {
-
-          event.preventDefault();
-
-          event.stopPropagation();
-
-          enterSelection(
-            messageId,
-            row
-          );
-        }
-      );
-
-      menu.appendChild(
-        selectButton
-      );
-
-      button.addEventListener(
-        "click",
-        event => {
-
-          event.preventDefault();
-
-          event.stopPropagation();
-
-          toggleMessageMenu(
-            menu
-          );
-        }
-      );
-
-      wrapper.appendChild(
-        button
-      );
-
-      wrapper.appendChild(
-        menu
-      );
-
-      return wrapper;
-    }
-
-    /* ==========================================
-       MESSAGE ELEMENT
-    ========================================== */
-
-    function createMessageElement(
-      message
-    ) {
-
-      const isMine =
-        message.sender_id ===
-        currentUser.id;
-
-      const row =
-        document.createElement(
-          "div"
-        );
-
-      row.className =
-        `message-row ${
-          isMine
-            ? "mine"
-            : "theirs"
-        }`;
-
-      row.dataset.messageId =
-        String(
-          message.id
-        );
-
-      const content =
-        document.createElement(
-          "div"
-        );
-
-      content.className =
-        "message-content";
-
-      const sender =
-        document.createElement(
-          "div"
-        );
-
-      sender.className =
-        "message-sender";
-
-      sender.textContent =
-        isMine
-          ? "You"
-          : partnerName;
-
-      const bubbleWrap =
-        document.createElement(
-          "div"
-        );
-
-      bubbleWrap.className =
-        "message-bubble-wrap";
-
-      const bubble =
-        document.createElement(
-          "div"
-        );
-
-      bubble.className =
-        "message-bubble";
-
-      if (
-        message.deleted_at
-      ) {
-
-        bubble.classList.add(
-          "deleted"
-        );
-
-        const label =
-          document.createElement(
-            "span"
-          );
-
-        label.className =
-          "deleted-label";
-
-        label.textContent =
-          "Deleted";
-
-        const original =
-          document.createElement(
-            "span"
-          );
-
-        original.className =
-          "deleted-content";
-
-        original.textContent =
-          message.content;
-
-        bubble.appendChild(
-          label
-        );
-
-        bubble.appendChild(
-          original
-        );
-
-      } else {
-
-        bubble.textContent =
-          message.content;
-      }
-
-      bubbleWrap.appendChild(
-        bubble
-      );
-
-      if (
-        isMine &&
-        !message.deleted_at
-      ) {
-
-        bubbleWrap.appendChild(
-          createMessageAction(
-            message.id,
-            row
-          )
-        );
-      }
-
-      const meta =
-        document.createElement(
-          "div"
-        );
-
-      meta.className =
-        "message-meta";
-
-      const time =
-        document.createElement(
-          "span"
-        );
-
-      time.textContent =
-        formatTime(
-          message.created_at
-        );
-
-      meta.appendChild(
-        time
-      );
-
-      if (
-        isMine
-      ) {
-
-        const status =
-          getMessageStatus(
-            message
-          );
-
-        const statusElement =
-          document.createElement(
-            "span"
-          );
-
-        statusElement.className =
-          `message-status ${
-            status.className
-          }`;
-
-        statusElement.textContent =
-          status.text;
-
-        meta.appendChild(
-          statusElement
-        );
-      }
-
-      content.appendChild(
-        sender
-      );
-
-      content.appendChild(
-        bubbleWrap
-      );
-
-      content.appendChild(
-        meta
-      );
-
-      row.appendChild(
-        content
-      );
-
-      return row;
-    }
-
-    /* ==========================================
-       EMPTY
-    ========================================== */
-
-    function renderEmptyState() {
-
-      messageList.innerHTML = `
-        <div class="empty-state">
-
-          <div class="empty-card">
-
-            <div class="empty-icon">
-
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M7 9h10" />
-                <path d="M7 13h6" />
-
-                <path
-                  d="
-                    M4 5.5
-                    A2.5 2.5 0 0 1
-                    6.5 3
-                    H17.5
-                    A2.5 2.5 0 0 1
-                    20 5.5
-                    V13.5
-                    A2.5 2.5 0 0 1
-                    17.5 16
-                    H11
-                    L6.5 20
-                    V16
-                    H6.5
-                    A2.5 2.5 0 0 1
-                    4 13.5
-                    Z
-                  "
-                />
-              </svg>
-
-            </div>
-
-            <div class="empty-title">
-              Start your conversation
-            </div>
-
-            <div class="empty-description">
-              Send your first message.
-            </div>
-
-          </div>
-
+    function showError(message) {
+      messagesEl.innerHTML = `
+        <div class="error-card">
+          <strong>Chat error</strong>
+          ${escapeHtml(message)}
         </div>
       `;
     }
 
-    /* ==========================================
-       RENDER
-    ========================================== */
-
-    function renderMessages(
-      messages
-    ) {
-
-      messageList.innerHTML =
-        "";
-
-      exitSelection();
-
-      if (
-        !messages.length
-      ) {
-
-        renderEmptyState();
-
+    function renderMessages() {
+      if (!messageRows.length) {
+        messagesEl.innerHTML = `
+          <div class="empty">
+            <div class="empty-card">
+              <h2>No messages yet</h2>
+              <p>Send a message to start the conversation.</p>
+            </div>
+          </div>
+        `;
         return;
       }
 
-      let previousDate =
-        null;
+      let html = "";
+      let previousDate = "";
 
-      messages.forEach(
-        message => {
+      for (const row of messageRows) {
+        const date = getDateKey(row.created_at);
 
-          const date =
-            getDateKey(
-              message.created_at
-            );
+        if (date !== previousDate) {
+          html += `
+            <div class="date-separator">
+              <span>${escapeHtml(formatDate(row.created_at))}</span>
+            </div>
+          `;
 
-          if (
-            date !==
-            previousDate
-          ) {
+          previousDate = date;
+        }
 
-            messageList.appendChild(
-              createDateSeparator(
-                message.created_at
+        const mine =
+          currentUser &&
+          row.sender_id === currentUser.id;
+
+        const deleted = Boolean(row.deleted_at);
+
+        const deletedLabel = deleted
+          ? `<span class="deleted-label">Deleted</span>`
+          : "";
+
+        const status = mine
+          ? (
+              row.seen_at
+                ? "Seen"
+                : row.delivered_at
+                  ? "Delivered"
+                  : "Sent"
+            )
+          : "";
+
+        html += `
+          <div class="message ${mine ? "mine" : "theirs"}">
+            <div class="bubble">
+              ${deletedLabel}
+              <div class="${deleted ? "deleted-content" : "message-text"}">
+                ${escapeHtml(row.content)}
+              </div>
+
+              <div class="message-meta">
+                <span>${escapeHtml(formatTime(row.created_at))}</span>
+                ${mine ? `<span>${escapeHtml(status)}</span>` : ""}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      messagesEl.innerHTML = html;
+
+      requestAnimationFrame(() => {
+        scrollEl.scrollTop = scrollEl.scrollHeight;
+      });
+    }
+
+    async function loadMessages() {
+      if (!currentUser) return;
+
+      /*
+        IMPORTANT:
+        The first query only uses the ORIGINAL message columns.
+        That means newer delete/status columns cannot break the chat.
+      */
+
+      const { data, error } = await client
+        .from("messages")
+        .select(
+          "id,space_id,sender_id,content,created_at"
+        )
+        .eq("space_id", SPACE_ID)
+        .order("created_at", { ascending: true });
+
+      if (error) {
+        console.error("MESSAGE LOAD ERROR:", error);
+        showError(error.message);
+        return;
+      }
+
+      messageRows = data || [];
+
+      /*
+        Try to enrich with the newer columns.
+        If they don't exist, the normal chat still works.
+      */
+
+      if (messageRows.length) {
+        try {
+          const ids = messageRows.map((row) => row.id);
+
+          const { data: extraRows, error: extraError } =
+            await client
+              .from("messages")
+              .select(
+                "id,deleted_at,deleted_by,delivered_at,seen_at"
               )
+              .in("id", ids);
+
+          if (!extraError && extraRows) {
+            const extraMap = new Map(
+              extraRows.map((row) => [
+                row.id,
+                row
+              ])
             );
 
-            previousDate =
-              date;
+            messageRows = messageRows.map((row) => ({
+              ...row,
+              ...(extraMap.get(row.id) || {})
+            }));
           }
-
-          messageList.appendChild(
-            createMessageElement(
-              message
-            );
-        }
-      );
-    }
-
-    /* ==========================================
-       LOAD
-    ========================================== */
-
-    async function loadMessages(
-      shouldScroll = true
-    ) {
-
-      const {
-        data,
-        error
-      } =
-        await client
-          .from(
-            "messages"
-          )
-          .select(
-            `
-              id,
-              space_id,
-              sender_id,
-              content,
-              created_at,
-              deleted_at,
-              deleted_by,
-              delivered_at,
-              seen_at
-            `
-          )
-          .eq(
-            "space_id",
-            SPACE_ID
-          )
-          .order(
-            "created_at",
-            {
-              ascending:
-                true
-            }
-          )
-          .limit(
-            500
+        } catch (extraError) {
+          console.warn(
+            "Optional message fields unavailable:",
+            extraError
           );
-
-      if (
-        error
-      ) {
-
-        console.error(
-          "Message loading error:",
-          error
-        );
-
-        showToast(
-          error.message,
-          true
-        );
-
-        return;
-      }
-
-      renderMessages(
-        data || []
-      );
-
-      if (
-        shouldScroll
-      ) {
-
-        scrollToBottom(
-          false
-        );
-      }
-    }
-
-    /* ==========================================
-       DELETE SELECTED
-    ========================================== */
-
-    async function deleteSelectedMessages() {
-
-      const ids =
-        [
-          ...selectedMessageIds
-        ];
-
-      if (
-        !ids.length
-      ) {
-        return;
-      }
-
-      const confirmed =
-        window.confirm(
-          ids.length === 1
-            ? "Delete this message?"
-            : `Delete ${ids.length} messages?`
-        );
-
-      if (
-        !confirmed
-      ) {
-        return;
-      }
-
-      for (
-        const id of ids
-      ) {
-
-        const {
-          data,
-          error
-        } =
-          await client.rpc(
-            "soft_delete_message",
-            {
-              p_message_id:
-                Number(id)
-            }
-          );
-
-        if (
-          error
-        ) {
-
-          console.error(
-            "Delete error:",
-            error
-          );
-
-          showToast(
-            error.message ||
-            "A message could not be deleted.",
-            true
-          );
-
-          return;
-        }
-
-        if (
-          !data
-        ) {
-
-          showToast(
-            "A selected message could not be deleted.",
-            true
-          );
-
-          return;
         }
       }
 
-      exitSelection();
-
-      await loadMessages(
-        false
-      );
-
-      showToast(
-        ids.length === 1
-          ? "Message deleted."
-          : "Messages deleted."
-      );
+      renderMessages();
     }
-
-    /* ==========================================
-       SELECTION
-    ========================================== */
-
-    selectionCancel.addEventListener(
-      "click",
-      () => {
-        exitSelection();
-      }
-    );
-
-    selectionDelete.addEventListener(
-      "click",
-      async () => {
-        await deleteSelectedMessages();
-      }
-    );
-
-    /* ==========================================
-       SEND
-    ========================================== */
 
     async function sendMessage() {
+      const text = input.value.trim();
 
-      if (
-        isSending
-      ) {
+      if (!text) {
         return;
       }
 
-      const content =
-        messageInput.value
-          .trim();
-
-      if (
-        !content ||
-        !currentUser
-      ) {
+      if (!currentUser) {
         return;
       }
 
-      isSending =
-        true;
+      sendButton.disabled = true;
 
-      sendButton.disabled =
-        true;
+      const { error } = await client
+        .from("messages")
+        .insert({
+          space_id: SPACE_ID,
+          sender_id: currentUser.id,
+          content: text
+        });
 
-      const {
-        error
-      } =
-        await client
-          .from(
-            "messages"
-          )
-          .insert({
-            space_id:
-              SPACE_ID,
+      sendButton.disabled = false;
 
-            sender_id:
-              currentUser.id,
-
-            content
-          });
-
-      if (
-        error
-      ) {
-
-        console.error(
-          "Send error:",
-          error
-        );
-
-        showToast(
-          error.message ||
-          "Message could not be sent.",
-          true
-        );
-
-        isSending =
-          false;
-
-        sendButton.disabled =
-          false;
-
+      if (error) {
+        console.error("SEND ERROR:", error);
+        alert(error.message);
         return;
       }
 
-      messageInput.value =
-        "";
+      input.value = "";
+      input.style.height = "40px";
 
-      autoResizeInput();
+      await loadMessages();
 
-      await loadMessages(
-        true
-      );
-
-      isSending =
-        false;
-
-      sendButton.disabled =
-        false;
-
-      messageInput.focus();
+      input.focus();
     }
 
-    /* ==========================================
-       INPUT
-    ========================================== */
-
-    messageInput.addEventListener(
-      "input",
-      autoResizeInput
-    );
-
-    messageInput.addEventListener(
-      "keydown",
-      async event => {
-
-        if (
-          event.key ===
-            "Enter" &&
-          !event.shiftKey
-        ) {
-
-          event.preventDefault();
-
-          await sendMessage();
-        }
-      }
-    );
-
-    messageForm.addEventListener(
-      "submit",
-      async event => {
-
-        event.preventDefault();
-
-        await sendMessage();
-      }
-    );
-
-    /* ==========================================
-       NAVIGATION
-    ========================================== */
-
-    function goHome() {
-      window.location.href =
-        "index.html";
-    }
-
-    backButton.addEventListener(
-      "click",
-      goHome
-    );
-
-    homeButton.addEventListener(
-      "click",
-      goHome
-    );
-
-    /* ==========================================
-       REALTIME
-    ========================================== */
-
-    function subscribeToMessages() {
-
-      if (
-        realtimeChannel
-      ) {
-
-        client.removeChannel(
-          realtimeChannel
-        );
-      }
-
-      realtimeChannel =
-        client
-          .channel(
-            "our-space-chat"
-          )
-
-          .on(
-            "postgres_changes",
-            {
-              event:
-                "INSERT",
-
-              schema:
-                "public",
-
-              table:
-                "messages",
-
-              filter:
-                `space_id=eq.${SPACE_ID}`
-            },
-
-            async () => {
-
-              await loadMessages(
-                true
-              );
-            }
-          )
-
-          .on(
-            "postgres_changes",
-            {
-              event:
-                "UPDATE",
-
-              schema:
-                "public",
-
-              table:
-                "messages",
-
-              filter:
-                `space_id=eq.${SPACE_ID}`
-            },
-
-            async () => {
-
-              await loadMessages(
-                false
-              );
-            }
-          )
-
-          .subscribe(
-            status => {
-
-              console.log(
-                "Realtime:",
-                status
-              );
-            }
-          );
-    }
-
-    /* ==========================================
-       DELIVERED / SEEN
-    ========================================== */
-
-    async function updateIncomingStatus() {
-
-      const {
-        data,
-        error
-      } =
-        await client
-          .from(
-            "messages"
-          )
-          .select(
-            `
-              id,
-              sender_id,
-              delivered_at,
-              seen_at
-            `
-          )
-          .eq(
-            "space_id",
-            SPACE_ID
-          )
-          .order(
-            "created_at",
-            {
-              ascending:
-                false
-            }
-          )
-          .limit(
-            100
-          );
-
-      if (
-        error ||
-        !data
-      ) {
+    async function markIncomingMessages() {
+      if (!currentUser || !messageRows.length) {
         return;
       }
 
-      const incoming =
-        data.filter(
-          message =>
-            message.sender_id !==
-            currentUser.id
-        );
+      const ids = messageRows
+        .filter(
+          (row) =>
+            row.sender_id !== currentUser.id
+        )
+        .map((row) => row.id);
 
-      if (
-        !incoming.length
-      ) {
+      if (!ids.length) {
         return;
       }
 
-      const deliveredIds =
-        incoming
-          .filter(
-            message =>
-              !message.delivered_at
-          )
-          .map(
-            message =>
-              Number(
-                message.id
-              )
-          );
-
-      if (
-        deliveredIds.length
-      ) {
-
+      try {
         await client.rpc(
           "mark_messages_delivered",
           {
-            p_message_ids:
-              deliveredIds
+            p_message_ids: ids
           }
+        );
+      } catch (error) {
+        console.warn(
+          "Delivered status unavailable:",
+          error
         );
       }
 
-      const seenIds =
-        incoming
-          .filter(
-            message =>
-              !message.seen_at
-          )
-          .map(
-            message =>
-              Number(
-                message.id
-              )
-          );
-
-      if (
-        seenIds.length
-      ) {
-
+      try {
         await client.rpc(
           "mark_messages_seen",
           {
-            p_message_ids:
-              seenIds
+            p_message_ids: ids
           }
         );
+      } catch (error) {
+        console.warn(
+          "Seen status unavailable:",
+          error
+        );
       }
-
-      await loadMessages(
-        false
-      );
     }
 
-    /* ==========================================
-       AUTH
-    ========================================== */
-
-    client.auth.onAuthStateChange(
-      (
-        event,
-        session
-      ) => {
-
-        if (
-          event ===
-            "SIGNED_OUT" ||
-          !session
-        ) {
-
-          window.location.href =
-            "login.html";
-        }
+    function subscribeRealtime() {
+      if (channel) {
+        client.removeChannel(channel);
       }
-    );
 
-    /* ==========================================
-       INITIALIZE
-    ========================================== */
+      channel = client
+        .channel("our-space-chat")
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "messages",
+            filter: "space_id=eq." + SPACE_ID
+          },
+          async () => {
+            await loadMessages();
+          }
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "UPDATE",
+            schema: "public",
+            table: "messages",
+            filter: "space_id=eq." + SPACE_ID
+          },
+          async () => {
+            await loadMessages();
+          }
+        )
+        .subscribe();
+    }
 
-    async function initializeChat() {
+    async function initialise() {
+      const { data, error } =
+        await client.auth.getSession();
 
-      const authenticated =
-        await checkAuthentication();
-
-      if (
-        !authenticated
-      ) {
+      if (error) {
+        console.error("SESSION ERROR:", error);
+        window.location.href = "login.html";
         return;
       }
 
-      await loadProfile();
+      if (!data.session || !data.session.user) {
+        window.location.href = "login.html";
+        return;
+      }
 
-      await loadMessages(
-        false
-      );
+      currentUser = data.session.user;
 
-      subscribeToMessages();
+      await loadMessages();
+      await markIncomingMessages();
+      await loadMessages();
 
-      await updateIncomingStatus();
-
-      scrollToBottom(
-        false
-      );
-
-      setTimeout(
-        () => {
-          messageInput.focus();
-        },
-        150
-      );
+      subscribeRealtime();
     }
 
-    initializeChat();
+    /*
+      SEND BUTTON
+    */
 
-    /* ==========================================
-       CLEANUP
-    ========================================== */
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      event.stopPropagation();
 
-    window.addEventListener(
-      "beforeunload",
-      () => {
+      await sendMessage();
+    });
 
+    /*
+      ENTER KEY
+      Enter = send
+      Shift + Enter = new line
+    */
+
+    input.addEventListener("keydown", async (event) => {
+      if (
+        event.key === "Enter" &&
+        !event.shiftKey &&
+        !event.isComposing
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        await sendMessage();
+      }
+    });
+
+    /*
+      AUTO-RESIZE TEXTAREA
+    */
+
+    input.addEventListener("input", () => {
+      input.style.height = "auto";
+
+      const height = Math.min(
+        input.scrollHeight,
+        130
+      );
+
+      input.style.height = height + "px";
+    });
+
+    homeButton.addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
+
+    logoutButton.addEventListener(
+      "click",
+      async () => {
+        await client.auth.signOut();
+        window.location.href = "login.html";
+      }
+    );
+
+    client.auth.onAuthStateChange(
+      (event, session) => {
         if (
-          realtimeChannel
+          event === "SIGNED_OUT" ||
+          !session
         ) {
-
-          client.removeChannel(
-            realtimeChannel
-          );
+          window.location.href = "login.html";
         }
       }
     );
-  </script>
 
+    initialise();
+  </script>
 </body>
 </html>
+```
