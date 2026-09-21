@@ -57,6 +57,9 @@ create trigger push_subscriptions_touch
 before update on public.push_subscriptions
 for each row execute function public.touch_push_subscription();
 
+alter function public.touch_push_subscription()
+set search_path = public;
+
 -- ============================================================
 -- MESSAGE COLUMNS
 -- ============================================================
@@ -228,8 +231,7 @@ begin
 end;
 $;
 
-revoke all on function public.broadcast_message_deleted() from public, anon;
-grant execute on function public.broadcast_message_deleted() to authenticated;
+revoke all on function public.broadcast_message_deleted() from public, anon, authenticated;
 
 drop trigger if exists messages_deleted_broadcast on public.messages;
 
