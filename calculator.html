@@ -429,12 +429,47 @@
 
     let unlockCode = DEFAULT_UNLOCK_CODE;
 
-    authClient.auth.getUser().then(({ data }) => {
-      const remoteCode = data?.user?.user_metadata?.calculator_code;
+    const allowedThemes = new Set([
+      "warm",
+      "dark",
+      "ocean",
+      "forest"
+    ]);
+
+    async function loadAccountSettings() {
+      const {
+        data: {
+          user
+        },
+        error
+      } =
+        await authClient.auth.getUser();
+
+      if (error || !user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      const savedTheme =
+        user.user_metadata?.our_space_theme || "warm";
+
+      document.documentElement.dataset.theme =
+        allowedThemes.has(savedTheme)
+          ? savedTheme
+          : "warm";
+
+      const remoteCode =
+        user.user_metadata?.calculator_code;
+
       if (/^\d{4,12}$/.test(remoteCode || "")) {
         unlockCode = remoteCode;
       }
-    }).catch(() => {});
+    }
+
+    loadAccountSettings().catch((error) => {
+      console.error("Account settings error:", error);
+      window.location.href = "login.html";
+    });
 
     const display = document.getElementById("display");
 
