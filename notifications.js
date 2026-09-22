@@ -107,11 +107,46 @@
 
       // Startup only restores an already-existing subscription.
       // New subscriptions are created only from the explicit Enable button.
-      const existing = await notificationRegistration.pushManager.getSubscription();
+      let existing = await notificationRegistration.pushManager.getSubscription();
       if (existing) {
-        // A browser has one push subscription, so when the signed-in Our Space
-        // account changes, transfer that subscription to the current account
-        // instead of silently leaving the new account without push delivery.
+        const ownerClient = await getClient();
+        const { data: ownedSubscription, error: ownerLookupError } = await ownerClient
+          .from("push_subscriptions")
+          .select("id")
+          .eq("user_id", notificationUser.id)
+          .eq("endpoint", existing.endpoint)
+          .maybeSingle();
+
+        if (ownerLookupError) {
+          console.warn("Could not verify the current notification subscription owner:", ownerLookupError);
+        } else if (ownedSubscription) {
+          await syncSubscription(existing, await getPreviewEnabled());
+        } else if (Notification.permission === "granted") {
+          // The browser subscription can belong to the previous Our Space account.
+          // We cannot update that row through RLS, so detach it and create a
+          // fresh subscription for the account that is currently signed in.
+          try {
+            await existing.unsubscribe();
+          } catch (error) {
+            console.warn("Could not detach the previous account push subscription:", error);
+          }
+
+          const publicKey = await getVapidPublicKey();
+          existing = await notificationRegistration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: base64ToUint8Array(publicKey)
+          });
+
+          await syncSubscription(existing, await getPreviewEnabled());
+        }
+      } else if (Notification.permission === "granted") {
+        // Permission was already granted on this device. Recreate the
+        // browser subscription automatically for the currently signed-in account.
+        const publicKey = await getVapidPublicKey();
+        existing = await notificationRegistration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: base64ToUint8Array(publicKey)
+        });
         await syncSubscription(existing, await getPreviewEnabled());
       }
 
