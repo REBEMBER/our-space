@@ -138,12 +138,12 @@
     </section>
 
     <section class="section">
-      <div class="section-head"><h2 class="section-title">Calculator code</h2><p class="section-description">Use exactly 4 digits for the private calculator unlock.</p></div>
+      <div class="section-head"><h2 class="section-title">Our Space code</h2><p class="section-description">Use exactly 4 digits for the private calculator unlock.</p></div>
       <div class="form-grid">
         <div class="field"><label for="calculatorCode">New calculator code</label><input id="calculatorCode" type="text" inputmode="numeric" autocomplete="off" minlength="4" maxlength="4" pattern="[0-9]{4}" placeholder="••••"></div>
         <div class="field"><label for="calculatorCodeConfirm">Confirm code</label><input id="calculatorCodeConfirm" type="password" inputmode="numeric" autocomplete="new-password" minlength="4" maxlength="4" placeholder="••••"></div>
       </div>
-      <div class="action-row"><button class="primary-button" id="saveCalculatorCode" type="button">Save calculator code</button><button class="secondary-button" id="resetCalculatorCode" type="button">Reset to default</button></div>
+      <div class="action-row"><button class="primary-button" id="saveOur SpaceCode" type="button">Save calculator code</button><button class="secondary-button" id="resetOur SpaceCode" type="button">Reset to default</button></div>
       <div class="status" id="calculatorStatus"></div>
     </section>
 
@@ -159,12 +159,12 @@
     </section>
 
     <section class="section">
-      <div class="section-head"><h2 class="section-title">Notifications</h2><p class="section-description">Choose how your calculator notification appears when your partner sends a message.</p></div>
+      <div class="section-head"><h2 class="section-title">Notifications</h2><p class="section-description">Choose how your Our Space notification appears when your partner sends a message.</p></div>
       <div class="account-line" style="display:flex;align-items:center;justify-content:space-between;gap:14px;">
-        <div><div class="account-label">Notification</div><div class="account-value">Calculator</div></div>
+        <div><div class="account-label">Notification</div><div class="account-value">Our Space</div></div>
         <label style="display:flex;align-items:center;gap:9px;margin:0;cursor:pointer;">
-          <span id="calculatorNotificationState" style="font-size:11px;font-weight:800;color:var(--muted)">ON</span>
-          <input id="calculatorNotificationToggle" type="checkbox" checked style="width:20px;height:20px;accent-color:var(--navy);">
+          <span id="ourSpaceNotificationState" style="font-size:11px;font-weight:800;color:var(--muted)">ON</span>
+          <input id="ourSpaceNotificationToggle" type="checkbox" checked style="width:20px;height:20px;accent-color:var(--navy);">
         </label>
       </div>
       <div class="action-row"><button class="primary-button" id="enableNotifications" type="button">Enable notifications</button></div>
@@ -226,7 +226,7 @@
       });
     });
 
-    function normalizeCalculatorCode(value){
+    function normalizeOur SpaceCode(value){
       return String(value||"").trim()
         .replace(/[٠-٩]/g,d=>String(d.charCodeAt(0)-0x0660))
         .replace(/[۰-۹]/g,d=>String(d.charCodeAt(0)-0x06F0));
@@ -236,9 +236,9 @@
       return value.length===4 && [...value].every(char=>char>="0"&&char<="9");
     }
 
-    document.getElementById("saveCalculatorCode").addEventListener("click",async()=>{
-      const code=normalizeCalculatorCode(document.getElementById("calculatorCode").value);
-      const confirm=normalizeCalculatorCode(document.getElementById("calculatorCodeConfirm").value);
+    document.getElementById("saveOur SpaceCode").addEventListener("click",async()=>{
+      const code=normalizeOur SpaceCode(document.getElementById("calculatorCode").value);
+      const confirm=normalizeOur SpaceCode(document.getElementById("calculatorCodeConfirm").value);
       const status=document.getElementById("calculatorStatus");
       if(!isExactlyFourDigits(code)){
         setStatus(status,"Use exactly 4 digits (for example 1234).","error");
@@ -246,19 +246,19 @@
       }
       if(code!==confirm){setStatus(status,"The codes do not match.","error");return;}
       const {error}=await client.auth.updateUser({data:{calculator_code:code}});
-      if(error){console.error("Calculator code error:",error);setStatus(status,error.message||"Could not save the calculator code.","error");return;}
+      if(error){console.error("Our Space code error:",error);setStatus(status,error.message||"Could not save the calculator code.","error");return;}
       document.getElementById("calculatorCode").value="";
       document.getElementById("calculatorCodeConfirm").value="";
-      setStatus(status,"Calculator code updated.","success");
+      setStatus(status,"Our Space code updated.","success");
     });
 
-    document.getElementById("resetCalculatorCode").addEventListener("click",async()=>{
+    document.getElementById("resetOur SpaceCode").addEventListener("click",async()=>{
       const status=document.getElementById("calculatorStatus");
       const {error}=await client.auth.updateUser({data:{calculator_code:DEFAULT_CALCULATOR_CODE}});
-      if(error){console.error("Calculator reset error:",error);setStatus(status,error.message||"Could not reset the code.","error");return;}
+      if(error){console.error("Our Space reset error:",error);setStatus(status,error.message||"Could not reset the code.","error");return;}
       document.getElementById("calculatorCode").value="";
       document.getElementById("calculatorCodeConfirm").value="";
-      setStatus(status,"Calculator code reset to the default.","success");
+      setStatus(status,"Our Space code reset to the default.","success");
     });
 
     document.getElementById("savePassword").addEventListener("click",async()=>{
@@ -326,8 +326,8 @@
         await window.OurSpaceNotifications.register(user);
         const button=document.getElementById("enableNotifications");
         const status=document.getElementById("notificationStatus");
-        const toggle=document.getElementById("calculatorNotificationToggle");
-        const toggleState=document.getElementById("calculatorNotificationState");
+        const toggle=document.getElementById("ourSpaceNotificationToggle");
+        const toggleState=document.getElementById("ourSpaceNotificationState");
         const permission=window.OurSpaceNotifications.permission;
         const previewEnabled=await window.OurSpaceNotifications.getPreviewEnabled();
         toggle.checked=previewEnabled;
@@ -335,7 +335,7 @@
 
         if(permission==="granted"){
           button.textContent="Notifications enabled";
-          setStatus(status,"Calculator notifications are enabled on this device.","success");
+          setStatus(status,"Our Space notifications are enabled on this device.","success");
         }else if(permission==="denied"){
           button.textContent="Notifications blocked";
           setStatus(status,"Notifications are blocked in your browser settings.","error");
@@ -343,9 +343,9 @@
       }
     }
 
-    document.getElementById("calculatorNotificationToggle").addEventListener("change",async(event)=>{
+    document.getElementById("ourSpaceNotificationToggle").addEventListener("change",async(event)=>{
       const toggle=event.target;
-      const state=document.getElementById("calculatorNotificationState");
+      const state=document.getElementById("ourSpaceNotificationState");
       const status=document.getElementById("notificationStatus");
       const enabled=toggle.checked;
       state.textContent=enabled?"ON":"OFF";
@@ -354,7 +354,7 @@
         if(!synced){
           setStatus(status,"Enable notifications first, then this choice will sync.","error");
         }else{
-          setStatus(status,enabled?"Calculator notifications will show Salma and the message.":"Calculator notifications will hide the message preview.","success");
+          setStatus(status,enabled?"Our Space notifications will show Salma and the message.":"Our Space notifications will hide the message preview.","success");
         }
       }catch(error){
         console.error("Notification preference error:",error);
@@ -371,9 +371,9 @@
       try{
         const enabled=await window.OurSpaceNotifications.enable();
         if(enabled){
-          await window.OurSpaceNotifications.setPreviewEnabled(document.getElementById("calculatorNotificationToggle").checked);
+          await window.OurSpaceNotifications.setPreviewEnabled(document.getElementById("ourSpaceNotificationToggle").checked);
           button.textContent="Notifications enabled";
-          setStatus(status,"Calculator notifications are enabled on this device.","success");
+          setStatus(status,"Our Space notifications are enabled on this device.","success");
         }else{
           button.textContent="Enable notifications";
           setStatus(status,"Notifications were not enabled. Check your browser permission.","error");
