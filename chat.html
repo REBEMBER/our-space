@@ -2996,7 +2996,7 @@ function renderError(message) {
     input.addEventListener(
       "input",
       () => {
-        if (replySuggestions.length && input.value.trim()) {
+        if (replySuggestion && input.value.trim()) {
           clearReplySuggestion();
         }
       }
