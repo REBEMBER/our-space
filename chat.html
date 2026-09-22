@@ -191,10 +191,14 @@
       bottom: 0;
       overflow-y: auto;
 
-      /* The composer floats above this layer. Reserve its exact measured
-         height inside the scroll content so the final bubble can always
-         scroll completely above the composer, including on iPhone. */
-      padding-bottom: calc(var(--composer-height, 100px) + 24px);
+      /*
+        The composer is fixed above this scroll layer. Do NOT rely on
+        padding on the scroll container to create the safe area: browsers
+        can treat that padding differently when calculating the maximum
+        scroll position. The messages content gets a real bottom spacer
+        instead (see .messages-container::after below).
+      */
+      padding-bottom: 0;
       scroll-padding-bottom: calc(var(--composer-height, 100px) + 24px);
 
       -webkit-overflow-scrolling: touch;
@@ -227,7 +231,24 @@
       flex-direction: column;
       justify-content: flex-start;
       padding:
-        24px 17px 8px;
+        24px 17px 12px;
+    }
+
+    /*
+      Real scrollable bottom clearance.
+
+      This is deliberately an actual flex item inside the scroll content,
+      rather than scroll-container padding. The composer is position:fixed,
+      so the final message needs enough real document height to move above
+      it when the user reaches the absolute bottom.
+    */
+    .messages-container::after {
+      content: "";
+      display: block;
+      flex: 0 0 calc(var(--composer-height, 100px) + 24px);
+      height: calc(var(--composer-height, 100px) + 24px);
+      width: 100%;
+      pointer-events: none;
     }
 
     /* =========================
@@ -938,7 +959,7 @@
       }
 
       .messages-container {
-        padding-bottom: 8px;
+        padding-bottom: 12px;
       }
 
       .message-content {
@@ -1422,8 +1443,8 @@
               messagesScroll.clientHeight
             );
 
-          // Scroll to the absolute content end. The reserved bottom spacer
-          // keeps the final bubble visibly above the fixed composer.
+          // The real bottom spacer inside .messages-container makes this
+          // absolute end safe: the last bubble sits above the fixed composer.
           messagesScroll.scrollTop = maxScroll;
         });
       });
