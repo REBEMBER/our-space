@@ -109,7 +109,17 @@
       // New subscriptions are created only from the explicit Enable button.
       const existing = await notificationRegistration.pushManager.getSubscription();
       if (existing) {
-        await syncSubscription(existing, await getPreviewEnabled());
+        const ownerCheckClient = await getClient();
+        const { data: ownedSubscription } = await ownerCheckClient
+          .from("push_subscriptions")
+          .select("id")
+          .eq("user_id", notificationUser.id)
+          .eq("endpoint", existing.endpoint)
+          .maybeSingle();
+
+        if (ownedSubscription) {
+          await syncSubscription(existing, await getPreviewEnabled());
+        }
       }
 
       await clearAppNotifications();
@@ -249,11 +259,19 @@
   }
 
   async function isNotificationsEnabled() {
-    if (!("serviceWorker" in navigator)) return false;
+    if (!("serviceWorker" in navigator) || !notificationUser || !notificationUser.id) return false;
     const registration = notificationRegistration || await navigator.serviceWorker.getRegistration("/");
     if (!registration) return false;
     const subscription = await registration.pushManager.getSubscription();
-    return Boolean(subscription);
+    if (!subscription) return false;
+    const client = await getClient();
+    const result = await client
+      .from("push_subscriptions")
+      .select("id")
+      .eq("user_id", notificationUser.id)
+      .eq("endpoint", subscription.endpoint)
+      .maybeSingle();
+    return !result.error && Boolean(result.data);
   }
 
   async function getPreviewEnabled() {
