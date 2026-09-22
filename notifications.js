@@ -199,6 +199,63 @@
     return true;
   }
 
+  async function disableNotifications() {
+    if (!notificationUser?.id) {
+      const client = await getClient();
+      const { data:{ user }, error } = await client.auth.getUser();
+      if (error || !user) throw new Error("Please log in again.");
+      notificationUser = user;
+    }
+
+    if (!("serviceWorker" in navigator)) return true;
+
+    const registration = notificationRegistration || await navigator.serviceWorker.getRegistration("/");
+    const subscription = registration
+      ? await registration.pushManager.getSubscription()
+      : null;
+
+    if (subscription) {
+      const endpoint = subscription.endpoint;
+      const unsubscribed = await subscription.unsubscribe();
+
+      if (!unsubscribed) {
+        throw new Error("The browser did not turn off notifications.");
+      }
+
+      const client = await getClient();
+      const { error } = await client
+        .from("push_subscriptions")
+        .delete()
+        .eq("endpoint", endpoint)
+        .eq("user_id", notificationUser.id);
+
+      if (error) {
+        console.warn("Could not remove the saved notification subscription:", error);
+      }
+    } else {
+      const client = await getClient();
+      const { error } = await client
+        .from("push_subscriptions")
+        .delete()
+        .eq("user_id", notificationUser.id);
+
+      if (error) {
+        console.warn("Could not clear saved notification subscriptions:", error);
+      }
+    }
+
+    await clearAppNotifications();
+    return true;
+  }
+
+  async function isNotificationsEnabled() {
+    if (!("serviceWorker" in navigator)) return false;
+    const registration = notificationRegistration || await navigator.serviceWorker.getRegistration("/");
+    if (!registration) return false;
+    const subscription = await registration.pushManager.getSubscription();
+    return Boolean(subscription);
+  }
+
   async function getPreviewEnabled() {
     const client = await getClient();
     if (!notificationUser?.id) return true;
@@ -309,6 +366,8 @@
     enable: enableNotifications,
     sendMessage: sendMessageNotification,
     sendTest: sendTestNotification,
+    disable: disableNotifications,
+    isEnabled: isNotificationsEnabled,
     getPreviewEnabled,
     setPreviewEnabled,
     get permission() {
