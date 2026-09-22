@@ -66,6 +66,20 @@
     return true;
   }
 
+  async function clearAppNotifications() {
+    if (!("serviceWorker" in navigator)) return;
+
+    try {
+      const registration = notificationRegistration || await navigator.serviceWorker.ready;
+      const worker = registration.active || navigator.serviceWorker.controller;
+      if (worker) {
+        worker.postMessage({ type: "CLEAR_OUR_SPACE_NOTIFICATIONS" });
+      }
+    } catch (error) {
+      console.warn("Could not clear Our Space notifications:", error);
+    }
+  }
+
   async function registerNotifications(user) {
     notificationUser = user;
     lastError = null;
@@ -98,6 +112,7 @@
         await syncSubscription(existing, await getPreviewEnabled());
       }
 
+      await clearAppNotifications();
       return notificationRegistration;
     } catch (error) {
       lastError = error;
@@ -257,6 +272,16 @@
     }
     return data;
   }
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      clearAppNotifications();
+    }
+  });
+
+  window.addEventListener("pageshow", () => {
+    clearAppNotifications();
+  });
 
   window.OurSpaceNotifications = {
     register: registerNotifications,
