@@ -12,27 +12,10 @@ self.addEventListener("push", (event) => {
     let data = {};
     try { data = event.data ? event.data.json() : {}; } catch (_) {}
 
-    const clientsList = await self.clients.matchAll({
-      type: "window",
-      includeUncontrolled: true
-    });
-
-    const chatOpen = clientsList.some((client) => {
-      try {
-        const url = new URL(client.url);
-        return url.pathname.endsWith("/chat.html") &&
-               client.visibilityState === "visible";
-      } catch (_) {
-        return false;
-      }
-    });
-
-    if (chatOpen) return;
-
     const previewEnabled = data.preview_enabled !== false;
     const title = previewEnabled
       ? (data.sender_name || "Salma")
-      : "Calculation time";
+      : "Our Space";
 
     const body = previewEnabled
       ? (data.content || "You have a new message.")
