@@ -12,6 +12,8 @@
 <meta name="theme-color" content="#F8F0EC">
 <title>Our Space</title>
 <script src="/theme.js?v=final"></script>
+<style>html.theme-pending body{visibility:hidden}</style>
+<script>document.documentElement.classList.add("theme-pending");</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
@@ -226,6 +228,7 @@ async function checkAuthentication(){
   const {data:{user},error}=await client.auth.getUser();
   if(error||!user){go("login.html");return false}
   window.OurSpaceTheme.syncFromUser(user);
+  document.documentElement.classList.remove("theme-pending");
   return user;
 }
 
