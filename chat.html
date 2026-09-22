@@ -2551,17 +2551,6 @@ function renderError(message) {
       "click",
       sendReplySuggestion
     );
-
-    replyAssistLike.addEventListener(
-      "click",
-      () => rateReply(1)
-    );
-
-    replyAssistDislike.addEventListener(
-      "click",
-      () => rateReply(-1)
-    );
-
     replyAssistClose.addEventListener(
       "click",
       clearReplySuggestion
