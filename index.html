@@ -64,7 +64,7 @@ button:focus-visible{outline:3px solid rgba(243,178,159,.65);outline-offset:3px}
 .header{height:64px;display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:18px}
 .brand{display:flex;align-items:center;gap:12px}
 .brand-mark{width:44px;height:44px;border-radius:15px;background:var(--navy);color:var(--hero-text);display:grid;place-items:center;box-shadow:0 10px 24px rgba(21,43,70,.15)}
-.brand-mark svg{width:21px;height:21px}
+.brand-mark img{display:block;width:44px;height:44px;border-radius:15px}
 .brand-title{color:var(--navy);font-size:16px;font-weight:850;letter-spacing:.1em}
 .brand-subtitle{margin-top:3px;color:var(--muted);font-size:12px}
 .desktop-nav{display:flex;align-items:center;gap:5px;padding:5px;background:rgba(255,255,255,.78);border:1px solid var(--line);border-radius:17px}
@@ -129,11 +129,7 @@ button:focus-visible{outline:3px solid rgba(243,178,159,.65);outline-offset:3px}
   <header class="header">
     <div class="brand">
       <div class="brand-mark" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="5" y="2.8" width="14" height="18.4" rx="2.2"/>
-          <path d="M8 6h8"/>
-          <path d="M8 10h2M14 10h2M8 14h2M14 14h2M8 18h2M14 18h2"/>
-        </svg>
+        <img src="/calculator.png" alt="" width="44" height="44">
       </div>
       <div><div class="brand-title">OUR SPACE</div><div class="brand-subtitle">Private space for two</div></div>
     </div>
