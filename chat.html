@@ -1577,6 +1577,19 @@
         });
       });
 
+      // Normal realtime/composer-driven scrolls only need a short
+      // stabilization window. Explicit entry/photo settling uses the
+      // longer lock below.
+      bottomScrollTimers.forEach(clearTimeout);
+      bottomScrollTimers = [
+        setTimeout(() => {
+          if (token === bottomScrollToken) {
+            stickToBottom = false;
+            bottomScrollTimers = [];
+          }
+        }, 1200)
+      ];
+
       return token;
     }
 
@@ -1635,6 +1648,20 @@
     });
     messagesScroll.addEventListener("pointerdown", userStartedScrollingChat, {
       passive: true
+    });
+
+    messagesScroll.addEventListener("keydown", (event) => {
+      if (
+        event.key === "ArrowUp" ||
+        event.key === "ArrowDown" ||
+        event.key === "PageUp" ||
+        event.key === "PageDown" ||
+        event.key === "Home" ||
+        event.key === "End" ||
+        event.key === " "
+      ) {
+        userStartedScrollingChat();
+      }
     });
 
     function dateKey(value) {
