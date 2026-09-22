@@ -2297,8 +2297,7 @@ function renderError(message) {
 
       replyAssist.classList.add("visible");
       replyAssistStatus.textContent = "Thinking...";
-      replyAssistSuggestion.textContent = "Generating the best reply for this moment...";
-      setReplyButtonsEnabled(false);
+      replyAssistSuggestions.textContent = "Generating three reply options...";
       syncLayoutMetrics();
 
       try {
@@ -2344,9 +2343,8 @@ function renderError(message) {
         });
       } catch (error) {
         replyAssistStatus.textContent = "Error";
-        replyAssistSuggestion.textContent =
+        replyAssistSuggestions.textContent =
           error.message || "Could not generate a reply.";
-        setReplyButtonsEnabled(false);
       } finally {
         bestReplyButton.disabled = false;
         bestReplyButton.innerHTML =
