@@ -3153,6 +3153,35 @@ function renderError(message) {
             }
           }
         )
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "message_reactions"
+          },
+          (payload) => {
+            const incoming = payload.new || payload.old || {};
+            if (!incoming?.id) return;
+
+            if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
+              messageReactions = [
+                ...messageReactions.filter((item) => item.id !== incoming.id),
+                incoming
+              ];
+              renderMessages();
+              return;
+            }
+
+            if (payload.eventType === "DELETE") {
+              messageReactions = messageReactions.filter(
+                (item) => item.id !== incoming.id
+              );
+              renderMessages();
+            }
+          }
+        )
+
         .subscribe((status, error) => {
           console.log("Our Space realtime:", status, error || "");
 
