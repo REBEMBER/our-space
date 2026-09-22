@@ -2137,15 +2137,7 @@ function renderError(message) {
         `;
       }
 
-      messagesEl.innerHTML =
-        html +
-        `
-          <div
-            class="messages-scroll-anchor"
-            id="messagesScrollAnchor"
-            aria-hidden="true"
-          ></div>
-        `;
+      messagesEl.innerHTML = html;
 
       setupVisibleMessageObserver();
     }
