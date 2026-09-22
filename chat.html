@@ -191,13 +191,6 @@
       bottom: var(--composer-height, 100px);
       overflow-y: auto;
 
-      /*
-        The composer is fixed above this scroll layer. Do NOT rely on
-        padding on the scroll container to create the safe area: browsers
-        can treat that padding differently when calculating the maximum
-        scroll position. The messages content gets a real bottom spacer
-        instead (see .messages-container::after below).
-      */
       padding-bottom: 0;
 
       -webkit-overflow-scrolling: touch;
@@ -231,18 +224,6 @@
       justify-content: flex-start;
       padding:
         24px 17px 12px;
-    }
-
-    /*
-      Real bottom clearance is an actual DOM element, not a pseudo-element.
-      The fixed composer sits outside the scroll container, so this spacer
-      gives the final message real scrollable room to sit above it.
-    */
-    .messages-scroll-anchor {
-      flex: 0 0 calc(var(--composer-height, 100px) + 24px);
-      height: calc(var(--composer-height, 100px) + 24px);
-      width: 100%;
-      pointer-events: none;
     }
 
     /* =========================
