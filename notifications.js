@@ -245,8 +245,6 @@
   }
 
   async function sendTestNotification() {
-    // The test button itself is a user gesture, so use it to repair a missing
-    // browser subscription before asking the server to send the test push.
     await enableNotifications();
 
     const client = await getClient();
