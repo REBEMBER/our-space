@@ -143,7 +143,7 @@
         <div class="field"><label for="calculatorCode">New calculator code</label><input id="calculatorCode" type="text" inputmode="numeric" autocomplete="off" minlength="4" maxlength="4" pattern="[0-9]{4}" placeholder="••••"></div>
         <div class="field"><label for="calculatorCodeConfirm">Confirm code</label><input id="calculatorCodeConfirm" type="password" inputmode="numeric" autocomplete="new-password" minlength="4" maxlength="4" placeholder="••••"></div>
       </div>
-      <div class="action-row"><button class="primary-button" id="saveOur SpaceCode" type="button">Save calculator code</button><button class="secondary-button" id="resetOur SpaceCode" type="button">Reset to default</button></div>
+      <div class="action-row"><button class="primary-button" id="saveCalculatorCode" type="button">Save calculator code</button><button class="secondary-button" id="resetCalculatorCode" type="button">Reset to default</button></div>
       <div class="status" id="calculatorStatus"></div>
     </section>
 
@@ -226,7 +226,7 @@
       });
     });
 
-    function normalizeOur SpaceCode(value){
+    function normalizeCalculatorCode(value){
       return String(value||"").trim()
         .replace(/[٠-٩]/g,d=>String(d.charCodeAt(0)-0x0660))
         .replace(/[۰-۹]/g,d=>String(d.charCodeAt(0)-0x06F0));
@@ -236,9 +236,9 @@
       return value.length===4 && [...value].every(char=>char>="0"&&char<="9");
     }
 
-    document.getElementById("saveOur SpaceCode").addEventListener("click",async()=>{
-      const code=normalizeOur SpaceCode(document.getElementById("calculatorCode").value);
-      const confirm=normalizeOur SpaceCode(document.getElementById("calculatorCodeConfirm").value);
+    document.getElementById("saveCalculatorCode").addEventListener("click",async()=>{
+      const code=normalizeCalculatorCode(document.getElementById("calculatorCode").value);
+      const confirm=normalizeCalculatorCode(document.getElementById("calculatorCodeConfirm").value);
       const status=document.getElementById("calculatorStatus");
       if(!isExactlyFourDigits(code)){
         setStatus(status,"Use exactly 4 digits (for example 1234).","error");
@@ -252,7 +252,7 @@
       setStatus(status,"Our Space code updated.","success");
     });
 
-    document.getElementById("resetOur SpaceCode").addEventListener("click",async()=>{
+    document.getElementById("resetCalculatorCode").addEventListener("click",async()=>{
       const status=document.getElementById("calculatorStatus");
       const {error}=await client.auth.updateUser({data:{calculator_code:DEFAULT_CALCULATOR_CODE}});
       if(error){console.error("Our Space reset error:",error);setStatus(status,error.message||"Could not reset the code.","error");return;}
