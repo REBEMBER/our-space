@@ -46,7 +46,7 @@ button{cursor:pointer}
 .chat-delete:hover{background:var(--surface);color:var(--navy)}
 .empty-history{padding:24px 10px;color:var(--muted);font-size:11px;line-height:1.6;text-align:center}
 .side-foot{padding-top:8px}
-.side-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}.share-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--soft);margin-bottom:10px}.share-copy{min-width:0}.share-title{font-size:11px;font-weight:800;color:var(--navy)}.share-text{font-size:10px;line-height:1.5;color:var(--muted);margin-top:4px}.share-toggle{min-width:72px;height:34px;border:1px solid var(--border);border-radius:999px;background:var(--surface);color:var(--navy);font-size:10px;font-weight:800}.share-toggle.on{background:var(--navy);color:var(--surface);border-color:var(--navy)}.share-status{font-size:10px;line-height:1.5;color:var(--muted);padding:6px 2px 2px}
+.side-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .side-action{height:36px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--navy);font-size:10px;font-weight:700}
 .workspace{min-width:0;flex:1;display:flex;flex-direction:column;padding-left:4px}
 .topbar{height:47px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:2px 2px 8px}
@@ -131,7 +131,6 @@ button{cursor:pointer}
       <div class="side-foot">
         <div class="side-actions">
           <button class="side-action" id="memories">Memory</button>
-          <button class="side-action" id="sharing">AI sharing</button>
           <button class="side-action" id="home">Home</button>
         </div>
       </div>
@@ -172,26 +171,10 @@ button{cursor:pointer}
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="m4 4 16 8-16 8 3-8-3-8Z"/><path d="M7 12h13"/></svg>
             </button>
           </div>
-          <div class="hint">Relationship-aware AI. Do not share passwords or API keys.</div>
+          <div class="hint">Do not share passwords or API keys.</div>
         </form>
       </section>
     </main>
-  </div>
-</div>
-
-<div class="modal-layer" id="sharingModal">
-  <div class="modal">
-    <div class="modal-head"><div class="modal-title">AI sharing</div><button class="close" id="closeSharing">×</button></div>
-    <div class="modal-body">
-      <div class="share-row">
-        <div class="share-copy">
-          <div class="share-title">Share my AI conversations with my partner</div>
-          <div class="share-text">When enabled, your partner can read your saved AI chats. Your sharing is off by default, and your partner cannot send messages into your chats.</div>
-        </div>
-        <button class="share-toggle" id="shareToggle" type="button" aria-pressed="false">Off</button>
-      </div>
-      <div class="share-status" id="shareStatus">Loading sharing status…</div>
-    </div>
   </div>
 </div>
 
@@ -209,7 +192,7 @@ const API="/api/ai";
 const {createClient}=supabase;
 const client=createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
 const $=id=>document.getElementById(id);
-let currentUser=null,currentSession=null,currentChatId=null,currentChatOwnerId=null,chats=[],sharedChats=[],messages=[],busy=false,viewingSharedChat=false;
+let currentUser=null,currentSession=null,currentChatId=null,chats=[],messages=[],busy=false;
 
 function escapeText(v){return String(v||"").trim()}
 function sameDay(a,b){return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate()}
@@ -255,72 +238,53 @@ async function migrateLocalHistory(){
 }
 
 async function loadChats(){
-  const {data,error}=await client.from("ai_chats").select("id,user_id,title,created_at,updated_at").order("updated_at",{ascending:false}).limit(1000);
+  const {data,error}=await client.from("ai_chats").select("id,title,created_at,updated_at").order("updated_at",{ascending:false}) .limit(1000);
   if(error){console.error(error);return}
-  const rows=data||[];
-  chats=rows.filter(c=>String(c.user_id)===String(currentUser.id));
-  sharedChats=rows.filter(c=>String(c.user_id)!==String(currentUser.id));
+  chats=data||[];
   renderChats();
-}
-
-function renderChatGroup(root,label,items,query,shared=false){
-  const filtered=items.filter(c=>!query||String(c.title||"").toLowerCase().includes(query));
-  if(!filtered.length)return false;
-  const heading=document.createElement("div");heading.className="group-title";heading.textContent=label;root.appendChild(heading);
-  const groups={};
-  filtered.forEach(c=>{const g=groupName(c.updated_at);(groups[g] ||= []).push(c)});
-  ["Today","Yesterday","Previous 7 days","Older"].forEach(g=>{
-    if(!groups[g])return;
-    const timeTitle=document.createElement("div");timeTitle.className="group-title";timeTitle.style.paddingTop="6px";timeTitle.style.fontSize="8px";timeTitle.textContent=g;root.appendChild(timeTitle);
-    groups[g].forEach(c=>{
-      const item=document.createElement("button");item.className="chat-item"+(c.id===currentChatId?" active":"");item.type="button";
-      const label=document.createElement("span");label.className="chat-label";label.textContent=c.title||"New chat";
-      const del=document.createElement("span");del.className="chat-delete";del.textContent=shared?"":"×";del.title=shared?"Shared chat":"Delete chat";
-      if(!shared)del.addEventListener("click",async e=>{e.stopPropagation();await deleteChat(c.id)});
-      item.append(label,del);item.addEventListener("click",()=>selectChat(c.id,c.user_id));root.appendChild(item);
-    });
-  });
-  return true;
 }
 
 function renderChats(){
   const root=$("history"),query=$("search").value.trim().toLowerCase();
   root.innerHTML="";
-  const ownVisible=renderChatGroup(root,"Your chats",chats,query,false);
-  const sharedVisible=renderChatGroup(root,"Shared with you",sharedChats,query,true);
-  if(!ownVisible&&!sharedVisible)root.innerHTML='<div class="empty-history">No saved chats yet.</div>';
+  const filtered=chats.filter(c=>!query||String(c.title||"").toLowerCase().includes(query));
+  if(!filtered.length){root.innerHTML='<div class="empty-history">No saved chats yet.</div>';return}
+  const groups={};
+  filtered.forEach(c=>{const g=groupName(c.updated_at);(groups[g] ||= []).push(c)});
+  ["Today","Yesterday","Previous 7 days","Older"].forEach(g=>{
+    if(!groups[g])return;
+    const title=document.createElement("div");title.className="group-title";title.textContent=g;root.appendChild(title);
+    groups[g].forEach(c=>{
+      const item=document.createElement("button");item.className="chat-item"+(c.id===currentChatId?" active":"");item.type="button";
+      const label=document.createElement("span");label.className="chat-label";label.textContent=c.title||"New chat";
+      const del=document.createElement("span");del.className="chat-delete";del.textContent="×";del.title="Delete chat";
+      del.addEventListener("click",async e=>{e.stopPropagation();await deleteChat(c.id)});
+      item.append(label,del);item.addEventListener("click",()=>selectChat(c.id));root.appendChild(item);
+    });
+  });
 }
 
-async function selectChat(id,ownerId){
+async function selectChat(id){
   closeSidebar();
   currentChatId=id;
-  const chat=[...chats,...sharedChats].find(c=>c.id===id);
-  currentChatOwnerId=String(ownerId||chat?.user_id||"");
-  viewingSharedChat=currentChatOwnerId!==String(currentUser.id);
   $("status").textContent="Loading…";
+  const chat=chats.find(c=>c.id===id);
   $("chatTitle").textContent=chat?.title||"Chat";
-  $("form").style.display=viewingSharedChat?"none":"block";
-  $("composeHint").textContent=viewingSharedChat?"Shared AI conversation · read-only":"Relationship-aware AI. Do not share passwords or API keys.";
   const {data,error}=await client.from("ai_messages").select("id,role,content,created_at").eq("chat_id",id).order("created_at",{ascending:true});
   if(error){$("status").textContent="Error";return}
   messages=data||[];
   renderMessages();
-  $("status").textContent=viewingSharedChat?"Shared by partner · read-only":"Ready";
+  $("status").textContent="Ready";
   renderChats();
 }
 
 async function createChat(){
-  const {data,error}=await client.from("ai_chats").insert({user_id:currentUser.id,title:"New chat"}).select("id,user_id,title,created_at,updated_at").single();
+  const {data,error}=await client.from("ai_chats").insert({user_id:currentUser.id,title:"New chat"}).select("id,title,created_at,updated_at").single();
   if(error||!data)throw error||new Error("Could not create chat.");
   chats.unshift(data);
   currentChatId=data.id;
-  currentChatOwnerId=currentUser.id;
-  viewingSharedChat=false;
-  $("form").style.display="block";
-  $("composeHint").textContent="Relationship-aware AI. Do not share passwords or API keys.";
   messages=[];
   $("chatTitle").textContent="New chat";
-  $("status").textContent="Ready";
   renderMessages();
   renderChats();
   closeSidebar();
@@ -329,7 +293,6 @@ async function createChat(){
 
 async function deleteChat(id){
   const chat=chats.find(c=>c.id===id);
-  if(!chat||String(chat.user_id)!==String(currentUser.id))return;
   if(!confirm("Delete this chat?"))return;
   const {error}=await client.from("ai_chats").delete().eq("id",id);
   if(error){alert("Could not delete this chat.");return}
@@ -366,7 +329,7 @@ function typing(){
 function resize(){$("prompt").style.height="auto";$("prompt").style.height=Math.min($("prompt").scrollHeight,140)+"px"}
 
 async function send(text){
-  if(!text||busy||viewingSharedChat)return;
+  if(!text||busy)return;
   busy=true;$("send").disabled=true;$("prompt").disabled=true;$("status").textContent="Thinking…";
   try{
     if(!currentChatId)await createChat();
@@ -395,50 +358,6 @@ async function send(text){
   }finally{busy=false;$("send").disabled=false;$("prompt").disabled=false;$("prompt").focus()}
 }
 
-async function getPartnerId(){
-  const {data:mine,error:mineError}=await client.from("space_members").select("space_id").eq("user_id",currentUser.id).limit(1).maybeSingle();
-  if(mineError||!mine?.space_id)return "";
-  const {data:partner,error:partnerError}=await client.from("space_members").select("user_id").eq("space_id",mine.space_id).neq("user_id",currentUser.id).limit(1).maybeSingle();
-  if(partnerError||!partner?.user_id)return "";
-  return String(partner.user_id);
-}
-
-async function loadSharingSettings(){
-  const status=$("shareStatus"),toggle=$("shareToggle");
-  status.textContent="Loading sharing status…";
-  toggle.disabled=true;
-  const partnerId=await getPartnerId();
-  if(!partnerId){
-    toggle.textContent="Off";toggle.classList.remove("on");toggle.setAttribute("aria-pressed","false");status.textContent="No partner account was found in this space.";toggle.disabled=true;return;
-  }
-  const {data,error}=await client.from("ai_partner_sharing").select("enabled,partner_id").eq("owner_id",currentUser.id).maybeSingle();
-  if(error){status.textContent="Could not load sharing status.";toggle.disabled=true;return}
-  const enabled=Boolean(data?.enabled);
-  toggle.dataset.partnerId=partnerId;
-  toggle.dataset.enabled=enabled?"true":"false";
-  toggle.textContent=enabled?"On":"Off";
-  toggle.classList.toggle("on",enabled);
-  toggle.setAttribute("aria-pressed",enabled?"true":"false");
-  toggle.disabled=false;
-  status.textContent=enabled?"Your partner can read your saved AI chats.":"Your AI chats are private. Your partner cannot read them.";
-}
-
-async function toggleSharing(){
-  const toggle=$("shareToggle"),partnerId=toggle.dataset.partnerId;
-  if(!partnerId||toggle.disabled)return;
-  const next=toggle.dataset.enabled!=="true";
-  toggle.disabled=true;
-  const {error}=await client.from("ai_partner_sharing").upsert({owner_id:currentUser.id,partner_id:partnerId,enabled:next,updated_at:new Date().toISOString()},{onConflict:"owner_id"});
-  if(error){$("shareStatus").textContent="Could not update sharing.";toggle.disabled=false;return}
-  toggle.dataset.enabled=next?"true":"false";
-  toggle.textContent=next?"On":"Off";
-  toggle.classList.toggle("on",next);
-  toggle.setAttribute("aria-pressed",next?"true":"false");
-  $("shareStatus").textContent=next?"Your partner can now read your saved AI chats.":"Your AI chats are private again.";
-  toggle.disabled=false;
-  await loadChats();
-}
-
 async function loadMemories(){
   const {data,error}=await client.from("ai_memories").select("id,memory,category,updated_at").order("updated_at",{ascending:false}).limit(200);
   const root=$("memoryList");root.innerHTML="";
@@ -458,16 +377,12 @@ async function loadMemories(){
 $("form").addEventListener("submit",e=>{e.preventDefault();const text=$("prompt").value.trim();if(!text)return;send(text)});
 $("prompt").addEventListener("input",resize);
 $("prompt").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();$("form").requestSubmit()}});
-$("newChat").addEventListener("click",()=>{currentChatId=null;currentChatOwnerId=currentUser.id;viewingSharedChat=false;$("form").style.display="block";$("composeHint").textContent="Relationship-aware AI. Do not share passwords or API keys.";messages=[];$("chatTitle").textContent="New chat";$("status").textContent="Ready";renderMessages();renderChats();closeSidebar();$("prompt").focus()});
+$("newChat").addEventListener("click",()=>{currentChatId=null;messages=[];$("chatTitle").textContent="New chat";$("status").textContent="Ready";renderMessages();renderChats();closeSidebar();$("prompt").focus()});
 $("search").addEventListener("input",renderChats);
 $("menu").addEventListener("click",openSidebar);
 $("home").addEventListener("click",()=>location.href="index.html");
 $("settings").addEventListener("click",()=>location.href="settings.html");
 $("memories").addEventListener("click",()=>{$("memoryModal").classList.add("open");loadMemories();closeSidebar()});
-$("sharing").addEventListener("click",async()=>{$("sharingModal").classList.add("open");await loadSharingSettings();closeSidebar()});
-$("shareToggle").addEventListener("click",toggleSharing);
-$("closeSharing").addEventListener("click",()=>$("sharingModal").classList.remove("open"));
-$("sharingModal").addEventListener("click",e=>{if(e.target===$("sharingModal"))$("sharingModal").classList.remove("open")});
 $("memoryBtn").addEventListener("click",()=>$("memoryModal").classList.add("open"));
 $("closeMemory").addEventListener("click",()=>$("memoryModal").classList.remove("open"));
 $("memoryModal").addEventListener("click",e=>{if(e.target===$("memoryModal"))$("memoryModal").classList.remove("open")});
@@ -477,7 +392,7 @@ async function init(){
   $("username").textContent=currentUser?.user_metadata?.username||"Private AI";
   window.OurSpaceTheme?.apply?.(window.OurSpaceTheme.getCookie?.()||"warm");
   await loadChats();
-  if(chats.length)await selectChat(chats[0].id,chats[0].user_id);else renderMessages();
+  if(chats.length)await selectChat(chats[0].id);else renderMessages();
 }
 client.auth.onAuthStateChange((event,sessionValue)=>{if(event==="SIGNED_OUT"||!sessionValue)location.href="login.html"});
 init();
