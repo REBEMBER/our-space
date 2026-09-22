@@ -7,7 +7,7 @@
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#F8F0EC",
-  "theme_color": "#F8F0EC",
+  "theme_color": "#152B46",
   "icons": [
     {
       "src": "/calculator.png",
