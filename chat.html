@@ -281,6 +281,53 @@
       position: relative;
       max-width: min(77%, 560px);
     }
+    .reply-preview {
+      margin: -2px 0 7px;
+      padding: 7px 9px;
+      border-left: 3px solid var(--peach);
+      border-radius: 8px;
+      background: rgba(220, 234, 245, 0.55);
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.35;
+    }
+    .reply-preview strong {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--navy);
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .reaction-summary { display:flex; flex-wrap:wrap; gap:4px; margin-top:5px; }
+    .reaction-chip {
+      min-height:22px; padding:2px 7px; border:1px solid var(--border);
+      border-radius:999px; background:var(--white); color:var(--text);
+      font-size:11px; line-height:1; cursor:pointer;
+    }
+    .reaction-chip.mine { border-color:rgba(21,43,70,.25); background:var(--blue); }
+    .reaction-picker {
+      position:absolute; right:4px; top:calc(100% + 6px); z-index:60;
+      display:none; align-items:center; gap:4px; padding:6px;
+      border:1px solid var(--border); border-radius:12px; background:var(--white);
+      box-shadow:var(--shadow);
+    }
+    .reaction-picker.open { display:flex; }
+    .reaction-picker button { width:30px; height:30px; padding:0; border:0; border-radius:8px; background:var(--blue); font-size:15px; }
+    .reply-composer {
+      width:min(100%,800px); margin:0 auto 8px; padding:8px 10px;
+      display:none; align-items:center; gap:9px;
+      border:1px solid var(--border); border-radius:13px; background:rgba(255,255,255,.92);
+    }
+    .reply-composer.visible { display:flex; }
+    .reply-composer-copy { min-width:0; flex:1; }
+    .reply-composer-label { color:var(--navy); font-size:8px; font-weight:850; text-transform:uppercase; letter-spacing:.06em; }
+    .reply-composer-text { margin-top:2px; color:var(--muted); font-size:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .reply-composer-close {
+      width:27px; height:27px; border:1px solid var(--border); border-radius:8px;
+      background:var(--blue); color:var(--navy); font-size:15px; line-height:1;
+    }
+
 
     /* =========================
        MESSAGE BUBBLE
@@ -1755,6 +1802,11 @@
         .forEach((menu) => {
           menu.classList.remove("open");
         });
+      document
+        .querySelectorAll(".reaction-picker.open")
+        .forEach((picker) => {
+          picker.classList.remove("open");
+        });
     }
 
     function syncLayoutMetrics() {
@@ -2044,45 +2096,23 @@ function renderError(message) {
             : "";
 
         const menuHtml =
-          mine && !deleted
-            ? `
-              <button
-                class="message-menu-trigger"
-                type="button"
-                data-menu-trigger="${message.id}"
-                aria-label="Message options"
-              >
-                <svg viewBox="0 0 24 24">
-                  <circle
-                    cx="5"
-                    cy="12"
-                    r="1.7"
-                  ></circle>
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="1.7"
-                  ></circle>
-                  <circle
-                    cx="19"
-                    cy="12"
-                    r="1.7"
-                  ></circle>
-                </svg>
-              </button>
-
-              <div
-                class="message-menu"
-                data-menu="${message.id}"
-              >
-                <button
-                  type="button"
-                  data-delete-direct="${message.id}"
-                >
-                  Delete
-                </button>
-              </div>
-            `
+          !deleted
+            ? '<button class="message-menu-trigger" type="button" data-menu-trigger="' + message.id + '" aria-label="Message options">' +
+                '<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.7"></circle><circle cx="12" cy="12" r="1.7"></circle><circle cx="19" cy="12" r="1.7"></circle></svg>' +
+              '</button>' +
+              '<div class="message-menu" data-menu="' + message.id + '">' +
+                '<button type="button" data-reply-message="' + message.id + '">Reply</button>' +
+                '<button type="button" data-open-reactions="' + message.id + '">React</button>' +
+                (mine ? '<button type="button" data-delete-direct="' + message.id + '">Delete</button>' : '') +
+              '</div>' +
+              '<div class="reaction-picker" data-reaction-picker="' + message.id + '">' +
+                '<button type="button" data-reaction="heart" data-reaction-message="' + message.id + '">❤️</button>' +
+                '<button type="button" data-reaction="laugh" data-reaction-message="' + message.id + '">😂</button>' +
+                '<button type="button" data-reaction="like" data-reaction-message="' + message.id + '">👍</button>' +
+                '<button type="button" data-reaction="sad" data-reaction-message="' + message.id + '">😢</button>' +
+                '<button type="button" data-reaction="wow" data-reaction-message="' + message.id + '">😮</button>' +
+                '<button type="button" data-reaction="love" data-reaction-message="' + message.id + '">😘</button>' +
+              '</div>'
             : "";
 
         html += `
@@ -2423,7 +2453,28 @@ function renderError(message) {
       renderMessages();
     }
 
-        /* ==========================================
+        async function loadMessageReactions() {
+      const ids = messages.map((item) => item.id);
+      if (!ids.length) {
+        messageReactions = [];
+        return;
+      }
+
+      const { data, error } = await client
+        .from("message_reactions")
+        .select("id, message_id, user_id, reaction, created_at")
+        .in("message_id", ids);
+
+      if (error) {
+        console.warn("Could not load message reactions:", error);
+        messageReactions = [];
+        return;
+      }
+
+      messageReactions = data || [];
+    }
+
+    /* ==========================================
        LOAD
     ========================================== */
 
@@ -2448,7 +2499,8 @@ function renderError(message) {
               created_at,
               deleted_at,
               deleted_by,
-              seen_at
+              seen_at,
+              reply_to_message_id
             `
           )
           .eq(
@@ -2514,7 +2566,10 @@ function renderError(message) {
       messages =
         result.data || [];
 
-      await hydrateImageUrls(messages);
+      await Promise.all([
+        hydrateImageUrls(messages),
+        loadMessageReactions()
+      ]);
 
       renderMessages();
 
@@ -2551,9 +2606,10 @@ function renderError(message) {
           .insert({
             space_id: SPACE_ID,
             sender_id: currentUser.id,
-            content: value
+            content: value,
+            reply_to_message_id: replyTargetMessageId
           })
-          .select("id, space_id, sender_id, content, created_at")
+          .select("id, space_id, sender_id, content, created_at, reply_to_message_id")
           .single();
 
       sendButton.disabled = false;
@@ -2575,6 +2631,7 @@ function renderError(message) {
       input.value = "";
       input.style.height =
         "40px";
+      clearReplyTarget();
       syncLayoutMetrics();
 
       await loadMessages(true);
@@ -2750,7 +2807,7 @@ function renderError(message) {
       try {
         const { data, error } = await client
           .from("messages")
-          .select("id, space_id, sender_id, content, message_type, media_path, created_at, deleted_at, deleted_by, seen_at")
+          .select("id, space_id, sender_id, content, message_type, media_path, created_at, deleted_at, deleted_by, seen_at, reply_to_message_id")
           .eq("space_id", SPACE_ID)
           .order("created_at", { ascending: true });
 
@@ -2878,8 +2935,60 @@ function renderError(message) {
           {
             event: "*",
             schema: "public",
-            table: "messages"
+            table: "message_reactions"
           },
+          (payload) => {
+            const incoming = payload.new || payload.old || {};
+            if (!incoming?.id) return;
+
+            if (payload.eventType === "INSERT") {
+              messageReactions = [
+                ...messageReactions.filter((item) => item.id !== incoming.id),
+                incoming
+              ];
+              renderMessages();
+              return;
+            }
+
+            if (payload.eventType === "DELETE") {
+              messageReactions = messageReactions.filter(
+                (item) => item.id !== incoming.id
+              );
+              renderMessages();
+              return;
+            }
+          }
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "message_reactions"
+          },
+          (payload) => {
+            const incoming = payload.new || payload.old || {};
+            if (!incoming?.id) return;
+
+            if (payload.eventType === "INSERT") {
+              messageReactions = [
+                ...messageReactions.filter((item) => item.id !== incoming.id),
+                incoming
+              ];
+              renderMessages();
+              return;
+            }
+
+            if (payload.eventType === "DELETE") {
+              messageReactions = messageReactions.filter(
+                (item) => item.id !== incoming.id
+              );
+              renderMessages();
+              return;
+            }
+          }
+        )
+
           async (payload) => {
             const incoming = payload.new || payload.old || {};
 
@@ -3037,6 +3146,14 @@ function renderError(message) {
       clearReplySuggestion
     );
 
+    replyAssistSuggestions.addEventListener("click", async (event) => {
+      const button = event.target.closest("[data-reply-suggestion-index]");
+      if (!button) return;
+      await sendReplySuggestion(Number(button.dataset.replySuggestionIndex));
+    });
+
+    replyComposerClose.addEventListener("click", clearReplyTarget);
+
     attachmentButton.addEventListener("click", () => {
       if (!attachmentButton.disabled) {
         photoInput.click();
@@ -3155,6 +3272,45 @@ function renderError(message) {
             );
           }
 
+          return;
+        }
+
+        const replyButton =
+          event.target.closest("[data-reply-message]");
+
+        if (replyButton) {
+          event.stopPropagation();
+          closeMenus();
+          const message = messages.find(
+            (item) => Number(item.id) === Number(replyButton.dataset.replyMessage)
+          );
+          if (message) setReplyTarget(message);
+          return;
+        }
+
+        const openReactions =
+          event.target.closest("[data-open-reactions]");
+
+        if (openReactions) {
+          event.stopPropagation();
+          closeMenus();
+          const picker = document.querySelector(
+            '[data-reaction-picker="' + openReactions.dataset.openReactions + '"]'
+          );
+          if (picker) picker.classList.add("open");
+          return;
+        }
+
+        const reactionButton =
+          event.target.closest("[data-reaction-message]");
+
+        if (reactionButton) {
+          event.stopPropagation();
+          await setMessageReaction(
+            Number(reactionButton.dataset.reactionMessage),
+            reactionButton.dataset.reaction
+          );
+          closeMenus();
           return;
         }
 
