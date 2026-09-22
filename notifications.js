@@ -245,13 +245,17 @@
   }
 
   async function sendTestNotification() {
+    // The test button itself is a user gesture, so use it to repair a missing
+    // browser subscription before asking the server to send the test push.
+    await enableNotifications();
+
     const client = await getClient();
     const { data, error } = await client.functions.invoke("notify-message", {
       body: { test: true }
     });
     if (error) throw new Error(error.message || "The notification test failed.");
     if (!data?.sent) {
-      throw new Error("The server found no active subscription for this account.");
+      throw new Error("The server still has no active subscription for this account after enabling notifications.");
     }
     return data;
   }
