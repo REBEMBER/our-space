@@ -109,24 +109,10 @@
       // New subscriptions are created only from the explicit Enable button.
       const existing = await notificationRegistration.pushManager.getSubscription();
       if (existing) {
-        const ownerCheckClient = await getClient();
-        const { data: ownedSubscription } = await ownerCheckClient
-          .from("push_subscriptions")
-          .select("id")
-          .eq("user_id", notificationUser.id)
-          .eq("endpoint", existing.endpoint)
-          .maybeSingle();
-
-        if (ownedSubscription) {
-          await syncSubscription(existing, await getPreviewEnabled());
-        } else {
-          try {
-            await existing.unsubscribe();
-            await clearAppNotifications();
-          } catch (error) {
-            console.warn("Could not detach the previous account notification subscription:", error);
-          }
-        }
+        // A browser has one push subscription, so when the signed-in Our Space
+        // account changes, transfer that subscription to the current account
+        // instead of silently leaving the new account without push delivery.
+        await syncSubscription(existing, await getPreviewEnabled());
       }
 
       await clearAppNotifications();
