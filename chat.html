@@ -363,6 +363,80 @@
       letter-spacing: -0.004em;
     }
 
+    .message-image-link {
+      display: block;
+      max-width: min(100%, 520px);
+      border-radius: 15px;
+      overflow: hidden;
+      background: rgba(21, 43, 70, 0.06);
+    }
+
+    .message-image {
+      display: block;
+      width: auto;
+      max-width: 100%;
+      max-height: 520px;
+      border-radius: 15px;
+      object-fit: contain;
+      cursor: zoom-in;
+    }
+
+    .message-image-loading {
+      display: block;
+      min-width: 180px;
+      padding: 28px 24px;
+      color: var(--muted);
+      font-size: 10px;
+      text-align: center;
+    }
+
+    .message-bubble.image-bubble {
+      padding: 6px;
+    }
+
+    .message-bubble.image-bubble .message-meta {
+      padding: 0 4px 2px;
+    }
+
+    .attachment-button {
+      width: 43px;
+      height: 43px;
+      flex-shrink: 0;
+      padding: 0;
+      border: 1px solid var(--input-border);
+      border-radius: 13px;
+      background: var(--white);
+      color: var(--navy);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--input-shadow);
+      transition: background .15s ease, transform .15s ease, opacity .15s ease;
+    }
+
+    .attachment-button:hover:not(:disabled) {
+      background: var(--blue);
+    }
+
+    .attachment-button:active:not(:disabled) {
+      transform: scale(.95);
+    }
+
+    .attachment-button:disabled {
+      opacity: .5;
+      cursor: default;
+    }
+
+    .attachment-button svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+    }
+
+    .photo-input {
+      display: none;
+    }
+
     /* =========================
        DELETED MESSAGE
     ========================= */
@@ -1262,6 +1336,28 @@
         </button>
 
         <form class="composer" id="composer">
+          <input
+            class="photo-input"
+            id="photoInput"
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            multiple
+          >
+
+          <button
+            class="attachment-button"
+            id="attachmentButton"
+            type="button"
+            aria-label="Send photos"
+            title="Send photos"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7">
+              <rect x="3.5" y="4" width="17" height="16" rx="2.5"></rect>
+              <circle cx="8.5" cy="9" r="1.4"></circle>
+              <path d="m4.5 17 4.7-4.8 3.4 3.2 2.3-2.3 4.6 4.4"></path>
+            </svg>
+          </button>
+
           <div class="input-shell">
 
             <div class="input-icon">
@@ -1357,6 +1453,12 @@
     const sendButton =
       document.getElementById("sendButton");
 
+    const attachmentButton =
+      document.getElementById("attachmentButton");
+
+    const photoInput =
+      document.getElementById("photoInput");
+
     const homeButton =
       document.getElementById("homeButton");
     const headerSubtitle =
@@ -1388,6 +1490,7 @@
     let replySuggestion = null;
     let replySuggestionSent = false;
     let busyReplySuggestion = false;
+    const imageUrlCache = new Map();
 
     /* ==========================================
        HELPERS
@@ -1476,6 +1579,48 @@
         message.sender_id ===
           currentUser.id
       );
+    }
+
+    async function hydrateImageUrls(list) {
+      const imageMessages = (list || []).filter(
+        (message) => message.media_path && message.message_type === "image"
+      );
+
+      const missingPaths = [
+        ...new Set(
+          imageMessages
+            .map((message) => message.media_path)
+            .filter((path) => {
+              const cached = imageUrlCache.get(path);
+              return !cached || cached.expiresAt <= Date.now() + 60_000;
+            })
+        )
+      ];
+
+      if (missingPaths.length) {
+        const { data, error } = await client.storage
+          .from("chat-media")
+          .createSignedUrls(missingPaths, 3600);
+
+        if (error) {
+          console.warn("Could not create signed image URLs:", error);
+        } else {
+          (data || []).forEach((item, index) => {
+            const path = missingPaths[index];
+            if (path && item?.signedUrl) {
+              imageUrlCache.set(path, {
+                url: item.signedUrl,
+                expiresAt: Date.now() + 55 * 60 * 1000
+              });
+            }
+          });
+        }
+      }
+
+      imageMessages.forEach((message) => {
+        const cached = imageUrlCache.get(message.media_path);
+        message.media_url = cached?.url || null;
+      });
     }
 
     function closeMenus() {
@@ -1706,14 +1851,42 @@ function renderError(message) {
         const showDeletedOriginal =
           currentUser?.id === MOHAMMAD_USER_ID;
 
+        const isImage =
+          message.message_type === "image" &&
+          Boolean(message.media_path);
+
         const contentHtml =
           deleted && !showDeletedOriginal
             ? ""
-            : `
-              <span class="message-text">
-                ${escapeHtml(message.content)}
-              </span>
-            `;
+            : isImage
+              ? message.media_url
+                ? `
+                  <a
+                    class="message-image-link"
+                    href="${escapeHtml(message.media_url)}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Open photo"
+                  >
+                    <img
+                      class="message-image"
+                      src="${escapeHtml(message.media_url)}"
+                      alt="Photo"
+                      loading="lazy"
+                      decoding="async"
+                    >
+                  </a>
+                `
+                : `
+                  <span class="message-image-loading">
+                    Photo unavailable
+                  </span>
+                `
+              : `
+                <span class="message-text">
+                  ${escapeHtml(message.content)}
+                </span>
+              `;
 
         const statusHtml =
           mine
@@ -1780,9 +1953,12 @@ function renderError(message) {
 
               <div
                 class="message-bubble ${
-                  deleted
-                    ? "deleted"
-                    : ""
+                  [
+                    deleted ? "deleted" : "",
+                    isImage ? "image-bubble" : ""
+                  ]
+                    .filter(Boolean)
+                    .join(" ")
                 }"
               >
 
@@ -2067,6 +2243,8 @@ function renderError(message) {
               space_id,
               sender_id,
               content,
+              message_type,
+              media_path,
               created_at,
               deleted_at,
               deleted_by,
@@ -2100,6 +2278,8 @@ function renderError(message) {
                 space_id,
                 sender_id,
                 content,
+                message_type,
+                media_path,
                 created_at,
                 deleted_at,
                 deleted_by,
@@ -2133,6 +2313,8 @@ function renderError(message) {
 
       messages =
         result.data || [];
+
+      await hydrateImageUrls(messages);
 
       renderMessages();
 
@@ -2208,6 +2390,84 @@ function renderError(message) {
       input.focus();
     }
 
+    async function sendImage(file) {
+      if (!file || !currentUser) return;
+
+      if (!file.type.startsWith("image/")) {
+        throw new Error("Please choose an image file.");
+      }
+
+      const maxBytes = 10 * 1024 * 1024;
+      if (file.size > maxBytes) {
+        throw new Error("That photo is too large. The maximum size is 10 MB.");
+      }
+
+      const extensionMap = {
+        "image/jpeg": "jpg",
+        "image/png": "png",
+        "image/webp": "webp",
+        "image/gif": "gif"
+      };
+      const extension = extensionMap[file.type];
+      if (!extension) {
+        throw new Error("This image format is not supported.");
+      }
+
+      const path =
+        `${SPACE_ID}/${currentUser.id}/${crypto.randomUUID()}.${extension}`;
+
+      attachmentButton.disabled = true;
+      sendButton.disabled = true;
+      headerSubtitle.textContent = "Uploading photo...";
+
+      try {
+        const { error: uploadError } = await client.storage
+          .from("chat-media")
+          .upload(path, file, {
+            cacheControl: "31536000",
+            contentType: file.type,
+            upsert: false
+          });
+
+        if (uploadError) {
+          throw uploadError;
+        }
+
+        const { data: sentMessage, error: insertError } = await client
+          .from("messages")
+          .insert({
+            space_id: SPACE_ID,
+            sender_id: currentUser.id,
+            content: "Photo",
+            message_type: "image",
+            media_path: path
+          })
+          .select("id, space_id, sender_id, content, message_type, media_path, created_at")
+          .single();
+
+        if (insertError) {
+          await client.storage.from("chat-media").remove([path]);
+          throw insertError;
+        }
+
+        await hydrateImageUrls([sentMessage]);
+        messages.push(sentMessage);
+        messages.sort(
+          (a, b) => new Date(a.created_at) - new Date(b.created_at)
+        );
+        renderMessages();
+        scrollToLatest();
+
+        if (sentMessage && window.OurSpaceNotifications) {
+          await window.OurSpaceNotifications.sendMessage(sentMessage);
+        }
+      } finally {
+        attachmentButton.disabled = false;
+        sendButton.disabled = false;
+        headerSubtitle.textContent = "Private chat";
+      }
+    }
+
     async function deleteMessageDirect(message) {
       if (!message || !currentUser) return;
       if (message.sender_id !== currentUser.id) return;
@@ -2263,6 +2523,18 @@ function renderError(message) {
           }
         }
 
+        if (message.media_path) {
+          const { error: mediaDeleteError } = await client.storage
+            .from("chat-media")
+            .remove([message.media_path]);
+
+          if (mediaDeleteError) {
+            console.warn("Could not delete the photo file:", mediaDeleteError);
+          } else {
+            imageUrlCache.delete(message.media_path);
+          }
+        }
+
         renderMessages();
       } catch (error) {
         console.error("Delete error:", error);
@@ -2278,7 +2550,7 @@ function renderError(message) {
       try {
         const { data, error } = await client
           .from("messages")
-          .select("id, space_id, sender_id, content, created_at, deleted_at, deleted_by, seen_at")
+          .select("id, space_id, sender_id, content, message_type, media_path, created_at, deleted_at, deleted_by, seen_at")
           .eq("space_id", SPACE_ID)
           .order("created_at", { ascending: true });
 
@@ -2342,6 +2614,7 @@ function renderError(message) {
             messagesScroll.scrollTop -
             messagesScroll.clientHeight < 80;
           messages = nextMessages;
+          await hydrateImageUrls(messages);
           renderMessages();
           if (hasNewMessage || wasNearBottom) {
             scrollToLatest();
@@ -2452,6 +2725,10 @@ function renderError(message) {
                   !inserted.deleted_at
                 ) {
                   clearReplySuggestion();
+                }
+
+                if (inserted.message_type === "image" && inserted.media_path) {
+                  await hydrateImageUrls([inserted]);
                 }
 
                 messages.push(inserted);
@@ -2575,6 +2852,32 @@ function renderError(message) {
       "click",
       clearReplySuggestion
     );
+
+    attachmentButton.addEventListener("click", () => {
+      if (!attachmentButton.disabled) {
+        photoInput.click();
+      }
+    });
+
+    photoInput.addEventListener("change", async () => {
+      const files = Array.from(photoInput.files || []);
+      photoInput.value = "";
+
+      if (!files.length || !currentUser) return;
+
+      try {
+        for (const file of files) {
+          await sendImage(file);
+        }
+      } catch (error) {
+        console.error("Photo send error:", error);
+        alert(error.message || "Could not send the photo.");
+      } finally {
+        attachmentButton.disabled = false;
+        sendButton.disabled = false;
+        headerSubtitle.textContent = "Private chat";
+      }
+    });
 
     composer.addEventListener(
       "submit",
