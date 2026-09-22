@@ -2373,8 +2373,13 @@ function renderError(message) {
 
         const raw = String(data.suggestion || "");
         const suggestions = raw
-          .split("\n")
-          .map((line) => line.trim())
+          .split(/\\r?\\n/)
+          .map((line) =>
+            line
+              .replace(/^\\s*(?:[-•*]|\\d+[.)])\\s*/, "")
+              .replace(/^["“”]+|["“”]+$/g, "")
+              .trim()
+          )
           .filter(Boolean)
           .slice(0, 3)
           .map((suggestion) => ({
