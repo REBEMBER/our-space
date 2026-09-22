@@ -238,9 +238,9 @@ async function migrateLocalHistory(){
 }
 
 async function loadChats(){
-  const {data,error}=await client.from("ai_chats").select("id,title,created_at,updated_at").order("updated_at",{ascending:false}) .limit(1000);
+  const {data,error}=await client.from("ai_chats").select("id,user_id,title,created_at,updated_at").order("updated_at",{ascending:false}).limit(1000);
   if(error){console.error(error);return}
-  chats=data||[];
+  chats=(data||[]).filter(chat=>String(chat.user_id)===String(currentUser.id));
   renderChats();
 }
 
@@ -336,9 +336,43 @@ async function send(text){
     const {error:insertError}=await client.from("ai_messages").insert({chat_id:currentChatId,user_id:currentUser.id,role:"user",content:text});
     if(insertError)throw insertError;
     messages.push({role:"user",content:text});addMessage("user",text);$("prompt").value="";resize();typing();
-    currentSession=(await client.auth.getSession()).data.session||currentSession;
-    if(!currentSession)throw new Error("Your session expired. Please sign in again.");
-    const r=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+currentSession.access_token},body:JSON.stringify({chat_id:currentChatId})});
+    async function freshAccessToken(forceRefresh=false){
+      if(!forceRefresh){
+        const sessionResult=await client.auth.getSession();
+        const sessionValue=sessionResult.data.session||null;
+        const expiresAt=Number(sessionValue?.expires_at||0)*1000;
+        if(sessionValue?.access_token && expiresAt-Date.now()>60000){
+          currentSession=sessionValue;
+          return sessionValue.access_token;
+        }
+      }
+      const refreshed=await client.auth.refreshSession();
+      if(refreshed.error||!refreshed.data.session){
+        throw new Error("Your session expired. Please sign in again.");
+      }
+      currentSession=refreshed.data.session;
+      return currentSession.access_token;
+    }
+
+    async function requestAi(token){
+      return fetch(API,{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json",
+          "Authorization":"Bearer "+token
+        },
+        body:JSON.stringify({chat_id:currentChatId})
+      });
+    }
+
+    let accessToken=await freshAccessToken();
+    let r=await requestAi(accessToken);
+
+    if(r.status===401){
+      accessToken=await freshAccessToken(true);
+      r=await requestAi(accessToken);
+    }
+
     const data=await r.json().catch(()=>({}));
     $("typing")?.remove();
     if(!r.ok)throw new Error(data.error||"AI request failed.");
