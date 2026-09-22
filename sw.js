@@ -7,6 +7,19 @@ self.addEventListener("activate", (event) => {
 });
 
 /* Our Space push service worker */
+self.addEventListener("message", (event) => {
+  if (event.data?.type !== "CLEAR_OUR_SPACE_NOTIFICATIONS") return;
+
+  event.waitUntil((async () => {
+    const notifications = await self.registration.getNotifications();
+    for (const notification of notifications) {
+      if (String(notification.tag || "").startsWith("our-space-message-")) {
+        notification.close();
+      }
+    }
+  })());
+});
+
 self.addEventListener("push", (event) => {
   event.waitUntil((async () => {
     let data = {};
