@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Our Space">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#F8F0EC">
 <title>Our Space</title>
 <script src="/theme.js?v=final"></script>
@@ -17,7 +17,7 @@
 :root{
   --navy:#152B46;--peach:#F3B29F;--blue:#DCEAF5;--bg:#F8F0EC;
   --surface:#fff;--text:#26313D;--muted:#7A8794;--line:rgba(21,43,70,.09);
-  --shadow:0 18px 55px rgba(21,43,70,.08);--r:24px;
+  --shadow:0 18px 50px rgba(21,43,70,.08)
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{min-height:100%;background:var(--bg)}
@@ -25,134 +25,137 @@ body{font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI"
 button{font:inherit;border:0}
 button:focus-visible{outline:3px solid rgba(243,178,159,.65);outline-offset:3px}
 .app{min-height:100vh;padding:18px}
-.shell{max-width:1160px;margin:0 auto}
-.topbar{height:64px;display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:18px}
+.shell{width:min(1160px,100%);margin:0 auto}
+.header{height:64px;display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:18px}
 .brand{display:flex;align-items:center;gap:12px}
-.brand-mark{width:44px;height:44px;border-radius:15px;background:var(--navy);color:#fff;display:grid;place-items:center;box-shadow:0 10px 25px rgba(21,43,70,.15)}
+.brand-mark{width:44px;height:44px;border-radius:15px;background:var(--navy);color:#fff;display:grid;place-items:center;box-shadow:0 10px 24px rgba(21,43,70,.15)}
 .brand-mark svg{width:21px;height:21px}
-.brand-title{font-size:16px;font-weight:850;letter-spacing:.1em;color:var(--navy)}
-.brand-subtitle{margin-top:3px;font-size:12px;color:var(--muted)}
-.desktop-nav{display:flex;align-items:center;gap:5px;padding:5px;background:rgba(255,255,255,.72);border:1px solid var(--line);border-radius:17px}
-.nav-link{height:38px;padding:0 13px;border-radius:12px;background:transparent;color:var(--muted);font-size:12px;font-weight:750;cursor:pointer}
+.brand-title{color:var(--navy);font-size:16px;font-weight:850;letter-spacing:.1em}
+.brand-subtitle{margin-top:3px;color:var(--muted);font-size:12px}
+.desktop-nav{display:flex;align-items:center;gap:5px;padding:5px;background:rgba(255,255,255,.78);border:1px solid var(--line);border-radius:17px}
+.nav-link{height:38px;padding:0 13px;border-radius:12px;background:transparent;color:var(--muted);font-size:12px;font-weight:800;cursor:pointer}
 .nav-link:hover,.nav-link.active{background:#fff;color:var(--navy);box-shadow:0 5px 15px rgba(21,43,70,.07)}
-.account-button{width:42px;height:42px;border-radius:14px;background:#fff;border:1px solid var(--line);color:var(--navy);display:grid;place-items:center;cursor:pointer;box-shadow:0 8px 20px rgba(21,43,70,.05)}
-.account-button svg{width:19px;height:19px}
-.hero{position:relative;overflow:hidden;border-radius:30px;padding:38px;min-height:300px;background:linear-gradient(135deg,#152B46 0%,#193551 58%,#234864 100%);box-shadow:0 25px 70px rgba(21,43,70,.17)}
+.settings-button{width:42px;height:42px;border-radius:14px;background:#fff;color:var(--navy);border:1px solid var(--line);display:grid;place-items:center;cursor:pointer;box-shadow:0 8px 20px rgba(21,43,70,.05)}
+.settings-button svg{width:19px;height:19px}
+.hero{position:relative;overflow:hidden;min-height:310px;padding:40px;border-radius:30px;background:linear-gradient(135deg,#152B46 0%,#193651 56%,#234965 100%);box-shadow:0 26px 70px rgba(21,43,70,.17)}
 .hero:before,.hero:after{content:"";position:absolute;border-radius:50%;pointer-events:none}
-.hero:before{width:360px;height:360px;right:-120px;top:-180px;background:var(--peach);opacity:.2;filter:blur(4px)}
-.hero:after{width:280px;height:280px;left:-160px;bottom:-190px;background:var(--blue);opacity:.12}
+.hero:before{width:380px;height:380px;right:-140px;top:-190px;background:var(--peach);opacity:.20;filter:blur(5px)}
+.hero:after{width:280px;height:280px;left:-170px;bottom:-190px;background:var(--blue);opacity:.11}
 .hero-inner{position:relative;z-index:1;max-width:780px}
-.eyebrow{display:inline-flex;padding:8px 12px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);border-radius:999px;color:#fff;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
-.hero h1{margin-top:20px;color:#fff;font-size:clamp(38px,6vw,66px);line-height:.98;letter-spacing:-.055em}
+.eyebrow{display:inline-flex;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:#fff;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.hero h1{margin-top:21px;color:#fff;font-size:clamp(42px,6vw,72px);line-height:.96;letter-spacing:-.06em}
 .hero h1 span{color:#F8D0C4}
-.hero p{max-width:620px;margin-top:16px;color:rgba(255,255,255,.72);font-size:15px;line-height:1.65}
-.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:27px}
-.primary,.secondary{min-height:48px;padding:0 18px;border-radius:14px;display:inline-flex;align-items:center;gap:9px;cursor:pointer;font-size:13px;font-weight:800}
-.primary{background:#fff;color:var(--navy);box-shadow:0 12px 28px rgba(0,0,0,.16)}
-.secondary{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.15);color:#fff}
-.primary svg,.secondary svg{width:17px;height:17px}
-.dashboard{display:grid;grid-template-columns:1.25fr .75fr;gap:16px;margin-top:16px}
-.card{background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
-.recent{padding:24px}
-.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.card-kicker{font-size:10px;font-weight:850;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.card-title{margin-top:5px;font-size:22px;letter-spacing:-.025em;color:var(--navy)}
-.view-link{background:transparent;color:var(--navy);font-size:12px;font-weight:800;cursor:pointer}
-.preview{margin-top:20px;padding:16px;border-radius:17px;background:#FBF8F6;border:1px solid var(--line);min-height:90px;display:flex;align-items:center;gap:14px;cursor:pointer}
-.preview-icon{width:42px;height:42px;flex:0 0 42px;border-radius:14px;background:var(--blue);color:var(--navy);display:grid;place-items:center}
-.preview-icon svg{width:19px;height:19px}
-.preview-copy{min-width:0}
-.preview-name{font-size:12px;font-weight:800;color:var(--navy)}
-.preview-text{margin-top:4px;color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.preview-time{margin-left:auto;flex:0 0 auto;color:#9AA4AE;font-size:10px}
-.empty-preview{color:var(--muted);font-size:13px;line-height:1.5}
-.tiles{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.dashboard{grid-template-columns:repeat(3,1fr)}
-.tile-chat{background:#F4F7FA}.tile-chat:after{background:#B8C9D9}
-.tile{min-height:184px;padding:22px;position:relative;overflow:hidden;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease}
-.tile:hover{transform:translateY(-2px);box-shadow:0 20px 45px rgba(21,43,70,.11)}
-.tile:after{content:"";position:absolute;width:130px;height:130px;border-radius:50%;right:-50px;bottom:-65px;opacity:.45}
-.tile-gallery{background:#EEF6FA}.tile-gallery:after{background:#B9DCEA}
-.tile-ai{background:#FFF1EC}.tile-ai:after{background:#F3B29F}
-.tile-icon{width:42px;height:42px;border-radius:14px;background:rgba(255,255,255,.8);color:var(--navy);display:grid;place-items:center}
-.tile-icon svg{width:19px;height:19px}
-.tile h3{position:relative;z-index:1;margin-top:28px;color:var(--navy);font-size:19px;letter-spacing:-.02em}
-.tile p{position:relative;z-index:1;margin-top:6px;max-width:180px;color:rgba(38,49,61,.66);font-size:12px;line-height:1.5}
+.hero p{max-width:600px;margin-top:18px;color:rgba(255,255,255,.73);font-size:15px;line-height:1.7}
+.open-chat{display:inline-flex;align-items:center;justify-content:center;gap:9px;margin-top:27px;min-height:50px;padding:0 20px;border-radius:15px;background:#fff;color:var(--navy);font-size:13px;font-weight:850;cursor:pointer;box-shadow:0 14px 30px rgba(0,0,0,.17)}
+.open-chat svg{width:18px;height:18px}
+.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
+.action-card{position:relative;overflow:hidden;min-height:190px;padding:23px;border-radius:24px;border:1px solid var(--line);cursor:pointer;box-shadow:var(--shadow);transition:transform .18s ease,box-shadow .18s ease}
+.action-card:hover{transform:translateY(-2px);box-shadow:0 22px 48px rgba(21,43,70,.11)}
+.action-card:after{content:"";position:absolute;width:150px;height:150px;right:-60px;bottom:-75px;border-radius:50%;opacity:.48}
+.card-chat{background:#F4F7FA}.card-chat:after{background:#B8C9D9}
+.card-gallery{background:#EEF6FA}.card-gallery:after{background:#B9DCEA}
+.card-ai{background:#FFF1EC}.card-ai:after{background:#F3B29F}
+.action-icon{width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,.80);color:var(--navy);display:grid;place-items:center}
+.action-icon svg{width:20px;height:20px}
+.action-card h2{position:relative;z-index:1;margin-top:31px;color:var(--navy);font-size:20px;letter-spacing:-.02em}
+.action-card p{position:relative;z-index:1;max-width:215px;margin-top:7px;color:rgba(38,49,61,.66);font-size:12px;line-height:1.55}
 .footer{padding:22px 2px 8px;text-align:center;color:#9AA4AE;font-size:10px}
 .mobile-nav{display:none}
-.modal-layer{position:fixed;inset:0;z-index:50;display:none;align-items:flex-end;justify-content:center;padding:14px;background:rgba(21,43,70,.3);backdrop-filter:blur(7px)}
-.modal-layer.open{display:flex}
-.modal{width:100%;max-width:480px;background:#fff;border-radius:26px;overflow:hidden;box-shadow:0 30px 80px rgba(21,43,70,.22)}
-.modal-header{display:flex;justify-content:space-between;align-items:center;padding:18px;border-bottom:1px solid var(--line)}
-.modal-title{font-size:16px;font-weight:850;color:var(--navy)}
-.modal-sub{margin-top:3px;font-size:11px;color:var(--muted)}
-.close{width:38px;height:38px;border-radius:12px;background:#FBF8F6;color:var(--navy);display:grid;place-items:center;cursor:pointer}
-.close svg{width:17px;height:17px}
-.account-panel{padding:18px}.account-box{padding:16px;border:1px solid var(--line);background:#FBF8F6;border-radius:17px}
-.account-label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.account-value{margin-top:6px;color:var(--navy);font-size:17px;font-weight:850}
-.logout{width:100%;margin-top:12px;height:48px;border-radius:14px;background:var(--navy);color:#fff;font-weight:800;cursor:pointer}
-@media(max-width:900px){.desktop-nav{display:none}.mobile-nav{position:fixed;display:grid;grid-template-columns:repeat(5,1fr);left:12px;right:12px;bottom:12px;z-index:20;padding:6px;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:19px;box-shadow:0 15px 45px rgba(21,43,70,.15);backdrop-filter:blur(15px)}.mobile-nav button{height:50px;border-radius:14px;background:transparent;color:#8A949E;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:9px;font-weight:800;cursor:pointer}.mobile-nav button.active{background:#F7F2EF;color:var(--navy)}.mobile-nav svg{width:18px;height:18px}.app{padding:13px 13px 88px}.topbar{margin-bottom:13px}.dashboard{grid-template-columns:1fr}.tiles{grid-template-columns:1fr 1fr}.hero{padding:28px;min-height:330px}}
-@media(max-width:560px){.brand-subtitle{display:none}.account-button{width:40px;height:40px}.hero{padding:24px;border-radius:25px;min-height:350px}.hero h1{font-size:43px}.hero p{font-size:14px}.hero-actions{margin-top:22px}.primary,.secondary{flex:1;justify-content:center}.recent{padding:20px}.tiles{gap:12px}.tile{min-height:160px;padding:18px}.tile h3{margin-top:22px;font-size:17px}.tile p{font-size:11px}.preview-time{display:none}}
-@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+@media(max-width:900px){
+  .desktop-nav{display:none}
+  .mobile-nav{position:fixed;left:12px;right:12px;bottom:12px;z-index:20;display:grid;grid-template-columns:repeat(5,1fr);gap:3px;padding:6px;border:1px solid var(--line);border-radius:19px;background:rgba(255,255,255,.95);box-shadow:0 15px 45px rgba(21,43,70,.15);backdrop-filter:blur(15px)}
+  .mobile-nav button{height:50px;border-radius:14px;background:transparent;color:#8A949E;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:9px;font-weight:850;cursor:pointer}
+  .mobile-nav button.active{background:#F7F2EF;color:var(--navy)}
+  .mobile-nav svg{width:18px;height:18px}
+  .app{padding:13px 13px 88px}
+  .actions{grid-template-columns:1fr}
+  .action-card{min-height:145px}
+}
+@media(max-width:560px){
+  .brand-subtitle{display:none}
+  .hero{padding:25px;min-height:350px;border-radius:25px}
+  .hero h1{font-size:43px}
+  .hero p{font-size:14px}
+  .open-chat{width:100%}
+  .action-card{min-height:142px;padding:20px}
+  .action-card h2{margin-top:22px;font-size:18px}
+}
+@media(prefers-reduced-motion:reduce){
+  *{scroll-behavior:auto!important;transition:none!important}
+}
 </style>
 </head>
 <body>
 <main class="app">
 <div class="shell">
-<header class="topbar">
-  <div class="brand">
-    <div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9h10"/><path d="M7 13h6"/><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H17.5A2.5 2.5 0 0 1 20 5.5V13.5A2.5 2.5 0 0 1 17.5 16H11L6.5 20V16H6.5A2.5 2.5 0 0 1 4 13.5Z"/></svg></div>
-    <div><div class="brand-title">OUR SPACE</div><div class="brand-subtitle">Private space for two</div></div>
-  </div>
-  <nav class="desktop-nav" aria-label="Primary">
-    <button class="nav-link active" data-go="index.html">Home</button>
-    <button class="nav-link" data-go="chat.html">Chat</button>
-    <button class="nav-link" data-go="gallery.html">Gallery</button>
-    <button class="nav-link" data-go="ai.html">AI</button>
-  </nav>
-  <button class="account-button" id="settingsButton" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2M12 19.2v2M21.2 12h-2M4.8 12h-2M18.5 5.5l-1.4 1.4M6.9 17.1l-1.4 1.4M18.5 18.5l-1.4-1.4M6.9 6.9L5.5 5.5"/></svg></button>
-</header>
-
-<section class="hero">
-  <div class="hero-inner">
-    <div class="eyebrow">Your private space</div>
-    <h1>Welcome back, <span id="heroName">there</span>.</h1>
-    <p>Your shared space for conversations, photos, and little moments. Everything important is one tap away.</p>
-    <div class="hero-actions">
-      <button class="primary" id="openChatButton"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9h10"/><path d="M7 13h6"/><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H17.5A2.5 2.5 0 0 1 20 5.5V13.5A2.5 2.5 0 0 1 17.5 16H11L6.5 20V16H6.5A2.5 2.5 0 0 1 4 13.5Z"/></svg>Open chat</button>
-      <button class="secondary" id="openGalleryButton"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4" width="17" height="16" rx="2.5"/><circle cx="8.5" cy="9" r="1.4"/><path d="m4.5 17 4.7-4.8 3.4 3.2 2.3-2.3 4.6 4.4"/></svg>Open gallery</button>
+  <header class="header">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 9h10"/><path d="M7 13h6"/>
+          <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H17.5A2.5 2.5 0 0 1 20 5.5V13.5A2.5 2.5 0 0 1 17.5 16H11L6.5 20V16H6.5A2.5 2.5 0 0 1 4 13.5Z"/>
+        </svg>
+      </div>
+      <div><div class="brand-title">OUR SPACE</div><div class="brand-subtitle">Private space for two</div></div>
     </div>
-  </div>
-</section>
 
-<section class="dashboard">
-  <article class="card tile tile-chat" id="chatCard">
-    <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9h10"/><path d="M7 13h6"/><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H17.5A2.5 2.5 0 0 1 20 5.5V13.5A2.5 2.5 0 0 1 17.5 16H11L6.5 20V16H6.5A2.5 2.5 0 0 1 4 13.5Z"/></svg></div>
-    <h3>Private chat</h3><p>Continue your conversation together.</p>
-  </article>
+    <nav class="desktop-nav" aria-label="Primary">
+      <button class="nav-link active" data-go="index.html">Home</button>
+      <button class="nav-link" data-go="chat.html">Chat</button>
+      <button class="nav-link" data-go="gallery.html">Gallery</button>
+      <button class="nav-link" data-go="ai.html">AI</button>
+    </nav>
 
-  <article class="card tile tile-gallery" id="galleryCard">
-    <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4" width="17" height="16" rx="2.5"/><circle cx="8.5" cy="9" r="1.4"/><path d="m4.5 17 4.7-4.8 3.4 3.2 2.3-2.3 2.3-2.3 4.6 4.4"/></svg></div>
-    <h3>Shared gallery</h3><p>Keep your photos together in one private place.</p>
-  </article>
+    <button class="settings-button" id="settingsButton" type="button" aria-label="Settings" title="Settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round">
+        <circle cx="12" cy="12" r="3.2"/>
+        <path d="M12 2.8v2M12 19.2v2M21.2 12h-2M4.8 12h-2M18.5 5.5l-1.4 1.4M6.9 17.1l-1.4 1.4M18.5 18.5l-1.4-1.4M6.9 6.9 5.5 5.5"/>
+      </svg>
+    </button>
+  </header>
 
-  <article class="card tile tile-ai" id="aiCard">
-    <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="4"/></svg></div>
-    <h3>AI space</h3><p>Ask, explore, or get help when you need it.</p>
-  </article>
-</section>
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">Your private space</div>
+      <h1>Welcome back, <span id="heroName">there</span>.</h1>
+      <p>Your shared space for conversations, photos, and little moments. Everything important stays one tap away.</p>
+      <button class="open-chat" id="openChatButton" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 9h10"/><path d="M7 13h6"/>
+          <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H17.5A2.5 2.5 0 0 1 20 5.5V13.5A2.5 2.5 0 0 1 17.5 16H11L6.5 20V16H6.5A2.5 2.5 0 0 1 4 13.5Z"/>
+        </svg>
+        Open chat
+      </button>
+    </div>
+  </section>
 
-<footer class="footer">Our Space · Private for two</footer>
+  <section class="actions" aria-label="Our Space">
+    <article class="action-card card-chat" data-go="chat.html" tabindex="0" role="button">
+      <div class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9h10"/><path d="M7 13h6"/><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H17.5A2.5 2.5 0 0 1 20 5.5V13.5A2.5 2.5 0 0 1 17.5 16H11L6.5 20V16H6.5A2.5 2.5 0 0 1 4 13.5Z"/></svg></div>
+      <h2>Private chat</h2><p>Continue your conversation together.</p>
+    </article>
+
+    <article class="action-card card-gallery" data-go="gallery.html" tabindex="0" role="button">
+      <div class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4" width="17" height="16" rx="2.5"/><circle cx="8.5" cy="9" r="1.4"/><path d="m4.5 17 4.7-4.8 3.4 3.2 2.3-2.3 2.3-2.3 4.6 4.4"/></svg></div>
+      <h2>Shared gallery</h2><p>Keep your photos together in one private place.</p>
+    </article>
+
+    <article class="action-card card-ai" data-go="ai.html" tabindex="0" role="button">
+      <div class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="4"/></svg></div>
+      <h2>AI space</h2><p>Ask, explore, or get help when you need it.</p>
+    </article>
+  </section>
+
+  <footer class="footer">Our Space · Private for two</footer>
 </div>
 </main>
 
 <nav class="mobile-nav" aria-label="Mobile navigation">
   <button class="active" data-go="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m4 10 8-6 8 6v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19Z"/><path d="M9.5 20.5v-6h5v6"/></svg>Home</button>
   <button data-go="chat.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9h10"/><path d="M7 13h6"/><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H17.5A2.5 2.5 0 0 1 20 5.5V13.5A2.5 2.5 0 0 1 17.5 16H11L6.5 20V16H6.5A2.5 2.5 0 0 1 4 13.5Z"/></svg>Chat</button>
-  <button data-go="gallery.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4" width="17" height="16" rx="2.5"/><circle cx="8.5" cy="9" r="1.4"/><path d="m4.5 17 4.7-4.8 3.4 3.2 2.3-2.3 4.6 4.4"/></svg>Gallery</button>
+  <button data-go="gallery.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4" width="17" height="16" rx="2.5"/><circle cx="8.5" cy="9" r="1.4"/><path d="m4.5 17 4.7-4.8 2.3-2.3 4.6 4.4"/></svg>Gallery</button>
   <button data-go="ai.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="4"/></svg>AI</button>
-  <button id="mobileSettings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2M12 19.2v2M21.2 12h-2M4.8 12h-2M18.5 5.5l-1.4 1.4M6.9 17.1l-1.4 1.4M18.5 18.5l-1.4-1.4M6.9 6.9 5.5 5.5"/></svg>Settings</button>
+  <button id="mobileSettings" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2M12 19.2v2M21.2 12h-2M4.8 12h-2M18.5 5.5l-1.4 1.4M6.9 17.1l-1.4 1.4M18.5 18.5l-1.4-1.4M6.9 6.9 5.5 5.5"/></svg>Settings</button>
 </nav>
 
 <script>
@@ -160,41 +163,48 @@ const SUPABASE_URL="https://ywflohxufmfydkpkkqly.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_qTMUO8KxerEQBDQ-A7Huyg_8N2Tqpmr";
 const {createClient}=supabase;
 const client=createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
-let currentUser=null;
-
 const $=id=>document.getElementById(id);
 function go(path){window.location.href=path}
-document.querySelectorAll("[data-go]").forEach(button=>button.addEventListener("click",()=>go(button.dataset.go)));
-$("openChatButton").addEventListener("click",()=>go("chat.html"));
-$("chatCard").addEventListener("click",()=>go("chat.html"));
-$("openGalleryButton").addEventListener("click",()=>go("gallery.html"));
-$("galleryCard").addEventListener("click",()=>go("gallery.html"));
-$("aiCard").addEventListener("click",()=>go("ai.html"));
 
-function openSettings(){ $("settingsModal").classList.add("open"); $("settingsModal").setAttribute("aria-hidden","false"); }
-function closeSettings(){ $("settingsModal").classList.remove("open"); $("settingsModal").setAttribute("aria-hidden","true"); }
+document.querySelectorAll("[data-go]").forEach((el)=>{
+  el.addEventListener("click",()=>go(el.dataset.go));
+  if(el.getAttribute("role")==="button"){
+    el.addEventListener("keydown",(event)=>{
+      if(event.key==="Enter"||event.key===" "){event.preventDefault();go(el.dataset.go)}
+    });
+  }
+});
+
+$("openChatButton").addEventListener("click",()=>go("chat.html"));
 $("settingsButton").addEventListener("click",()=>go("settings.html"));
 $("mobileSettings").addEventListener("click",()=>go("settings.html"));
 
 async function checkAuthentication(){
   const {data:{user},error}=await client.auth.getUser();
   if(error||!user){go("login.html");return false}
-  currentUser=user;
   window.OurSpaceTheme.syncFromUser(user);
-  return true;
+  return user;
 }
-async function loadProfile(){
-  const {data,error}=await client.from("user_profiles").select("username").eq("user_id",currentUser.id).maybeSingle();
-  if(error||!data?.username){$("heroName").textContent="there";$("settingsUsername").textContent="Account";return}
+
+async function loadProfile(user){
+  const {data,error}=await client.from("user_profiles").select("username").eq("user_id",user.id).maybeSingle();
+  if(error||!data?.username){
+    $("heroName").textContent="there";
+    return;
+  }
   const username=data.username;
   $("heroName").textContent=username.charAt(0).toUpperCase()+username.slice(1);
-  $("settingsUsername").textContent=username;
 }
-async function initializeApp(){
-  if(!await checkAuthentication())return;
-  await loadProfile();
-}
-initializeApp();
+
+client.auth.onAuthStateChange((event,session)=>{
+  if(event==="SIGNED_OUT"||!session)go("login.html");
+});
+
+(async()=>{
+  const user=await checkAuthentication();
+  if(!user)return;
+  await loadProfile(user);
+})();
 </script>
 </body>
 </html>
