@@ -2095,6 +2095,44 @@ function renderError(message) {
             `
             : "";
 
+        const replyTarget =
+          message.reply_to_message_id
+            ? messages.find((item) => Number(item.id) === Number(message.reply_to_message_id))
+            : null;
+
+        const replyPreviewHtml =
+          replyTarget && !deleted
+            ? '<div class="reply-preview"><strong>Reply</strong>' +
+              escapeHtml(replyTarget.content || (replyTarget.message_type === "image" ? "Photo" : "Message")) +
+              '</div>'
+            : "";
+
+        const reactionRows = messageReactions.filter(
+          (item) => Number(item.message_id) === Number(message.id)
+        );
+        const reactionCounts = {};
+        reactionRows.forEach((item) => {
+          reactionCounts[item.reaction] =
+            (reactionCounts[item.reaction] || 0) + 1;
+        });
+
+        const reactionSummaryHtml =
+          !deleted && reactionRows.length
+            ? '<div class="reaction-summary">' +
+              Object.entries(reactionCounts).map(([reaction, count]) => {
+                const mineReaction = reactionRows.some(
+                  (item) => item.reaction === reaction && item.user_id === currentUser?.id
+                );
+                return '<button class="reaction-chip ' +
+                  (mineReaction ? 'mine' : '') +
+                  '" type="button" data-reaction="' + reaction +
+                  '" data-reaction-message="' + message.id + '">' +
+                  REACTION_META[reaction] + ' ' + count +
+                  '</button>';
+              }).join("") +
+              '</div>'
+            : "";
+
         const menuHtml =
           !deleted
             ? '<button class="message-menu-trigger" type="button" data-menu-trigger="' + message.id + '" aria-label="Message options">' +
