@@ -57,8 +57,8 @@ self.addEventListener("push", (event) => {
 
     await self.registration.showNotification(title, {
       body,
-      icon: "/favicon.svg",
-      badge: "/favicon.svg",
+      icon: "/calculator.png",
+      badge: "/calculator.png",
       tag: "our-space-message-" + (data.message_id || Date.now()),
       renotify: true,
       data: {
