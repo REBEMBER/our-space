@@ -39,6 +39,10 @@ module.exports = async (req, res) => {
 
     const body = await response.text();
 
+    if (!response.ok) {
+      console.error("Our Space AI upstream error:", response.status, body.slice(0, 1000));
+    }
+
     res.status(response.status);
     res.setHeader(
       "Content-Type",
