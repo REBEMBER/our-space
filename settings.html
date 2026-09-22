@@ -167,7 +167,7 @@
           <input id="ourSpaceNotificationToggle" type="checkbox" checked style="width:20px;height:20px;accent-color:var(--navy);">
         </label>
       </div>
-      <div class="action-row"><button class="primary-button" id="enableNotifications" type="button">Enable notifications</button></div>
+      <div class="action-row"><button class="primary-button" id="enableNotifications" type="button">Enable notifications</button><button class="secondary-button" id="testNotifications" type="button">Send test notification</button></div>
       <div class="status" id="notificationStatus"></div>
     </section>
 
@@ -384,6 +384,24 @@
         setStatus(status,error.message||"Could not enable notifications.","error");
       }finally{
         button.disabled=false;
+      }
+    });
+
+    document.getElementById("testNotifications").addEventListener("click",async()=>{
+      const button=document.getElementById("testNotifications");
+      const status=document.getElementById("notificationStatus");
+      button.disabled=true;
+      button.textContent="Testing...";
+      try{
+        const result=await window.OurSpaceNotifications.sendTest();
+        setStatus(status,"Test push sent successfully. Check your device notifications.","success");
+        console.log("Our Space notification test:",result);
+      }catch(error){
+        console.error("Notification test error:",error);
+        setStatus(status,error.message||"Notification test failed.","error");
+      }finally{
+        button.disabled=false;
+        button.textContent="Send test notification";
       }
     });
     start();
