@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="manifest" href="/manifest.json">
+  <script src="/theme.js?v=final"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <title>Our Space — Gallery</title>
+  <style>
+    :root{
+      --bg:#F8F0EC;--navy:#152B46;--peach:#F3B29F;--blue:#DCEAF5;
+      --white:#fff;--text:#26313D;--muted:#7A8794;--border:rgba(21,43,70,.09);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    body{padding:18px}
+    button{font:inherit;cursor:pointer}
+    .app{width:min(100%,1080px);margin:0 auto}
+    .header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:6px 0 18px}
+    .header-left{display:flex;align-items:center;gap:10px}
+    .back-button{width:40px;height:40px;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,.86);color:var(--navy);display:grid;place-items:center}
+    .back-button svg{width:18px;height:18px}
+    .title{margin:0;color:var(--navy);font-size:20px;font-weight:850}
+    .subtitle{margin:4px 0 0;color:var(--muted);font-size:11px}
+    .refresh-button{height:40px;padding:0 12px;border:1px solid var(--border);border-radius:12px;background:var(--white);color:var(--navy);font-size:10px;font-weight:800}
+    .gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+    .photo-card{position:relative;overflow:hidden;min-height:220px;border-radius:20px;background:var(--white);border:1px solid var(--border);box-shadow:0 10px 28px rgba(21,43,70,.06)}
+    .photo-card a{display:block;width:100%;height:100%}
+    .photo-card img{display:block;width:100%;height:100%;min-height:220px;object-fit:cover;background:var(--blue)}
+    .photo-date{position:absolute;left:8px;bottom:8px;padding:5px 7px;border-radius:8px;background:rgba(21,43,70,.72);color:#fff;font-size:8px;font-weight:700}
+    .state{padding:60px 20px;text-align:center;color:var(--muted)}
+    .state strong{display:block;margin-bottom:7px;color:var(--navy);font-size:16px}
+    @media(max-width:760px){.gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.photo-card,.photo-card img{min-height:180px}}
+    @media(max-width:430px){body{padding:12px}.photo-card,.photo-card img{min-height:145px}.title{font-size:18px}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="header-left">
+        <button class="back-button" id="backButton" type="button" aria-label="Back to Our Space">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m15 18-6-6 6-6"></path></svg>
+        </button>
+        <div>
+          <h1 class="title">Our Gallery</h1>
+          <p class="subtitle">Photos shared in your private space</p>
+        </div>
+      </div>
+      <button class="refresh-button" id="refreshButton" type="button">Refresh</button>
+    </header>
+    <main id="gallery" class="gallery"></main>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://ywflohxufmfydkpkkqly.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_qTMUO8KxerEQBDQ-A7Huyg_8N2Tqpmr";
+    const SPACE_ID = "6547fe99-ed80-421c-8572-50ae3fb6fbe4";
+    const client = supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY,
+      { auth: { persistSession:true, autoRefreshToken:true, detectSessionInUrl:true } }
+    );
+
+    const galleryEl = document.getElementById("gallery");
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function formatDate(value) {
+      return new Date(value).toLocaleDateString([], {
+        day:"numeric", month:"short", year:"numeric"
+      });
+    }
+
+    async function loadGallery() {
+      galleryEl.innerHTML =
+        '<div class="state"><strong>Loading gallery...</strong><span>Loading your shared photos.</span></div>';
+
+      const { data:{ user }, error:authError } = await client.auth.getUser();
+      if (authError || !user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      if (window.OurSpaceTheme?.syncFromUser) {
+        window.OurSpaceTheme.syncFromUser(user);
+      }
+
+      const { data:rows, error } = await client
+        .from("messages")
+        .select("id,created_at,media_path,message_type")
+        .eq("space_id", SPACE_ID)
+        .eq("message_type", "image")
+        .not("media_path", "is", null)
+        .order("created_at", { ascending:false });
+
+      if (error) {
+        galleryEl.innerHTML =
+          '<div class="state"><strong>Could not load the gallery</strong><span>' +
+          escapeHtml(error.message) +
+          '</span></div>';
+        return;
+      }
+
+      if (!rows?.length) {
+        galleryEl.innerHTML =
+          '<div class="state"><strong>No photos yet</strong><span>Photos you send in chat will appear here.</span></div>';
+        return;
+      }
+
+      const paths = rows.map((row) => row.media_path).filter(Boolean);
+      const { data:signed, error:signedError } =
+        await client.storage.from("chat-media").createSignedUrls(paths, 3600);
+
+      if (signedError) {
+        galleryEl.innerHTML =
+          '<div class="state"><strong>Could not open the photos</strong><span>' +
+          escapeHtml(signedError.message) +
+          '</span></div>';
+        return;
+      }
+
+      const urlByPath = new Map(
+        (signed || []).map((item) => [item.path, item.signedUrl])
+      );
+
+      galleryEl.innerHTML = rows.map((row) => {
+        const url = urlByPath.get(row.media_path);
+        if (!url) return "";
+        return '<article class="photo-card">' +
+          '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener noreferrer">' +
+          '<img src="' + escapeHtml(url) + '" alt="Shared photo" loading="lazy" decoding="async">' +
+          '<span class="photo-date">' + escapeHtml(formatDate(row.created_at)) + '</span>' +
+          '</a></article>';
+      }).join("");
+    }
+
+    document.getElementById("backButton").addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
+
+    document.getElementById("refreshButton").addEventListener("click", loadGallery);
+
+    client.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT" || !session) {
+        window.location.href = "login.html";
+      }
+    });
+
+    loadGallery();
+  </script>
+</body>
+</html>
