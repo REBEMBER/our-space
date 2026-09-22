@@ -365,13 +365,29 @@ async function send(text){
       });
     }
 
-    let accessToken=await freshAccessToken();
-    let r=await requestAi(accessToken);
+    async function requestAiWithRetry(token){
+      try{
+        let response=await requestAi(token);
 
-    if(r.status===401){
-      accessToken=await freshAccessToken(true);
-      r=await requestAi(accessToken);
+        if(response.status===401){
+          token=await freshAccessToken(true);
+          return requestAi(token);
+        }
+
+        if(response.status===502||response.status===503||response.status===504){
+          await new Promise(resolve=>setTimeout(resolve,450));
+          return requestAi(token);
+        }
+
+        return response;
+      }catch(error){
+        await new Promise(resolve=>setTimeout(resolve,450));
+        return requestAi(token);
+      }
     }
+
+    let accessToken=await freshAccessToken();
+    let r=await requestAiWithRetry(accessToken);
 
     const data=await r.json().catch(()=>({}));
     $("typing")?.remove();
