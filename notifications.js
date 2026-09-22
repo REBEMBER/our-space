@@ -119,6 +119,13 @@
 
         if (ownedSubscription) {
           await syncSubscription(existing, await getPreviewEnabled());
+        } else {
+          try {
+            await existing.unsubscribe();
+            await clearAppNotifications();
+          } catch (error) {
+            console.warn("Could not detach the previous account notification subscription:", error);
+          }
         }
       }
 
