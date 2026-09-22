@@ -67,6 +67,8 @@ button:focus-visible{outline:3px solid rgba(243,178,159,.65);outline-offset:3px}
 .preview-time{margin-left:auto;flex:0 0 auto;color:#9AA4AE;font-size:10px}
 .empty-preview{color:var(--muted);font-size:13px;line-height:1.5}
 .tiles{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.dashboard{grid-template-columns:repeat(3,1fr)}
+.tile-chat{background:#F4F7FA}.tile-chat:after{background:#B8C9D9}
 .tile{min-height:184px;padding:22px;position:relative;overflow:hidden;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease}
 .tile:hover{transform:translateY(-2px);box-shadow:0 20px 45px rgba(21,43,70,.11)}
 .tile:after{content:"";position:absolute;width:130px;height:130px;border-radius:50%;right:-50px;bottom:-65px;opacity:.45}
@@ -125,28 +127,20 @@ button:focus-visible{outline:3px solid rgba(243,178,159,.65);outline-offset:3px}
 </section>
 
 <section class="dashboard">
-  <article class="card recent">
-    <div class="card-head">
-      <div><div class="card-kicker">Continue where you left off</div><div class="card-title">Recent conversation</div></div>
-      <button class="view-link" id="recentChatButton">View chat</button>
-    </div>
-    <div class="preview" id="recentPreview" role="button" tabindex="0" aria-label="Open recent conversation">
-      <div class="preview-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9h10"/><path d="M7 13h6"/><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H17.5A2.5 2.5 0 0 1 20 5.5V13.5A2.5 2.5 0 0 1 17.5 16H11L6.5 20V16H6.5A2.5 2.5 0 0 1 4 13.5Z"/></svg></div>
-      <div class="preview-copy"><div class="preview-name" id="recentName">Our Space</div><div class="preview-text" id="recentText">Loading your latest conversation…</div></div>
-      <div class="preview-time" id="recentTime"></div>
-    </div>
+  <article class="card tile tile-chat" id="chatCard">
+    <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9h10"/><path d="M7 13h6"/><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H17.5A2.5 2.5 0 0 1 20 5.5V13.5A2.5 2.5 0 0 1 17.5 16H11L6.5 20V16H6.5A2.5 2.5 0 0 1 4 13.5Z"/></svg></div>
+    <h3>Private chat</h3><p>Continue your conversation together.</p>
   </article>
 
-  <div class="tiles">
-    <article class="card tile tile-gallery" id="galleryCard">
-      <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4" width="17" height="16" rx="2.5"/><circle cx="8.5" cy="9" r="1.4"/><path d="m4.5 17 4.7-4.8 3.4 3.2 2.3-2.3 4.6 4.4"/></svg></div>
-      <h3>Shared gallery</h3><p>Keep your photos together in one private place.</p>
-    </article>
-    <article class="card tile tile-ai" id="aiCard">
-      <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="4"/></svg></div>
-      <h3>AI space</h3><p>Ask, explore, or get help when you need it.</p>
-    </article>
-  </div>
+  <article class="card tile tile-gallery" id="galleryCard">
+    <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4" width="17" height="16" rx="2.5"/><circle cx="8.5" cy="9" r="1.4"/><path d="m4.5 17 4.7-4.8 3.4 3.2 2.3-2.3 2.3-2.3 4.6 4.4"/></svg></div>
+    <h3>Shared gallery</h3><p>Keep your photos together in one private place.</p>
+  </article>
+
+  <article class="card tile tile-ai" id="aiCard">
+    <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="4"/></svg></div>
+    <h3>AI space</h3><p>Ask, explore, or get help when you need it.</p>
+  </article>
 </section>
 
 <footer class="footer">Our Space · Private for two</footer>
@@ -161,13 +155,6 @@ button:focus-visible{outline:3px solid rgba(243,178,159,.65);outline-offset:3px}
   <button id="mobileSettings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2M12 19.2v2M21.2 12h-2M4.8 12h-2M18.5 5.5l-1.4 1.4M6.9 17.1l-1.4 1.4M18.5 18.5l-1.4-1.4M6.9 6.9 5.5 5.5"/></svg>Settings</button>
 </nav>
 
-<div class="modal-layer" id="settingsModal" aria-hidden="true">
-  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
-    <header class="modal-header"><div><div class="modal-title" id="settingsTitle">Settings</div><div class="modal-sub">Your account</div></div><button class="close" id="closeSettings" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M6 6l12 12"/><path d="M18 6 6 18"/></svg></button></header>
-    <div class="account-panel"><div class="account-box"><div class="account-label">Username</div><div class="account-value" id="settingsUsername">Loading…</div></div><button class="logout" id="logoutButton">Log out</button></div>
-  </section>
-</div>
-
 <script>
 const SUPABASE_URL="https://ywflohxufmfydkpkkqly.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_qTMUO8KxerEQBDQ-A7Huyg_8N2Tqpmr";
@@ -179,19 +166,15 @@ const $=id=>document.getElementById(id);
 function go(path){window.location.href=path}
 document.querySelectorAll("[data-go]").forEach(button=>button.addEventListener("click",()=>go(button.dataset.go)));
 $("openChatButton").addEventListener("click",()=>go("chat.html"));
-$("recentChatButton").addEventListener("click",()=>go("chat.html"));
-$("recentPreview").addEventListener("click",()=>go("chat.html"));
-$("recentPreview").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go("chat.html")}});
+$("chatCard").addEventListener("click",()=>go("chat.html"));
 $("openGalleryButton").addEventListener("click",()=>go("gallery.html"));
 $("galleryCard").addEventListener("click",()=>go("gallery.html"));
 $("aiCard").addEventListener("click",()=>go("ai.html"));
 
 function openSettings(){ $("settingsModal").classList.add("open"); $("settingsModal").setAttribute("aria-hidden","false"); }
 function closeSettings(){ $("settingsModal").classList.remove("open"); $("settingsModal").setAttribute("aria-hidden","true"); }
-$("settingsButton").addEventListener("click",openSettings);
-$("mobileSettings").addEventListener("click",openSettings);
-$("closeSettings").addEventListener("click",closeSettings);
-$("settingsModal").addEventListener("click",e=>{if(e.target===$("settingsModal"))closeSettings()});
+$("settingsButton").addEventListener("click",()=>go("settings.html"));
+$("mobileSettings").addEventListener("click",()=>go("settings.html"));
 
 async function checkAuthentication(){
   const {data:{user},error}=await client.auth.getUser();
@@ -207,38 +190,9 @@ async function loadProfile(){
   $("heroName").textContent=username.charAt(0).toUpperCase()+username.slice(1);
   $("settingsUsername").textContent=username;
 }
-function formatPreview(message){
-  if(message.message_type==="image")return "Photo";
-  return String(message.content||"").replace(/\s+/g," ").trim()||"Message";
-}
-function formatTime(value){
-  const date=new Date(value);
-  const now=new Date();
-  const sameDay=date.toDateString()===now.toDateString();
-  return sameDay?date.toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}):date.toLocaleDateString([], {month:"short",day:"numeric"});
-}
-async function loadRecentMessage(){
-  const {data,error}=await client.from("messages").select("content,message_type,created_at,sender_id,deleted_at").eq("space_id","6547fe99-ed80-421c-8572-50ae3fb6fbe4").order("created_at",{ascending:false}).limit(1).maybeSingle();
-  if(error||!data){
-    $("recentText").textContent="Start your first conversation together.";
-    $("recentName").textContent="Our Space";
-    return;
-  }
-  const {data:profile}=await client.from("user_profiles").select("username").eq("user_id",data.sender_id).maybeSingle();
-  $("recentName").textContent=profile?.username?profile.username.charAt(0).toUpperCase()+profile.username.slice(1):"Our Space";
-  $("recentText").textContent=data.deleted_at&&data.sender_id!==currentUser.id?"Message deleted":formatPreview(data);
-  $("recentTime").textContent=formatTime(data.created_at);
-}
-$("logoutButton").addEventListener("click",async()=>{
-  const {error}=await client.auth.signOut({scope:"local"});
-  if(!error)go("login.html");
-});
-client.auth.onAuthStateChange((event,session)=>{if(event==="SIGNED_OUT"||!session)go("login.html")});
-
 async function initializeApp(){
   if(!await checkAuthentication())return;
   await loadProfile();
-  await loadRecentMessage();
 }
 initializeApp();
 </script>
