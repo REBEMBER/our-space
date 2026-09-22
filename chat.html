@@ -1626,60 +1626,60 @@
     function scrollToLatestAfterImages(behavior = "auto") {
       syncLayoutMetrics();
 
+      const scroll = (scrollBehavior = "auto") => {
+        syncLayoutMetrics();
+
+        const maxScroll = Math.max(
+          0,
+          messagesScroll.scrollHeight -
+            messagesScroll.clientHeight
+        );
+
+        messagesScroll.scrollTo({
+          top: maxScroll,
+          behavior: scrollBehavior
+        });
+      };
+
       const images = Array.from(
         messagesEl.querySelectorAll(".message-image")
       );
 
-      const finish = () => {
+      // Do an immediate pass first, then repeat after layout/image
+      // measurements have had time to settle. This fixes both initial
+      // chat entry and newly-rendered photo messages.
+      requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            const maxScroll = Math.max(
-              0,
-              messagesScroll.scrollHeight -
-                messagesScroll.clientHeight
-            );
-
-            messagesScroll.scrollTo({
-              top: maxScroll,
-              behavior
-            });
-          });
+          scroll(behavior);
         });
-      };
-
-      const pendingImages = images.filter(
-        (image) => !image.complete
-      );
-
-      if (!pendingImages.length) {
-        finish();
-        return;
-      }
-
-      let remaining = pendingImages.length;
-      let finished = false;
-
-      const done = () => {
-        if (finished) return;
-        remaining -= 1;
-
-        if (remaining <= 0) {
-          finished = true;
-          finish();
-        }
-      };
-
-      pendingImages.forEach((image) => {
-        image.addEventListener("load", done, { once: true });
-        image.addEventListener("error", done, { once: true });
       });
 
+      const settleTimers = [80, 180, 350, 700, 1200].map((delay) =>
+        setTimeout(() => {
+          scroll("auto");
+        }, delay)
+      );
+
+      images.forEach((image) => {
+        image.addEventListener(
+          "load",
+          () => {
+            requestAnimationFrame(() => scroll("auto"));
+          },
+          { once: true }
+        );
+        image.addEventListener(
+          "error",
+          () => scroll("auto"),
+          { once: true }
+        );
+      });
+
+      // Keep the final cleanup bounded so this cannot create a permanent
+      // timer or observer.
       setTimeout(() => {
-        if (!finished) {
-          finished = true;
-          finish();
-        }
-      }, 1500);
+        settleTimers.forEach(clearTimeout);
+      }, 1250);
     }
 
     function closeMenus() {
