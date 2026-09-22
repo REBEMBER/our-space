@@ -2951,15 +2951,6 @@ function renderError(message) {
       requestBestReply
     );
 
-    replyAssistSuggestion.addEventListener(
-      "click",
-      sendReplySuggestion
-    );
-
-    replyAssistSend.addEventListener(
-      "click",
-      sendReplySuggestion
-    );
     replyAssistClose.addEventListener(
       "click",
       clearReplySuggestion
@@ -3004,7 +2995,7 @@ function renderError(message) {
     input.addEventListener(
       "input",
       () => {
-        if (replySuggestion && input.value.trim()) {
+        if (replySuggestions.length && input.value.trim()) {
           clearReplySuggestion();
         }
       }
