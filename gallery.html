@@ -217,25 +217,38 @@
       if (!messageId || !isMohammad || !user) return;
 
       const row = { id: messageId };
+      const galleryMessage = Array.from(document.querySelectorAll("[data-gallery-delete]"))
+        .find((node) => Number(node.dataset.galleryDelete) === Number(messageId));
+
       button.disabled = true;
       try {
+        const { data:mediaRow, error:mediaLookupError } = await client
+          .from("messages")
+          .select("media_path,sender_id")
+          .eq("id", row.id)
+          .eq("sender_id", user.id)
+          .maybeSingle();
+
+        if (mediaLookupError || !mediaRow?.media_path) {
+          throw mediaLookupError || new Error("Could not find the photo.");
+        }
+
+        const mediaPath = mediaRow.media_path;
+
         const { data:changed, error:rpcError } = await client.rpc("delete_message_for_everyone", { p_message_id: row.id });
         if (rpcError || changed === false) {
           throw rpcError || new Error("Could not delete the photo.");
         }
 
-        // Remove the underlying file as well. The message is already marked deleted.
-        const { data:deletedRow } = await client
-          .from("messages")
-          .select("media_path,sender_id")
-          .eq("id", row.id)
-          .maybeSingle();
+        const { error:storageError } = await client
+          .storage
+          .from("chat-media")
+          .remove([mediaPath]);
 
-        if (deletedRow?.media_path) {
-          const { error:storageError } = await client.storage
-            .from("chat-media")
-            .remove([deletedRow.media_path]);
-          if (storageError) throw storageError;
+        if (storageError) throw storageError;
+
+        if (galleryMessage) {
+          galleryMessage.closest(".photo-card")?.remove();
         }
 
         closeGalleryDelete();
