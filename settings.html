@@ -316,6 +316,14 @@
 
     document.getElementById("logoutButton").addEventListener("click",async()=>{
       const status=document.getElementById("logoutStatus");
+      try{
+        if(window.OurSpaceNotifications){
+          await window.OurSpaceNotifications.disable();
+        }
+      }catch(error){
+        console.warn("Notification cleanup during logout failed:",error);
+      }
+
       const {error}=await client.auth.signOut({scope:"local"});
       if(error){console.error("Logout error:",error);setStatus(status,error.message||"Could not log out.","error");return;}
       window.location.href="login.html";
