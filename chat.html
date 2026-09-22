@@ -895,6 +895,11 @@
       line-height: 1;
     }
 
+    .reply-assist-suggestions {
+      display: grid;
+      gap: 7px;
+    }
+
     .reply-assist-suggestion {
       width: 100%;
       border: 1px solid var(--border);
@@ -907,7 +912,7 @@
       line-height: 1.5;
       white-space: pre-wrap;
       word-break: break-word;
-      transition: border-color .15s ease, background .15s ease;
+      transition: border-color .15s ease, background .15s ease, opacity .15s ease;
     }
 
     .reply-assist-suggestion:hover:not(:disabled) {
@@ -1285,15 +1290,14 @@
           </div>
         </div>
 
-        <button
-          class="reply-assist-suggestion"
-          id="replyAssistSuggestion"
-          type="button"
-          aria-label="Send suggested reply"
-        ></button>
+        <div
+          class="reply-assist-suggestions"
+          id="replyAssistSuggestions"
+          aria-label="Suggested replies"
+        ></div>
 
         <div class="reply-assist-actions">
-          <button class="reply-assist-action send-reply" id="replyAssistSend" type="button">Send reply</button>
+          <span class="reply-assist-note">Tap a reply to send it</span>
         </div>
       </div>
 
@@ -1446,10 +1450,8 @@
       document.getElementById("replyAssist");
     const replyAssistStatus =
       document.getElementById("replyAssistStatus");
-    const replyAssistSuggestion =
-      document.getElementById("replyAssistSuggestion");
-    const replyAssistSend =
-      document.getElementById("replyAssistSend");
+    const replyAssistSuggestions =
+      document.getElementById("replyAssistSuggestions");
     const replyAssistClose =
       document.getElementById("replyAssistClose");
     const bestReplyButton =
@@ -1465,7 +1467,7 @@
     let realtimeChannel = null;
     let visibleMessageObserver = null;
     let isChatVisible = document.visibilityState === "visible";
-    let replySuggestion = null;
+    let replySuggestions = [];
     let replySuggestionSent = false;
     let busyReplySuggestion = false;
     const imageUrlCache = new Map();
@@ -2223,29 +2225,58 @@ function renderError(message) {
     }
 
     function clearReplySuggestion() {
-      replySuggestion = null;
+      replySuggestions = [];
       replySuggestionSent = false;
       replyAssist.classList.remove("visible");
-      replyAssistSuggestion.textContent = "";
-      replyAssistSuggestion.classList.remove("sent");
+      replyAssistSuggestions.innerHTML = "";
       replyAssistStatus.textContent = "Ready";
-      setReplyButtonsEnabled(false);
       syncLayoutMetrics();
     }
 
-    function setReplyButtonsEnabled(enabled) {
-      replyAssistSend.disabled = !enabled;
-      replyAssistSuggestion.disabled = !enabled;
+    function normalizeReplySuggestions(raw) {
+      return String(raw || "")
+        .split("\n")
+        .map((line) =>
+          line
+            .replace(/^\s*(?:[-*•]|\d+[.)])\s*/, "")
+            .replace(/^[\"“”']+|[\"“”']+$/g, "")
+            .trim()
+        )
+        .filter(Boolean)
+        .slice(0, 3);
     }
 
     function showReplyAssist(data) {
-      replySuggestion = data;
+      const suggestions = Array.isArray(data.suggestions)
+        ? data.suggestions
+        : normalizeReplySuggestions(data.suggestion);
+
+      if (suggestions.length !== 3) {
+        throw new Error("The AI returned an invalid set of three replies.");
+      }
+
+      replySuggestions = suggestions.map((suggestion) => ({
+        suggestion,
+        suggestion_id: data.suggestion_id,
+        source_message_id: Number(data.source_message_id)
+      }));
       replySuggestionSent = false;
+
+      replyAssistSuggestions.innerHTML = replySuggestions
+        .map(
+          (item, index) => `
+            <button
+              class="reply-assist-suggestion"
+              type="button"
+              data-reply-index="${index}"
+              aria-label="Send suggested reply ${index + 1}"
+            >${escapeHtml(item.suggestion)}</button>
+          `
+        )
+        .join("");
+
       replyAssist.classList.add("visible");
-      replyAssistSuggestion.textContent = data.suggestion || "";
-      replyAssistSuggestion.classList.remove("sent");
-      replyAssistStatus.textContent = "Ready to send";
-      setReplyButtonsEnabled(true);
+      replyAssistStatus.textContent = "Choose a reply";
       syncLayoutMetrics();
     }
 
@@ -2300,10 +2331,16 @@ function renderError(message) {
           throw new Error("The AI returned an empty suggestion.");
         }
 
+        const suggestions = normalizeReplySuggestions(data.suggestion);
+
+        if (suggestions.length !== 3) {
+          throw new Error("The AI returned an invalid set of three replies.");
+        }
+
         showReplyAssist({
           suggestion_id: data.suggestion_id,
           source_message_id: Number(data.source_message_id),
-          suggestion: String(data.suggestion)
+          suggestions
         });
       } catch (error) {
         replyAssistStatus.textContent = "Error";
@@ -2318,14 +2355,17 @@ function renderError(message) {
       }
     }
 
-    async function sendReplySuggestion() {
-      if (!replySuggestion || replySuggestionSent || busyReplySuggestion) return;
+    async function sendReplySuggestion(index) {
+      if (replySuggestionSent || busyReplySuggestion) return;
+
+      const selected = replySuggestions[index];
+      if (!selected) return;
 
       const incoming = latestIncomingMessage();
 
       if (
         !incoming ||
-        Number(incoming.id) !== Number(replySuggestion.source_message_id)
+        Number(incoming.id) !== Number(selected.source_message_id)
       ) {
         clearReplySuggestion();
         alert("A newer message from Salma arrived. Generate a fresh reply.");
@@ -2334,19 +2374,32 @@ function renderError(message) {
 
       busyReplySuggestion = true;
       replyAssistStatus.textContent = "Sending...";
-      setReplyButtonsEnabled(false);
+
+      const buttons = replyAssistSuggestions.querySelectorAll(
+        "[data-reply-index]"
+      );
+      buttons.forEach((button) => {
+        button.disabled = true;
+      });
 
       try {
-        await sendMessage(replySuggestion.suggestion, true);
+        await sendMessage(selected.suggestion, true);
         replySuggestionSent = true;
-        replyAssistSuggestion.classList.add("sent");
-        replyAssistSuggestion.disabled = true;
-        replyAssistSend.disabled = true;
+
+        buttons.forEach((button) => {
+          button.classList.toggle(
+            "sent",
+            Number(button.dataset.replyIndex) === Number(index)
+          );
+        });
+
         replyAssistStatus.textContent = "Sent";
       } catch (error) {
+        buttons.forEach((button) => {
+          button.disabled = false;
+        });
         replyAssistStatus.textContent =
           error.message || "Could not send.";
-        setReplyButtonsEnabled(true);
       } finally {
         busyReplySuggestion = false;
         syncLayoutMetrics();
@@ -2958,6 +3011,17 @@ function renderError(message) {
       clearReplySuggestion
     );
 
+    replyAssistSuggestions.addEventListener(
+      "click",
+      async (event) => {
+        const button = event.target.closest("[data-reply-index]");
+        if (!button) return;
+
+        const index = Number(button.dataset.replyIndex);
+        await sendReplySuggestion(index);
+      }
+    );
+
     attachmentButton.addEventListener("click", () => {
       if (!attachmentButton.disabled) {
         photoInput.click();
@@ -2997,7 +3061,7 @@ function renderError(message) {
     input.addEventListener(
       "input",
       () => {
-        if (replySuggestion && input.value.trim()) {
+        if (replySuggestions.length && input.value.trim()) {
           clearReplySuggestion();
         }
       }
