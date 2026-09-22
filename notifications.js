@@ -235,10 +235,20 @@
   }
 
   async function sendMessageNotification(message) {
-    if (!notificationUser || !message) return;
+    if (!message) return;
 
     try {
       const client = await getClient();
+      const { data:authData, error:authError } = await client.auth.getUser();
+      if (authError || !authData.user) return;
+
+      notificationUser = authData.user;
+
+      // A device must never request a push for the account that just sent the message.
+      if (!message.sender_id || message.sender_id === notificationUser.id) {
+        return;
+      }
+
       const { data, error } = await client.functions.invoke("notify-message", {
         body: {
           message_id: message.id,
@@ -281,6 +291,16 @@
 
   window.addEventListener("pageshow", () => {
     clearAppNotifications();
+  });
+
+  window.addEventListener("storage", () => {
+    if (!notificationUser) return;
+    getClient()
+      .then((client) => client.auth.getUser())
+      .then(({ data }) => {
+        if (!data?.user) notificationUser = null;
+      })
+      .catch(() => {});
   });
 
   window.OurSpaceNotifications = {
