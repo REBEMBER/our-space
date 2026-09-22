@@ -1549,7 +1549,18 @@
 
     function scrollToLatestNow() {
       syncLayoutMetrics();
-      messagesScroll.scrollTop = messagesScroll.scrollHeight;
+
+      // scrollHeight is relative to the scroll container's content box.
+      // Use the explicit maximum rather than relying on browser clamping;
+      // this is more reliable when a fixed composer and a flex spacer are
+      // involved.
+      const maxScrollTop = Math.max(
+        0,
+        messagesScroll.scrollHeight -
+          messagesScroll.clientHeight
+      );
+
+      messagesScroll.scrollTop = maxScrollTop;
     }
 
     function scrollToLatest(behavior = "auto") {
@@ -1649,6 +1660,21 @@
     messagesScroll.addEventListener("pointerdown", userStartedScrollingChat, {
       passive: true
     });
+
+    messagesScroll.addEventListener("scroll", () => {
+      // If the user manually moves away from the bottom, don't let a
+      // late image/layout callback pull them back down.
+      if (!stickToBottom) return;
+
+      const distance =
+        messagesScroll.scrollHeight -
+        messagesScroll.clientHeight -
+        messagesScroll.scrollTop;
+
+      if (distance > 24) {
+        cancelBottomLock();
+      }
+    }, { passive: true });
 
     messagesScroll.addEventListener("keydown", (event) => {
       if (
