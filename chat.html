@@ -1623,6 +1623,65 @@
       });
     }
 
+    function scrollToLatestAfterImages(behavior = "auto") {
+      syncLayoutMetrics();
+
+      const images = Array.from(
+        messagesEl.querySelectorAll(".message-image")
+      );
+
+      const finish = () => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            const maxScroll = Math.max(
+              0,
+              messagesScroll.scrollHeight -
+                messagesScroll.clientHeight
+            );
+
+            messagesScroll.scrollTo({
+              top: maxScroll,
+              behavior
+            });
+          });
+        });
+      };
+
+      const pendingImages = images.filter(
+        (image) => !image.complete
+      );
+
+      if (!pendingImages.length) {
+        finish();
+        return;
+      }
+
+      let remaining = pendingImages.length;
+      let finished = false;
+
+      const done = () => {
+        if (finished) return;
+        remaining -= 1;
+
+        if (remaining <= 0) {
+          finished = true;
+          finish();
+        }
+      };
+
+      pendingImages.forEach((image) => {
+        image.addEventListener("load", done, { once: true });
+        image.addEventListener("error", done, { once: true });
+      });
+
+      setTimeout(() => {
+        if (!finished) {
+          finished = true;
+          finish();
+        }
+      }, 1500);
+    }
+
     function closeMenus() {
       document
         .querySelectorAll(".message-menu.open")
@@ -2319,7 +2378,7 @@ function renderError(message) {
       renderMessages();
 
       if (shouldScroll) {
-        scrollToLatest();
+        scrollToLatestAfterImages("auto");
       }
     }
 
@@ -2456,7 +2515,7 @@ function renderError(message) {
           (a, b) => new Date(a.created_at) - new Date(b.created_at)
         );
         renderMessages();
-        scrollToLatest();
+        scrollToLatestAfterImages("smooth");
 
         if (sentMessage && window.OurSpaceNotifications) {
           await window.OurSpaceNotifications.sendMessage(sentMessage);
