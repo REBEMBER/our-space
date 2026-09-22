@@ -10,9 +10,9 @@
   "theme_color": "#152B46",
   "icons": [
     {
-      "src": "/favicon.svg",
+      "src": "/calculator.png",
       "sizes": "any",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]
