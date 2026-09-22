@@ -1,6 +1,7 @@
 (() => {
   const THEMES = ["warm","dark","ocean","forest","blush","sunset"];
   const DEFAULT_THEME = "warm";
+  const BUILD_MARKER = "2026-09-23-ui-sync";
   const COOKIE = "our_space_theme";
   const MAX_AGE = 31536000;
   const THEME_META_COLORS = {
