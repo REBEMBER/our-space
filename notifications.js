@@ -59,6 +59,8 @@
       notificationRegistration =
         await navigator.serviceWorker.register("/sw.js", { scope: "/" });
 
+      await notificationRegistration.update();
+
       const existing =
         await notificationRegistration.pushManager.getSubscription();
 
