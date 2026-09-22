@@ -16,6 +16,7 @@
   >
 
   <title>Our Space</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <script src="/theme.js?v=final"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1917,8 +1918,6 @@ function renderError(message) {
       replyAssistSuggestion.textContent = data.suggestion || "";
       replyAssistSuggestion.classList.remove("sent");
       replyAssistStatus.textContent = "Ready to send";
-      replyAssistLike.classList.remove("active");
-      replyAssistDislike.classList.remove("active");
       setReplyButtonsEnabled(true);
       syncLayoutMetrics();
     }
