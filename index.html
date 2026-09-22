@@ -218,7 +218,7 @@ function formatTime(value){
   return sameDay?date.toLocaleTimeString([], {hour:"numeric",minute:"2-digit"}):date.toLocaleDateString([], {month:"short",day:"numeric"});
 }
 async function loadRecentMessage(){
-  const {data,error}=await client.from("messages").select("content,message_type,created_at,sender_id,deleted_at").eq("space_id","00000000-0000-0000-0000-000000000001").order("created_at",{ascending:false}).limit(1).maybeSingle();
+  const {data,error}=await client.from("messages").select("content,message_type,created_at,sender_id,deleted_at").eq("space_id","6547fe99-ed80-421c-8572-50ae3fb6fbe4").order("created_at",{ascending:false}).limit(1).maybeSingle();
   if(error||!data){
     $("recentText").textContent="Start your first conversation together.";
     $("recentName").textContent="Our Space";
