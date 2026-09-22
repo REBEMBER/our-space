@@ -1381,6 +1381,28 @@
 
           <button
             class="settings-button"
+            id="galleryButton"
+            type="button"
+            aria-label="Gallery"
+            title="Gallery"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="3.5" y="4" width="17" height="16" rx="2.5"></rect>
+              <circle cx="8.5" cy="9" r="1.4"></circle>
+              <path d="m4.5 17 4.7-4.8 3.4 3.2 2.3-2.3 4.6 4.4"></path>
+            </svg>
+            <span>Gallery</span>
+          </button>
+
+          <button
+            class="settings-button"
             id="settingsButton"
             type="button"
             aria-label="Settings"
@@ -1704,6 +1726,9 @@
         "settingsModal"
       );
 
+    const galleryButton =
+      document.getElementById("galleryButton");
+
     const openChatButton =
       document.getElementById(
         "openChatButton"
@@ -1826,6 +1851,10 @@
           window.location.href = "ai.html";
         }
       );
+
+    galleryButton.addEventListener("click", () => {
+      window.location.href = "gallery.html";
+    });
 
     /* ==========================================
        SETTINGS
