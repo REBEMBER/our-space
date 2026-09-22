@@ -1492,6 +1492,13 @@
     let busyReplySuggestion = false;
     const imageUrlCache = new Map();
 
+    // Scroll state is centralized so initial entry, photo sends, realtime
+    // inserts, and image/layout changes all use the same bottom-lock logic.
+    let stickToBottom = false;
+    let bottomScrollFrame = 0;
+    let bottomScrollToken = 0;
+    let bottomScrollTimers = [];
+
     /* ==========================================
        HELPERS
     ========================================== */
@@ -1515,43 +1522,120 @@
       );
     }
 
-    // Put the last message itself at the visual bottom of the chat,
-    // not merely at the scroll container's mathematical bottom.
-    // This is important because the composer is fixed over the scroll area.
+    // Keep the last message above the fixed composer. We intentionally
+    // scroll using the container's real scrollHeight; assigning scrollTop
+    // to scrollHeight clamps to the browser's true maximum scroll position.
     function isAtBottom() {
       const distance =
         messagesScroll.scrollHeight -
         messagesScroll.clientHeight -
         messagesScroll.scrollTop;
 
-      return distance <= 12;
+      return distance <= 16;
     }
 
-    let scrollRequestFrame = 0;
-    let scrollRequestFrame2 = 0;
+    function cancelBottomLock() {
+      stickToBottom = false;
+      bottomScrollToken += 1;
 
-    function scrollToLatest() {
-      if (scrollRequestFrame || scrollRequestFrame2) return;
+      if (bottomScrollFrame) {
+        cancelAnimationFrame(bottomScrollFrame);
+        bottomScrollFrame = 0;
+      }
 
-      scrollRequestFrame = requestAnimationFrame(() => {
-        scrollRequestFrame = 0;
+      bottomScrollTimers.forEach(clearTimeout);
+      bottomScrollTimers = [];
+    }
 
-        scrollRequestFrame2 = requestAnimationFrame(() => {
-          scrollRequestFrame2 = 0;
+    function scrollToLatestNow() {
+      syncLayoutMetrics();
+      messagesScroll.scrollTop = messagesScroll.scrollHeight;
+    }
 
-          const maxScroll =
-            Math.max(
-              0,
-              messagesScroll.scrollHeight -
-              messagesScroll.clientHeight
-            );
+    function scrollToLatest(behavior = "auto") {
+      stickToBottom = true;
+      const token = ++bottomScrollToken;
 
-          // The real bottom spacer inside .messages-container makes this
-          // absolute end safe: the last bubble sits above the fixed composer.
-          messagesScroll.scrollTop = maxScroll;
+      if (bottomScrollFrame) {
+        cancelAnimationFrame(bottomScrollFrame);
+      }
+
+      bottomScrollFrame = requestAnimationFrame(() => {
+        bottomScrollFrame = requestAnimationFrame(() => {
+          bottomScrollFrame = 0;
+
+          if (token !== bottomScrollToken) return;
+
+          if (behavior === "smooth") {
+            messagesScroll.scrollTo({
+              top: messagesScroll.scrollHeight,
+              behavior: "smooth"
+            });
+          } else {
+            scrollToLatestNow();
+          }
         });
       });
+
+      return token;
     }
+
+    // A forced bottom lock is used only when the app itself knows that the
+    // user should be at the latest message (chat entry / sending a photo).
+    // It survives image decoding and any resulting layout reflow.
+    function lockToLatestForSettling() {
+      stickToBottom = true;
+      const token = ++bottomScrollToken;
+
+      if (bottomScrollFrame) {
+        cancelAnimationFrame(bottomScrollFrame);
+        bottomScrollFrame = 0;
+      }
+
+      bottomScrollTimers.forEach(clearTimeout);
+      bottomScrollTimers = [];
+
+      const settle = () => {
+        if (!stickToBottom || token !== bottomScrollToken) return;
+        scrollToLatestNow();
+      };
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(settle);
+      });
+
+      // Image loading and decoding can change scrollHeight well after the
+      // first paint. ResizeObserver below handles exact changes; these
+      // bounded passes cover browser scheduling gaps as well.
+      [50, 120, 250, 500, 900, 1400].forEach((delay) => {
+        bottomScrollTimers.push(
+          setTimeout(settle, delay)
+        );
+      });
+
+      bottomScrollTimers.push(
+        setTimeout(() => {
+          if (token === bottomScrollToken) {
+            stickToBottom = false;
+            bottomScrollTimers = [];
+          }
+        }, 1800)
+      );
+    }
+
+    function userStartedScrollingChat() {
+      cancelBottomLock();
+    }
+
+    messagesScroll.addEventListener("wheel", userStartedScrollingChat, {
+      passive: true
+    });
+    messagesScroll.addEventListener("touchstart", userStartedScrollingChat, {
+      passive: true
+    });
+    messagesScroll.addEventListener("pointerdown", userStartedScrollingChat, {
+      passive: true
+    });
 
     function dateKey(value) {
       const d = new Date(value);
@@ -1623,63 +1707,8 @@
       });
     }
 
-    function scrollToLatestAfterImages(behavior = "auto") {
-      syncLayoutMetrics();
-
-      const scroll = (scrollBehavior = "auto") => {
-        syncLayoutMetrics();
-
-        const maxScroll = Math.max(
-          0,
-          messagesScroll.scrollHeight -
-            messagesScroll.clientHeight
-        );
-
-        messagesScroll.scrollTo({
-          top: maxScroll,
-          behavior: scrollBehavior
-        });
-      };
-
-      const images = Array.from(
-        messagesEl.querySelectorAll(".message-image")
-      );
-
-      // Do an immediate pass first, then repeat after layout/image
-      // measurements have had time to settle. This fixes both initial
-      // chat entry and newly-rendered photo messages.
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          scroll(behavior);
-        });
-      });
-
-      const settleTimers = [80, 180, 350, 700, 1200].map((delay) =>
-        setTimeout(() => {
-          scroll("auto");
-        }, delay)
-      );
-
-      images.forEach((image) => {
-        image.addEventListener(
-          "load",
-          () => {
-            requestAnimationFrame(() => scroll("auto"));
-          },
-          { once: true }
-        );
-        image.addEventListener(
-          "error",
-          () => scroll("auto"),
-          { once: true }
-        );
-      });
-
-      // Keep the final cleanup bounded so this cannot create a permanent
-      // timer or observer.
-      setTimeout(() => {
-        settleTimers.forEach(clearTimeout);
-      }, 1250);
+    function scrollToLatestAfterImages() {
+      lockToLatestForSettling();
     }
 
     function closeMenus() {
@@ -1709,6 +1738,18 @@
       }
     }
 
+    const messagesContentResizeObserver = new ResizeObserver(() => {
+      if (!stickToBottom) return;
+
+      // ResizeObserver fires when images finish decoding or message layout
+      // changes. Defer the scroll one frame so the new geometry is committed.
+      requestAnimationFrame(() => {
+        if (stickToBottom) {
+          scrollToLatestNow();
+        }
+      });
+    });
+
     const headerResizeObserver = new ResizeObserver(() => {
       syncLayoutMetrics();
     });
@@ -1735,6 +1776,10 @@
 
     if (composerAreaElement) {
       composerResizeObserver.observe(composerAreaElement);
+    }
+
+    if (messagesEl) {
+      messagesContentResizeObserver.observe(messagesEl);
     }
 
     syncLayoutMetrics();
@@ -1931,7 +1976,7 @@ function renderError(message) {
                       class="message-image"
                       src="${escapeHtml(message.media_url)}"
                       alt="Photo"
-                      loading="lazy"
+                      loading="eager"
                       decoding="async"
                     >
                   </a>
@@ -2378,7 +2423,7 @@ function renderError(message) {
       renderMessages();
 
       if (shouldScroll) {
-        scrollToLatestAfterImages("auto");
+        scrollToLatestAfterImages();
       }
     }
 
@@ -2515,7 +2560,7 @@ function renderError(message) {
           (a, b) => new Date(a.created_at) - new Date(b.created_at)
         );
         renderMessages();
-        scrollToLatestAfterImages("smooth");
+        scrollToLatestAfterImages();
 
         if (sentMessage && window.OurSpaceNotifications) {
           await window.OurSpaceNotifications.sendMessage(sentMessage);
