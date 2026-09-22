@@ -15,7 +15,7 @@ self.addEventListener("push", (event) => {
     const previewEnabled = data.preview_enabled !== false;
     const title = previewEnabled
       ? (data.sender_name || "Salma")
-      : "Our Space";
+      : "Calculator";
 
     const body = previewEnabled
       ? (data.content || "You have a new message.")
