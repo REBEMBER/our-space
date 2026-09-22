@@ -76,28 +76,30 @@ button:focus-visible{outline:3px solid rgba(243,178,159,.65);outline-offset:3px}
 .hero-inner{position:relative;z-index:1;max-width:780px}
 .eyebrow{display:inline-flex;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:var(--hero-text);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
 .hero h1{margin-top:21px;color:var(--hero-text);font-size:clamp(42px,6vw,72px);line-height:.96;letter-spacing:-.06em}
-.hero h1 span{color:#F8D0C4}
+.hero h1 span{color:var(--peach)}
 .hero p{max-width:600px;margin-top:18px;color:var(--hero-soft);font-size:15px;line-height:1.7}
 .open-chat{display:inline-flex;align-items:center;justify-content:center;gap:9px;margin-top:27px;min-height:50px;padding:0 20px;border-radius:15px;background:var(--surface);color:var(--navy);font-size:13px;font-weight:850;cursor:pointer;box-shadow:0 14px 30px rgba(0,0,0,.17)}
 .open-chat svg{width:18px;height:18px}
-.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
+.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:16px}
 .action-card{position:relative;overflow:hidden;min-height:190px;padding:23px;border-radius:24px;border:1px solid var(--line);cursor:pointer;box-shadow:var(--shadow);transition:transform .18s ease,box-shadow .18s ease}
 .action-card:hover{transform:translateY(-2px);box-shadow:0 22px 48px rgba(21,43,70,.11)}
 .action-card:after{content:"";position:absolute;width:150px;height:150px;right:-60px;bottom:-75px;border-radius:50%;opacity:.48}
 .card-chat{background:var(--soft)}.card-chat:after{background:color-mix(in srgb,var(--navy) 18%,#fff)}
 .card-gallery{background:var(--soft-2)}.card-gallery:after{background:color-mix(in srgb,var(--blue) 88%,#fff)}
 .card-ai{background:var(--soft-3)}.card-ai:after{background:var(--peach)}
+.card-calculator{background:color-mix(in srgb,var(--blue) 52%,var(--surface))}.card-calculator:after{background:var(--peach)}
+
 .action-icon{width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,.80);color:var(--navy);display:grid;place-items:center}
 .action-icon svg{width:20px;height:20px}
 .action-card h2{position:relative;z-index:1;margin-top:31px;color:var(--navy);font-size:20px;letter-spacing:-.02em}
-.action-card p{position:relative;z-index:1;max-width:215px;margin-top:7px;color:rgba(38,49,61,.66);font-size:12px;line-height:1.55}
+.action-card p{position:relative;z-index:1;max-width:215px;margin-top:7px;color:color-mix(in srgb,var(--text) 66%,transparent);font-size:12px;line-height:1.55}
 .footer{padding:22px 2px 8px;text-align:center;color:#9AA4AE;font-size:10px}
 .mobile-nav{display:none}
 @media(max-width:900px){
   .desktop-nav{display:none}
-  .mobile-nav{position:fixed;left:12px;right:12px;bottom:12px;z-index:20;display:grid;grid-template-columns:repeat(6,1fr);gap:3px;padding:6px;border:1px solid var(--line);border-radius:19px;background:rgba(255,255,255,.95);box-shadow:0 15px 45px rgba(21,43,70,.15);backdrop-filter:blur(15px)}
+  .mobile-nav{position:fixed;left:12px;right:12px;bottom:12px;z-index:20;display:grid;grid-template-columns:repeat(6,1fr);gap:3px;padding:6px;border:1px solid var(--line);border-radius:19px;background:color-mix(in srgb,var(--surface) 94%,transparent);box-shadow:0 15px 45px rgba(21,43,70,.15);backdrop-filter:blur(15px)}
   .mobile-nav button{height:50px;border-radius:14px;background:transparent;color:#8A949E;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:9px;font-weight:850;cursor:pointer}
-  .mobile-nav button.active{background:#F7F2EF;color:var(--navy)}
+  .mobile-nav button.active{background:color-mix(in srgb,var(--peach) 16%,var(--surface));color:var(--navy)}
   .mobile-nav svg{width:18px;height:18px}
   .app{padding:13px 13px 88px}
   .actions{grid-template-columns:1fr}
@@ -124,8 +126,9 @@ button:focus-visible{outline:3px solid rgba(243,178,159,.65);outline-offset:3px}
     <div class="brand">
       <div class="brand-mark" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M7 9h10"/><path d="M7 13h6"/>
-          <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H17.5A2.5 2.5 0 0 1 20 5.5V13.5A2.5 2.5 0 0 1 17.5 16H11L6.5 20V16H6.5A2.5 2.5 0 0 1 4 13.5Z"/>
+          <rect x="5" y="2.8" width="14" height="18.4" rx="2.2"/>
+          <path d="M8 6h8"/>
+          <path d="M8 10h2M14 10h2M8 14h2M14 14h2M8 18h2M14 18h2"/>
         </svg>
       </div>
       <div><div class="brand-title">OUR SPACE</div><div class="brand-subtitle">Private space for two</div></div>
