@@ -159,15 +159,20 @@
     </section>
 
     <section class="section">
-      <div class="section-head"><h2 class="section-title">Notifications</h2><p class="section-description">Choose how your Our Space notification appears when your partner sends a message.</p></div>
+      <div class="section-head"><h2 class="section-title">Notifications</h2><p class="section-description">Control push notifications on this device. Turning them off removes this device from Our Space push delivery.</p></div>
       <div class="account-line" style="display:flex;align-items:center;justify-content:space-between;gap:14px;">
-        <div><div class="account-label">Notification</div><div class="account-value">Our Space</div></div>
-        <label style="display:flex;align-items:center;gap:9px;margin:0;cursor:pointer;">
-          <span id="ourSpaceNotificationState" style="font-size:11px;font-weight:800;color:var(--muted)">ON</span>
-          <input id="ourSpaceNotificationToggle" type="checkbox" checked style="width:20px;height:20px;accent-color:var(--navy);">
-        </label>
+        <div><div class="account-label">Push notifications</div><div class="account-value" id="ourSpaceNotificationState">Checking...</div></div>
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--muted);opacity:.55" id="notificationDot"></div>
       </div>
-      <div class="action-row"><button class="primary-button" id="enableNotifications" type="button">Enable notifications</button><button class="secondary-button" id="testNotifications" type="button">Send test notification</button></div>
+      <div class="action-row">
+        <button class="primary-button" id="enableNotifications" type="button">Enable notifications</button>
+        <button class="secondary-button" id="testNotifications" type="button">Send test notification</button>
+        <button class="danger-button" id="disableNotifications" type="button">Turn off notifications</button>
+      </div>
+      <div class="account-line" style="margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:14px;">
+        <div><div class="account-label">Message preview</div><div class="account-value">Show the message text in notifications</div></div>
+        <input id="ourSpaceNotificationToggle" type="checkbox" checked style="width:20px;height:20px;accent-color:var(--navy);">
+      </div>
       <div class="status" id="notificationStatus"></div>
     </section>
 
@@ -328,37 +333,65 @@
         const status=document.getElementById("notificationStatus");
         const toggle=document.getElementById("ourSpaceNotificationToggle");
         const toggleState=document.getElementById("ourSpaceNotificationState");
+        const dot=document.getElementById("notificationDot");
+        const disableButton=document.getElementById("disableNotifications");
         const permission=window.OurSpaceNotifications.permission;
         const previewEnabled=await window.OurSpaceNotifications.getPreviewEnabled();
+        const enabled=await window.OurSpaceNotifications.isEnabled();
         toggle.checked=previewEnabled;
-        toggleState.textContent=previewEnabled?"ON":"OFF";
+        toggleState.textContent=enabled?"Enabled":"Off";
+        toggleState.style.color=enabled?"var(--success)":"var(--muted)";
+        dot.style.background=enabled?"var(--success)":"var(--muted)";
+        disableButton.disabled=!enabled;
 
-        if(permission==="granted"){
+        if(enabled){
           button.textContent="Notifications enabled";
-          setStatus(status,"Our Space notifications are enabled on this device.","success");
+          setStatus(status,"Push notifications are active on this device.","success");
         }else if(permission==="denied"){
           button.textContent="Notifications blocked";
           setStatus(status,"Notifications are blocked in your browser settings.","error");
+        }else{
+          button.textContent="Enable notifications";
+          setStatus(status,"Push notifications are currently off on this device.","");
         }
       }
     }
 
     document.getElementById("ourSpaceNotificationToggle").addEventListener("change",async(event)=>{
-      const toggle=event.target;
-      const state=document.getElementById("ourSpaceNotificationState");
       const status=document.getElementById("notificationStatus");
-      const enabled=toggle.checked;
-      state.textContent=enabled?"ON":"OFF";
       try{
-        const synced=await window.OurSpaceNotifications.setPreviewEnabled(enabled);
+        const synced=await window.OurSpaceNotifications.setPreviewEnabled(event.target.checked);
         if(!synced){
-          setStatus(status,"Enable notifications first, then this choice will sync.","error");
+          setStatus(status,"Enable push notifications first, then this preference will sync.","error");
         }else{
-          setStatus(status,enabled?"Our Space notifications will show Salma and the message.":"Our Space notifications will hide the message preview.","success");
+          setStatus(status,event.target.checked?"Message preview enabled.":"Message preview hidden.","success");
         }
       }catch(error){
         console.error("Notification preference error:",error);
-        setStatus(status,error.message||"Could not save the notification choice.","error");
+        setStatus(status,error.message||"Could not save the notification preference.","error");
+      }
+    });
+
+    document.getElementById("disableNotifications").addEventListener("click",async()=>{
+      const button=document.getElementById("disableNotifications");
+      const enableButton=document.getElementById("enableNotifications");
+      const status=document.getElementById("notificationStatus");
+      button.disabled=true;
+      button.textContent="Turning off...";
+      try{
+        await window.OurSpaceNotifications.disable();
+        document.getElementById("ourSpaceNotificationState").textContent="Off";
+        document.getElementById("ourSpaceNotificationState").style.color="var(--muted)";
+        document.getElementById("notificationDot").style.background="var(--muted)";
+        enableButton.textContent="Enable notifications";
+        setStatus(status,"Push notifications are now off on this device.","success");
+      }catch(error){
+        console.error("Notification disable error:",error);
+        setStatus(status,error.message||"Could not turn off notifications.","error");
+      }finally{
+        button.disabled=false;
+        button.textContent="Turn off notifications";
+        button.disabled=!(await window.OurSpaceNotifications.isEnabled());
       }
     });
 
@@ -372,8 +405,13 @@
         const enabled=await window.OurSpaceNotifications.enable();
         if(enabled){
           await window.OurSpaceNotifications.setPreviewEnabled(document.getElementById("ourSpaceNotificationToggle").checked);
+          const state=document.getElementById("ourSpaceNotificationState");
+          state.textContent="Enabled";
+          state.style.color="var(--success)";
+          document.getElementById("notificationDot").style.background="var(--success)";
+          document.getElementById("disableNotifications").disabled=false;
           button.textContent="Notifications enabled";
-          setStatus(status,"Our Space notifications are enabled on this device.","success");
+          setStatus(status,"Push notifications are enabled on this device.","success");
         }else{
           button.textContent="Enable notifications";
           setStatus(status,"Notifications were not enabled. Check your browser permission.","error");
