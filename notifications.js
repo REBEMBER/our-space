@@ -244,8 +244,9 @@
 
       notificationUser = authData.user;
 
-      // A device must never request a push for the account that just sent the message.
-      if (!message.sender_id || message.sender_id === notificationUser.id) {
+      // Only the authenticated sender may request a push for this message.
+      // The server then excludes that sender and targets the other space member.
+      if (!message.sender_id || message.sender_id !== notificationUser.id) {
         return;
       }
 
