@@ -12,6 +12,27 @@ self.addEventListener("push", (event) => {
     let data = {};
     try { data = event.data ? event.data.json() : {}; } catch (_) {}
 
+    // Do not show a system notification while the actual chat conversation
+    // is open and visible. Notifications should still work when the chat is
+    // in another tab, backgrounded, minimized, or not open at all.
+    const openClients = await self.clients.matchAll({
+      type: "window",
+      includeUncontrolled: true
+    });
+
+    const chatIsVisible = openClients.some((client) => {
+      try {
+        const url = new URL(client.url);
+        return url.pathname.endsWith("/chat.html") && client.visibilityState === "visible";
+      } catch (_) {
+        return false;
+      }
+    });
+
+    if (chatIsVisible) {
+      return;
+    }
+
     const previewEnabled = data.preview_enabled !== false;
     const title = previewEnabled
       ? (data.sender_name || "Salma")
