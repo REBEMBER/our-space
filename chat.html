@@ -2926,11 +2926,6 @@ function renderError(message) {
 
       const channelName = "our-space-chat-" + SPACE_ID;
 
-      // Do NOT filter the Postgres Changes subscription here.
-      // The database/RLS layer decides which rows the user may receive,
-      // then we filter by SPACE_ID in the browser. This avoids a common
-      // Supabase failure mode where a filtered UPDATE subscription silently
-      // receives nothing even though the table itself is in the publication.
       realtimeChannel = client
         .channel(channelName, {
           config: {
@@ -2982,60 +2977,8 @@ function renderError(message) {
           {
             event: "*",
             schema: "public",
-            table: "message_reactions"
+            table: "messages"
           },
-          (payload) => {
-            const incoming = payload.new || payload.old || {};
-            if (!incoming?.id) return;
-
-            if (payload.eventType === "INSERT") {
-              messageReactions = [
-                ...messageReactions.filter((item) => item.id !== incoming.id),
-                incoming
-              ];
-              renderMessages();
-              return;
-            }
-
-            if (payload.eventType === "DELETE") {
-              messageReactions = messageReactions.filter(
-                (item) => item.id !== incoming.id
-              );
-              renderMessages();
-              return;
-            }
-          }
-        )
-        .on(
-          "postgres_changes",
-          {
-            event: "*",
-            schema: "public",
-            table: "message_reactions"
-          },
-          (payload) => {
-            const incoming = payload.new || payload.old || {};
-            if (!incoming?.id) return;
-
-            if (payload.eventType === "INSERT") {
-              messageReactions = [
-                ...messageReactions.filter((item) => item.id !== incoming.id),
-                incoming
-              ];
-              renderMessages();
-              return;
-            }
-
-            if (payload.eventType === "DELETE") {
-              messageReactions = messageReactions.filter(
-                (item) => item.id !== incoming.id
-              );
-              renderMessages();
-              return;
-            }
-          }
-        )
-
           async (payload) => {
             const incoming = payload.new || payload.old || {};
 
@@ -3078,8 +3021,6 @@ function renderError(message) {
                 );
 
                 renderMessages();
-
-                // New messages must always bring the conversation to the latest message.
                 scrollToLatest();
               }
 
@@ -3103,9 +3044,8 @@ function renderError(message) {
                 return;
               }
 
-              // Merge the event immediately. If Supabase omits a field,
-              // the existing local value remains intact.
               const current = messages[index];
+
               messages[index] = {
                 ...current,
                 ...updated
@@ -3118,12 +3058,14 @@ function renderError(message) {
 
               if (seenOnlyUpdate) {
                 const status = document.querySelector(
-                  `[data-status="${updated.id}"]`
+                  \`[data-status="\${updated.id}"]\`
                 );
+
                 if (status) {
                   status.textContent =
                     messages[index].seen_at ? "Seen" : "Sent";
                 }
+
                 return;
               }
 
@@ -3141,14 +3083,17 @@ function renderError(message) {
               return;
             }
 
-            // A hard DELETE is not used by our app, but handle it safely.
             if (payload.eventType === "DELETE") {
               const deletedId = Number(payload.old?.id);
-              if (!deletedId) return;
+
+              if (!deletedId) {
+                return;
+              }
 
               messages = messages.filter(
                 (item) => Number(item.id) !== deletedId
               );
+
               renderMessages();
             }
           }
@@ -3162,13 +3107,22 @@ function renderError(message) {
           },
           (payload) => {
             const incoming = payload.new || payload.old || {};
-            if (!incoming?.id) return;
 
-            if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
+            if (!incoming?.id) {
+              return;
+            }
+
+            if (
+              payload.eventType === "INSERT" ||
+              payload.eventType === "UPDATE"
+            ) {
               messageReactions = [
-                ...messageReactions.filter((item) => item.id !== incoming.id),
+                ...messageReactions.filter(
+                  (item) => item.id !== incoming.id
+                ),
                 incoming
               ];
+
               renderMessages();
               return;
             }
@@ -3177,13 +3131,17 @@ function renderError(message) {
               messageReactions = messageReactions.filter(
                 (item) => item.id !== incoming.id
               );
+
               renderMessages();
             }
           }
         )
-
         .subscribe((status, error) => {
-          console.log("Our Space realtime:", status, error || "");
+          console.log(
+            "Our Space realtime:",
+            status,
+            error || ""
+          );
 
           if (
             status === "CHANNEL_ERROR" ||
