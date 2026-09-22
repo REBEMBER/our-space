@@ -188,7 +188,7 @@
       top: var(--header-height, 0px);
       left: 0;
       right: 0;
-      bottom: 0;
+      bottom: var(--composer-height, 100px);
       overflow-y: auto;
 
       /*
@@ -199,7 +199,6 @@
         instead (see .messages-container::after below).
       */
       padding-bottom: 0;
-      scroll-padding-bottom: calc(var(--composer-height, 100px) + 24px);
 
       -webkit-overflow-scrolling: touch;
       overscroll-behavior: contain;
@@ -1545,25 +1544,10 @@
     function scrollToLatestNow() {
       syncLayoutMetrics();
 
-      const anchor = document.getElementById("messagesScrollAnchor");
-
-      if (anchor) {
-        // Scroll the real bottom anchor into view. This avoids relying on
-        // scrollHeight/clientHeight rounding when the fixed composer and
-        // dynamic image heights change the scroll geometry.
-        anchor.scrollIntoView({
-          block: "end",
-          inline: "nearest",
-          behavior: "auto"
-        });
-        return;
-      }
-
-      // Safe fallback for the very first render.
-      messagesScroll.scrollTop = Math.max(
-        0,
-        messagesScroll.scrollHeight - messagesScroll.clientHeight
-      );
+      // The scroll viewport ends exactly above the fixed composer, so its
+      // natural maximum scrollTop is the true visible bottom of the chat.
+      messagesScroll.scrollTop =
+        Math.max(0, messagesScroll.scrollHeight - messagesScroll.clientHeight);
     }
 
     function scrollToLatest(behavior = "auto") {
@@ -1581,16 +1565,13 @@
           if (token !== bottomScrollToken) return;
 
           if (behavior === "smooth") {
-            const anchor = document.getElementById("messagesScrollAnchor");
-            if (anchor) {
-              anchor.scrollIntoView({
-                block: "end",
-                inline: "nearest",
-                behavior: "smooth"
-              });
-            } else {
-              scrollToLatestNow();
-            }
+            messagesScroll.scrollTo({
+              top: Math.max(
+                0,
+                messagesScroll.scrollHeight - messagesScroll.clientHeight
+              ),
+              behavior: "smooth"
+            });
           } else {
             scrollToLatestNow();
           }
@@ -1925,11 +1906,6 @@ function renderError(message) {
               </p>
             </div>
           </div>
-          <div
-            class="messages-scroll-anchor"
-            id="messagesScrollAnchor"
-            aria-hidden="true"
-          ></div>
         `;
 
         return;
@@ -2753,22 +2729,6 @@ function renderError(message) {
               current.deleted_by !== next.deleted_by ||
               current.seen_at !== next.seen_at;
           });
-
-        if (
-          hasNewMessage &&
-          currentUser?.id === MOHAMMAD_USER_ID
-        ) {
-          const latestNextMessage =
-            nextMessages[nextMessages.length - 1];
-
-          if (
-            latestNextMessage &&
-            latestNextMessage.sender_id !== currentUser.id &&
-            !latestNextMessage.deleted_at
-          ) {
-            clearReplySuggestion();
-          }
-        }
 
         if (
           hasNewMessage &&
