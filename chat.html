@@ -281,53 +281,6 @@
       position: relative;
       max-width: min(77%, 560px);
     }
-    .reply-preview {
-      margin: -2px 0 7px;
-      padding: 7px 9px;
-      border-left: 3px solid var(--peach);
-      border-radius: 8px;
-      background: rgba(220, 234, 245, 0.55);
-      color: var(--muted);
-      font-size: 10px;
-      line-height: 1.35;
-    }
-    .reply-preview strong {
-      display: block;
-      margin-bottom: 2px;
-      color: var(--navy);
-      font-size: 8px;
-      text-transform: uppercase;
-      letter-spacing: .05em;
-    }
-    .reaction-summary { display:flex; flex-wrap:wrap; gap:4px; margin-top:5px; }
-    .reaction-chip {
-      min-height:22px; padding:2px 7px; border:1px solid var(--border);
-      border-radius:999px; background:var(--white); color:var(--text);
-      font-size:11px; line-height:1; cursor:pointer;
-    }
-    .reaction-chip.mine { border-color:rgba(21,43,70,.25); background:var(--blue); }
-    .reaction-picker {
-      position:absolute; right:4px; top:calc(100% + 6px); z-index:60;
-      display:none; align-items:center; gap:4px; padding:6px;
-      border:1px solid var(--border); border-radius:12px; background:var(--white);
-      box-shadow:var(--shadow);
-    }
-    .reaction-picker.open { display:flex; }
-    .reaction-picker button { width:30px; height:30px; padding:0; border:0; border-radius:8px; background:var(--blue); font-size:15px; }
-    .reply-composer {
-      width:min(100%,800px); margin:0 auto 8px; padding:8px 10px;
-      display:none; align-items:center; gap:9px;
-      border:1px solid var(--border); border-radius:13px; background:rgba(255,255,255,.92);
-    }
-    .reply-composer.visible { display:flex; }
-    .reply-composer-copy { min-width:0; flex:1; }
-    .reply-composer-label { color:var(--navy); font-size:8px; font-weight:850; text-transform:uppercase; letter-spacing:.06em; }
-    .reply-composer-text { margin-top:2px; color:var(--muted); font-size:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .reply-composer-close {
-      width:27px; height:27px; border:1px solid var(--border); border-radius:8px;
-      background:var(--blue); color:var(--navy); font-size:15px; line-height:1;
-    }
-
 
     /* =========================
        MESSAGE BUBBLE
@@ -1322,23 +1275,24 @@
       <div class="reply-assist" id="replyAssist">
         <div class="reply-assist-header">
           <div style="display:flex;align-items:center;gap:8px">
-            <span class="reply-assist-title">AI replies</span>
-            <span class="reply-assist-note">3 quick options</span>
+            <span class="reply-assist-title">Best reply</span>
           </div>
           <div style="display:flex;align-items:center;gap:6px">
             <span class="reply-assist-status" id="replyAssistStatus">Ready</span>
             <button class="reply-assist-close" id="replyAssistClose" type="button" aria-label="Close">×</button>
           </div>
         </div>
-        <div class="reply-assist-suggestions" id="replyAssistSuggestions"></div>
-      </div>
 
-      <div class="reply-composer" id="replyComposer">
-        <div class="reply-composer-copy">
-          <div class="reply-composer-label">Replying to</div>
-          <div class="reply-composer-text" id="replyComposerText"></div>
+        <button
+          class="reply-assist-suggestion"
+          id="replyAssistSuggestion"
+          type="button"
+          aria-label="Send suggested reply"
+        ></button>
+
+        <div class="reply-assist-actions">
+          <button class="reply-assist-action send-reply" id="replyAssistSend" type="button">Send reply</button>
         </div>
-        <button class="reply-composer-close" id="replyComposerClose" type="button" aria-label="Cancel reply">×</button>
       </div>
 
       <div class="composer-row">
@@ -1347,14 +1301,14 @@
           class="best-reply-button"
           id="bestReplyButton"
           type="button"
-          aria-label="Get three AI reply suggestions"
-          title="Get three AI reply suggestions"
+          aria-label="Get the best reply to Salma"
+          title="Get the best reply to Salma"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7">
             <path d="M12 3v4M12 17v4M3 12h4M17 12h4"></path>
             <circle cx="12" cy="12" r="4"></circle>
           </svg>
-          <span>AI replies</span>
+          <span>Best reply</span>
         </button>
 
         <form class="composer" id="composer">
@@ -1490,14 +1444,10 @@
       document.getElementById("replyAssist");
     const replyAssistStatus =
       document.getElementById("replyAssistStatus");
-    const replyAssistSuggestions =
-      document.getElementById("replyAssistSuggestions");
-    const replyComposer =
-      document.getElementById("replyComposer");
-    const replyComposerText =
-      document.getElementById("replyComposerText");
-    const replyComposerClose =
-      document.getElementById("replyComposerClose");
+    const replyAssistSuggestion =
+      document.getElementById("replyAssistSuggestion");
+    const replyAssistSend =
+      document.getElementById("replyAssistSend");
     const replyAssistClose =
       document.getElementById("replyAssistClose");
     const bestReplyButton =
@@ -1513,19 +1463,9 @@
     let realtimeChannel = null;
     let visibleMessageObserver = null;
     let isChatVisible = document.visibilityState === "visible";
-    let replySuggestions = [];
+    let replySuggestion = null;
     let replySuggestionSent = false;
     let busyReplySuggestion = false;
-    let replyTargetMessageId = null;
-    let messageReactions = [];
-    const REACTION_META = {
-      heart: "❤️",
-      laugh: "😂",
-      like: "👍",
-      sad: "😢",
-      wow: "😮",
-      love: "😘"
-    };
     const imageUrlCache = new Map();
 
     // Scroll state is centralized so initial entry, photo sends, realtime
@@ -1801,11 +1741,6 @@
         .querySelectorAll(".message-menu.open")
         .forEach((menu) => {
           menu.classList.remove("open");
-        });
-      document
-        .querySelectorAll(".reaction-picker.open")
-        .forEach((picker) => {
-          picker.classList.remove("open");
         });
     }
 
@@ -2095,62 +2030,46 @@ function renderError(message) {
             `
             : "";
 
-        const replyTarget =
-          message.reply_to_message_id
-            ? messages.find((item) => Number(item.id) === Number(message.reply_to_message_id))
-            : null;
-
-        const replyPreviewHtml =
-          replyTarget && !deleted
-            ? '<div class="reply-preview"><strong>Reply</strong>' +
-              escapeHtml(replyTarget.content || (replyTarget.message_type === "image" ? "Photo" : "Message")) +
-              '</div>'
-            : "";
-
-        const reactionRows = messageReactions.filter(
-          (item) => Number(item.message_id) === Number(message.id)
-        );
-        const reactionCounts = {};
-        reactionRows.forEach((item) => {
-          reactionCounts[item.reaction] =
-            (reactionCounts[item.reaction] || 0) + 1;
-        });
-
-        const reactionSummaryHtml =
-          !deleted && reactionRows.length
-            ? '<div class="reaction-summary">' +
-              Object.entries(reactionCounts).map(([reaction, count]) => {
-                const mineReaction = reactionRows.some(
-                  (item) => item.reaction === reaction && item.user_id === currentUser?.id
-                );
-                return '<button class="reaction-chip ' +
-                  (mineReaction ? 'mine' : '') +
-                  '" type="button" data-reaction="' + reaction +
-                  '" data-reaction-message="' + message.id + '">' +
-                  REACTION_META[reaction] + ' ' + count +
-                  '</button>';
-              }).join("") +
-              '</div>'
-            : "";
-
         const menuHtml =
-          !deleted
-            ? '<button class="message-menu-trigger" type="button" data-menu-trigger="' + message.id + '" aria-label="Message options">' +
-                '<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.7"></circle><circle cx="12" cy="12" r="1.7"></circle><circle cx="19" cy="12" r="1.7"></circle></svg>' +
-              '</button>' +
-              '<div class="message-menu" data-menu="' + message.id + '">' +
-                '<button type="button" data-reply-message="' + message.id + '">Reply</button>' +
-                '<button type="button" data-open-reactions="' + message.id + '">React</button>' +
-                (mine ? '<button type="button" data-delete-direct="' + message.id + '">Delete</button>' : '') +
-              '</div>' +
-              '<div class="reaction-picker" data-reaction-picker="' + message.id + '">' +
-                '<button type="button" data-reaction="heart" data-reaction-message="' + message.id + '">❤️</button>' +
-                '<button type="button" data-reaction="laugh" data-reaction-message="' + message.id + '">😂</button>' +
-                '<button type="button" data-reaction="like" data-reaction-message="' + message.id + '">👍</button>' +
-                '<button type="button" data-reaction="sad" data-reaction-message="' + message.id + '">😢</button>' +
-                '<button type="button" data-reaction="wow" data-reaction-message="' + message.id + '">😮</button>' +
-                '<button type="button" data-reaction="love" data-reaction-message="' + message.id + '">😘</button>' +
-              '</div>'
+          mine && !deleted
+            ? `
+              <button
+                class="message-menu-trigger"
+                type="button"
+                data-menu-trigger="${message.id}"
+                aria-label="Message options"
+              >
+                <svg viewBox="0 0 24 24">
+                  <circle
+                    cx="5"
+                    cy="12"
+                    r="1.7"
+                  ></circle>
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="1.7"
+                  ></circle>
+                  <circle
+                    cx="19"
+                    cy="12"
+                    r="1.7"
+                  ></circle>
+                </svg>
+              </button>
+
+              <div
+                class="message-menu"
+                data-menu="${message.id}"
+              >
+                <button
+                  type="button"
+                  data-delete-direct="${message.id}"
+                >
+                  Delete
+                </button>
+              </div>
+            `
             : "";
 
         html += `
@@ -2174,8 +2093,6 @@ function renderError(message) {
 
                 ${deletedHtml}
 
-                ${replyPreviewHtml}
-
                 ${contentHtml}
 
                 <div class="message-meta">
@@ -2191,8 +2108,6 @@ function renderError(message) {
                   ${statusHtml}
 
                 </div>
-
-                ${reactionSummaryHtml}
 
                 ${menuHtml}
 
@@ -2306,55 +2221,60 @@ function renderError(message) {
     }
 
     function clearReplySuggestion() {
-      replySuggestions = [];
+      replySuggestion = null;
       replySuggestionSent = false;
       replyAssist.classList.remove("visible");
-      replyAssistSuggestions.innerHTML = "";
+      replyAssistSuggestion.textContent = "";
+      replyAssistSuggestion.classList.remove("sent");
       replyAssistStatus.textContent = "Ready";
+      setReplyButtonsEnabled(false);
       syncLayoutMetrics();
     }
 
+    function setReplyButtonsEnabled(enabled) {
+      replyAssistSend.disabled = !enabled;
+      replyAssistSuggestion.disabled = !enabled;
+    }
+
     function showReplyAssist(data) {
-      replySuggestions = Array.isArray(data.suggestions) ? data.suggestions : [];
+      replySuggestion = data;
       replySuggestionSent = false;
       replyAssist.classList.add("visible");
-      replyAssistStatus.textContent = "Choose one";
-      replyAssistSuggestions.innerHTML = "";
-      replySuggestions.forEach((item, index) => {
-        const button = document.createElement("button");
-        button.className = "reply-assist-suggestion";
-        button.type = "button";
-        button.dataset.replySuggestionIndex = String(index);
-        button.textContent = item.suggestion || "";
-        replyAssistSuggestions.appendChild(button);
-      });
+      replyAssistSuggestion.textContent = data.suggestion || "";
+      replyAssistSuggestion.classList.remove("sent");
+      replyAssistStatus.textContent = "Ready to send";
+      setReplyButtonsEnabled(true);
       syncLayoutMetrics();
     }
 
     async function requestBestReply() {
-      if (!currentUser || currentUser.id !== MOHAMMAD_USER_ID || busyReplySuggestion) return;
+      if (!currentUser || currentUser.id !== MOHAMMAD_USER_ID) return;
+
       const incoming = latestIncomingMessage();
+
       if (!incoming) {
         alert("There is no message from Salma to reply to yet.");
         return;
       }
 
       clearReplySuggestion();
-      busyReplySuggestion = true;
       bestReplyButton.disabled = true;
       bestReplyButton.innerHTML =
         '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"></path><circle cx="12" cy="12" r="4"></circle></svg><span>Thinking...</span>';
 
       replyAssist.classList.add("visible");
       replyAssistStatus.textContent = "Thinking...";
-      replyAssistSuggestions.innerHTML =
-        '<div class="reply-assist-suggestion" style="cursor:default;opacity:.7">Creating 3 quick replies...</div>';
+      replyAssistSuggestion.textContent = "Generating the best reply for this moment...";
+      setReplyButtonsEnabled(false);
       syncLayoutMetrics();
 
       try {
         const sessionResult = await client.auth.getSession();
         const session = sessionResult?.data?.session;
-        if (!session) throw new Error("Your session has expired. Please sign in again.");
+
+        if (!session) {
+          throw new Error("Your session has expired. Please sign in again.");
+        }
 
         const response = await fetch("/api/ai", {
           method: "POST",
@@ -2369,159 +2289,69 @@ function renderError(message) {
         });
 
         const data = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(data.error || "Could not generate reply suggestions.");
 
-        const raw = String(data.suggestion || "");
-        const suggestions = raw
-          .split(/\\r?\\n/)
-          .map((line) =>
-            line
-              .replace(/^\\s*(?:[-•*]|\\d+[.)])\\s*/, "")
-              .replace(/^["“”]+|["“”]+$/g, "")
-              .trim()
-          )
-          .filter(Boolean)
-          .slice(0, 3)
-          .map((suggestion) => ({
-            suggestion_id: crypto.randomUUID(),
-            source_message_id: Number(data.source_message_id || incoming.id),
-            suggestion
-          }));
-
-        if (suggestions.length !== 3) {
-          throw new Error("The AI returned an incomplete suggestion set.");
+        if (!response.ok) {
+          throw new Error(data.error || "Could not generate a reply.");
         }
 
-        showReplyAssist({ suggestions });
+        if (!data.suggestion || !data.suggestion_id) {
+          throw new Error("The AI returned an empty suggestion.");
+        }
+
+        showReplyAssist({
+          suggestion_id: data.suggestion_id,
+          source_message_id: Number(data.source_message_id),
+          suggestion: String(data.suggestion)
+        });
       } catch (error) {
         replyAssistStatus.textContent = "Error";
-        replyAssistSuggestions.innerHTML =
-          '<div class="reply-assist-suggestion" style="cursor:default">' +
-          escapeHtml(error.message || "Could not generate reply suggestions.") +
-          '</div>';
+        replyAssistSuggestion.textContent =
+          error.message || "Could not generate a reply.";
+        setReplyButtonsEnabled(false);
       } finally {
-        busyReplySuggestion = false;
         bestReplyButton.disabled = false;
         bestReplyButton.innerHTML =
-          '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"></path><circle cx="12" cy="12" r="4"></circle></svg><span>AI replies</span>';
+          '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"></path><circle cx="12" cy="12" r="4"></circle></svg><span>Best reply</span>';
         syncLayoutMetrics();
       }
     }
 
-    async function sendReplySuggestion(index) {
-      if (replySuggestionSent || busyReplySuggestion) return;
-      const item = replySuggestions[index];
-      if (!item?.suggestion) return;
+    async function sendReplySuggestion() {
+      if (!replySuggestion || replySuggestionSent || busyReplySuggestion) return;
 
       const incoming = latestIncomingMessage();
-      if (!incoming || Number(incoming.id) !== Number(item.source_message_id)) {
+
+      if (
+        !incoming ||
+        Number(incoming.id) !== Number(replySuggestion.source_message_id)
+      ) {
         clearReplySuggestion();
-        alert("A newer message from Salma arrived. Generate fresh suggestions.");
+        alert("A newer message from Salma arrived. Generate a fresh reply.");
         return;
       }
 
       busyReplySuggestion = true;
       replyAssistStatus.textContent = "Sending...";
+      setReplyButtonsEnabled(false);
+
       try {
-        await sendMessage(item.suggestion, true);
+        await sendMessage(replySuggestion.suggestion, true);
         replySuggestionSent = true;
+        replyAssistSuggestion.classList.add("sent");
+        replyAssistSuggestion.disabled = true;
+        replyAssistSend.disabled = true;
         replyAssistStatus.textContent = "Sent";
-        replyAssistSuggestions.querySelectorAll("button").forEach((button) => {
-          button.disabled = true;
-          button.classList.add("sent");
-        });
       } catch (error) {
-        replyAssistStatus.textContent = error.message || "Could not send.";
+        replyAssistStatus.textContent =
+          error.message || "Could not send.";
+        setReplyButtonsEnabled(true);
       } finally {
         busyReplySuggestion = false;
         syncLayoutMetrics();
       }
     }
 
-    function setReplyTarget(message) {
-      if (!message || message.deleted_at) return;
-      replyTargetMessageId = Number(message.id);
-      replyComposerText.textContent =
-        message.content ||
-        (message.message_type === "image" ? "Photo" : "Message");
-      replyComposer.classList.add("visible");
-      input.focus();
-      syncLayoutMetrics();
-    }
-
-    function clearReplyTarget() {
-      replyTargetMessageId = null;
-      replyComposer.classList.remove("visible");
-      replyComposerText.textContent = "";
-    }
-
-    async function setMessageReaction(messageId, reaction) {
-      if (!currentUser || !messageId || !REACTION_META[reaction]) return;
-      const existing = messageReactions.find(
-        (item) =>
-          Number(item.message_id) === Number(messageId) &&
-          item.user_id === currentUser.id
-      );
-
-      if (existing?.reaction === reaction) {
-        const { error } = await client
-          .from("message_reactions")
-          .delete()
-          .eq("id", existing.id);
-        if (error) return;
-        messageReactions = messageReactions.filter((item) => item.id !== existing.id);
-      } else {
-        if (existing) {
-          const { error } = await client
-            .from("message_reactions")
-            .delete()
-            .eq("id", existing.id);
-          if (error) return;
-        }
-        const { data, error } = await client
-          .from("message_reactions")
-          .insert({
-            message_id: messageId,
-            user_id: currentUser.id,
-            reaction
-          })
-          .select("id, message_id, user_id, reaction, created_at")
-          .single();
-        if (error) return;
-        messageReactions = [
-          ...messageReactions.filter(
-            (item) =>
-              !(Number(item.message_id) === Number(messageId) &&
-                item.user_id === currentUser.id)
-          ),
-          data
-        ];
-      }
-      renderMessages();
-    }
-
-        async function loadMessageReactions() {
-      const ids = messages.map((item) => item.id);
-      if (!ids.length) {
-        messageReactions = [];
-        return;
-      }
-
-      const { data, error } = await client
-        .from("message_reactions")
-        .select("id, message_id, user_id, reaction, created_at")
-        .in("message_id", ids);
-
-      if (error) {
-        console.warn("Could not load message reactions:", error);
-        messageReactions = [];
-        return;
-      }
-
-      messageReactions = data || [];
-    }
-
-    /* ==========================================
+        /* ==========================================
        LOAD
     ========================================== */
 
@@ -2546,8 +2376,7 @@ function renderError(message) {
               created_at,
               deleted_at,
               deleted_by,
-              seen_at,
-              reply_to_message_id
+              seen_at
             `
           )
           .eq(
@@ -2613,10 +2442,7 @@ function renderError(message) {
       messages =
         result.data || [];
 
-      await Promise.all([
-        hydrateImageUrls(messages),
-        loadMessageReactions()
-      ]);
+      await hydrateImageUrls(messages);
 
       renderMessages();
 
@@ -2653,10 +2479,9 @@ function renderError(message) {
           .insert({
             space_id: SPACE_ID,
             sender_id: currentUser.id,
-            content: value,
-            reply_to_message_id: replyTargetMessageId
+            content: value
           })
-          .select("id, space_id, sender_id, content, created_at, reply_to_message_id")
+          .select("id, space_id, sender_id, content, created_at")
           .single();
 
       sendButton.disabled = false;
@@ -2678,7 +2503,6 @@ function renderError(message) {
       input.value = "";
       input.style.height =
         "40px";
-      clearReplyTarget();
       syncLayoutMetrics();
 
       await loadMessages(true);
@@ -2854,7 +2678,7 @@ function renderError(message) {
       try {
         const { data, error } = await client
           .from("messages")
-          .select("id, space_id, sender_id, content, message_type, media_path, created_at, deleted_at, deleted_by, seen_at, reply_to_message_id")
+          .select("id, space_id, sender_id, content, message_type, media_path, created_at, deleted_at, deleted_by, seen_at")
           .eq("space_id", SPACE_ID)
           .order("created_at", { ascending: true });
 
@@ -2926,6 +2750,11 @@ function renderError(message) {
 
       const channelName = "our-space-chat-" + SPACE_ID;
 
+      // Do NOT filter the Postgres Changes subscription here.
+      // The database/RLS layer decides which rows the user may receive,
+      // then we filter by SPACE_ID in the browser. This avoids a common
+      // Supabase failure mode where a filtered UPDATE subscription silently
+      // receives nothing even though the table itself is in the publication.
       realtimeChannel = client
         .channel(channelName, {
           config: {
@@ -3021,6 +2850,8 @@ function renderError(message) {
                 );
 
                 renderMessages();
+
+                // New messages must always bring the conversation to the latest message.
                 scrollToLatest();
               }
 
@@ -3044,8 +2875,9 @@ function renderError(message) {
                 return;
               }
 
+              // Merge the event immediately. If Supabase omits a field,
+              // the existing local value remains intact.
               const current = messages[index];
-
               messages[index] = {
                 ...current,
                 ...updated
@@ -3058,14 +2890,12 @@ function renderError(message) {
 
               if (seenOnlyUpdate) {
                 const status = document.querySelector(
-                  \`[data-status="\${updated.id}"]\`
+                  `[data-status="${updated.id}"]`
                 );
-
                 if (status) {
                   status.textContent =
                     messages[index].seen_at ? "Seen" : "Sent";
                 }
-
                 return;
               }
 
@@ -3083,65 +2913,20 @@ function renderError(message) {
               return;
             }
 
+            // A hard DELETE is not used by our app, but handle it safely.
             if (payload.eventType === "DELETE") {
               const deletedId = Number(payload.old?.id);
-
-              if (!deletedId) {
-                return;
-              }
+              if (!deletedId) return;
 
               messages = messages.filter(
                 (item) => Number(item.id) !== deletedId
               );
-
-              renderMessages();
-            }
-          }
-        )
-        .on(
-          "postgres_changes",
-          {
-            event: "*",
-            schema: "public",
-            table: "message_reactions"
-          },
-          (payload) => {
-            const incoming = payload.new || payload.old || {};
-
-            if (!incoming?.id) {
-              return;
-            }
-
-            if (
-              payload.eventType === "INSERT" ||
-              payload.eventType === "UPDATE"
-            ) {
-              messageReactions = [
-                ...messageReactions.filter(
-                  (item) => item.id !== incoming.id
-                ),
-                incoming
-              ];
-
-              renderMessages();
-              return;
-            }
-
-            if (payload.eventType === "DELETE") {
-              messageReactions = messageReactions.filter(
-                (item) => item.id !== incoming.id
-              );
-
               renderMessages();
             }
           }
         )
         .subscribe((status, error) => {
-          console.log(
-            "Our Space realtime:",
-            status,
-            error || ""
-          );
+          console.log("Our Space realtime:", status, error || "");
 
           if (
             status === "CHANNEL_ERROR" ||
@@ -3166,18 +2951,19 @@ function renderError(message) {
       requestBestReply
     );
 
+    replyAssistSuggestion.addEventListener(
+      "click",
+      sendReplySuggestion
+    );
+
+    replyAssistSend.addEventListener(
+      "click",
+      sendReplySuggestion
+    );
     replyAssistClose.addEventListener(
       "click",
       clearReplySuggestion
     );
-
-    replyAssistSuggestions.addEventListener("click", async (event) => {
-      const button = event.target.closest("[data-reply-suggestion-index]");
-      if (!button) return;
-      await sendReplySuggestion(Number(button.dataset.replySuggestionIndex));
-    });
-
-    replyComposerClose.addEventListener("click", clearReplyTarget);
 
     attachmentButton.addEventListener("click", () => {
       if (!attachmentButton.disabled) {
@@ -3218,7 +3004,7 @@ function renderError(message) {
     input.addEventListener(
       "input",
       () => {
-        if (replySuggestions.length && input.value.trim()) {
+        if (replySuggestion && input.value.trim()) {
           clearReplySuggestion();
         }
       }
@@ -3297,45 +3083,6 @@ function renderError(message) {
             );
           }
 
-          return;
-        }
-
-        const replyButton =
-          event.target.closest("[data-reply-message]");
-
-        if (replyButton) {
-          event.stopPropagation();
-          closeMenus();
-          const message = messages.find(
-            (item) => Number(item.id) === Number(replyButton.dataset.replyMessage)
-          );
-          if (message) setReplyTarget(message);
-          return;
-        }
-
-        const openReactions =
-          event.target.closest("[data-open-reactions]");
-
-        if (openReactions) {
-          event.stopPropagation();
-          closeMenus();
-          const picker = document.querySelector(
-            '[data-reaction-picker="' + openReactions.dataset.openReactions + '"]'
-          );
-          if (picker) picker.classList.add("open");
-          return;
-        }
-
-        const reactionButton =
-          event.target.closest("[data-reaction-message]");
-
-        if (reactionButton) {
-          event.stopPropagation();
-          await setMessageReaction(
-            Number(reactionButton.dataset.reactionMessage),
-            reactionButton.dataset.reaction
-          );
-          closeMenus();
           return;
         }
 
