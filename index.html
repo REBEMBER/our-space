@@ -84,8 +84,8 @@ button:focus-visible{outline:3px solid rgba(243,178,159,.65);outline-offset:3px}
 .action-card{position:relative;overflow:hidden;min-height:190px;padding:23px;border-radius:24px;border:1px solid var(--line);cursor:pointer;box-shadow:var(--shadow);transition:transform .18s ease,box-shadow .18s ease}
 .action-card:hover{transform:translateY(-2px);box-shadow:0 22px 48px rgba(21,43,70,.11)}
 .action-card:after{content:"";position:absolute;width:150px;height:150px;right:-60px;bottom:-75px;border-radius:50%;opacity:.48}
-.card-chat{background:var(--soft)}.card-chat:after{background:color-mix(in srgb,var(--navy) 18%,#fff)}
-.card-gallery{background:var(--soft-2)}.card-gallery:after{background:color-mix(in srgb,var(--blue) 88%,#fff)}
+.card-chat{background:var(--soft)}.card-chat:after{background:color-mix(in srgb,var(--navy) 18%,var(--surface))}
+.card-gallery{background:var(--soft-2)}.card-gallery:after{background:color-mix(in srgb,var(--blue) 88%,var(--surface))}
 .card-ai{background:var(--soft-3)}.card-ai:after{background:var(--peach)}
 .card-calculator{background:color-mix(in srgb,var(--blue) 52%,var(--surface))}.card-calculator:after{background:var(--peach)}
 
@@ -102,10 +102,11 @@ button:focus-visible{outline:3px solid rgba(243,178,159,.65);outline-offset:3px}
   .mobile-nav button.active{background:color-mix(in srgb,var(--peach) 16%,var(--surface));color:var(--navy)}
   .mobile-nav svg{width:18px;height:18px}
   .app{padding:13px 13px 88px}
-  .actions{grid-template-columns:1fr}
+  .actions{grid-template-columns:repeat(2,1fr)}
   .action-card{min-height:145px}
 }
 @media(max-width:560px){
+  .actions{grid-template-columns:1fr}
   .brand-subtitle{display:none}
   .hero{padding:25px;min-height:350px;border-radius:25px}
   .hero h1{font-size:43px}
