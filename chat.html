@@ -77,6 +77,10 @@
       width: 100%;
       height: 100dvh;
       overflow: hidden;
+
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
     }
 
     /* =========================
@@ -184,11 +188,10 @@
     ========================= */
 
     .messages-scroll {
-      position: absolute;
-      top: var(--header-height, 0px);
-      left: 0;
-      right: 0;
-      bottom: var(--composer-height, 100px);
+      position: relative;
+      flex: 1 1 auto;
+      min-height: 0;
+      width: 100%;
       overflow-y: auto;
 
       padding-bottom: 0;
@@ -651,10 +654,8 @@
     ========================= */
 
     .composer-area {
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      position: relative;
+      flex: 0 0 auto;
       width: 100%;
       z-index: 999;
 
@@ -1497,9 +1498,9 @@
       );
     }
 
-    // Keep the last message above the fixed composer. We intentionally
-    // scroll using the container's real scrollHeight; assigning scrollTop
-    // to scrollHeight clamps to the browser's true maximum scroll position.
+    // The message viewport ends naturally above the composer because both
+    // elements participate in the same flex layout. The browser therefore
+    // computes the true maximum scrollTop without any spacer or overlay math.
     function isAtBottom() {
       const distance =
         messagesScroll.scrollHeight -
@@ -1525,8 +1526,8 @@
     function scrollToLatestNow() {
       syncLayoutMetrics();
 
-      // The scroll viewport ends exactly above the fixed composer, so its
-      // natural maximum scrollTop is the true visible bottom of the chat.
+      // The flex layout gives the scroll viewport exactly the visible space
+      // above the composer, so this is the true visible bottom of the chat.
       messagesScroll.scrollTop =
         Math.max(0, messagesScroll.scrollHeight - messagesScroll.clientHeight);
     }
