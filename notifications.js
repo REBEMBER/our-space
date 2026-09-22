@@ -67,6 +67,17 @@
       if (existing) {
         const previewEnabled = await getPreviewEnabled();
         await syncSubscription(existing, previewEnabled);
+      } else if (Notification.permission === "granted") {
+        // Permission may already be granted from an earlier visit while the
+        // subscription was lost or never synchronized. Restore it silently.
+        const publicKey = await getVapidPublicKey();
+        if (publicKey) {
+          const subscription = await notificationRegistration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: base64ToUint8Array(publicKey)
+          });
+          await syncSubscription(subscription, true);
+        }
       }
 
       // Make sure the worker is active before any later push operation.
@@ -109,7 +120,13 @@
     if (Notification.permission === "denied") return false;
 
     const permission = await Notification.requestPermission();
-    if (permission !== "granted") return false;
+    if (permission !== "granted") {
+      throw new Error(
+        permission === "denied"
+          ? "Notifications are blocked for Our Space. Allow them in your browser site settings."
+          : "Notification permission was not granted."
+      );
+    }
 
     const publicKey = await getVapidPublicKey();
     if (!publicKey) return false;
