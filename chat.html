@@ -235,16 +235,11 @@
     }
 
     /*
-      Real scrollable bottom clearance.
-
-      This is deliberately an actual flex item inside the scroll content,
-      rather than scroll-container padding. The composer is position:fixed,
-      so the final message needs enough real document height to move above
-      it when the user reaches the absolute bottom.
+      Real bottom clearance is an actual DOM element, not a pseudo-element.
+      The fixed composer sits outside the scroll container, so this spacer
+      gives the final message real scrollable room to sit above it.
     */
-    .messages-container::after {
-      content: "";
-      display: block;
+    .messages-scroll-anchor {
       flex: 0 0 calc(var(--composer-height, 100px) + 24px);
       height: calc(var(--composer-height, 100px) + 24px);
       width: 100%;
@@ -1550,17 +1545,25 @@
     function scrollToLatestNow() {
       syncLayoutMetrics();
 
-      // scrollHeight is relative to the scroll container's content box.
-      // Use the explicit maximum rather than relying on browser clamping;
-      // this is more reliable when a fixed composer and a flex spacer are
-      // involved.
-      const maxScrollTop = Math.max(
-        0,
-        messagesScroll.scrollHeight -
-          messagesScroll.clientHeight
-      );
+      const anchor = document.getElementById("messagesScrollAnchor");
 
-      messagesScroll.scrollTop = maxScrollTop;
+      if (anchor) {
+        // Scroll the real bottom anchor into view. This avoids relying on
+        // scrollHeight/clientHeight rounding when the fixed composer and
+        // dynamic image heights change the scroll geometry.
+        anchor.scrollIntoView({
+          block: "end",
+          inline: "nearest",
+          behavior: "auto"
+        });
+        return;
+      }
+
+      // Safe fallback for the very first render.
+      messagesScroll.scrollTop = Math.max(
+        0,
+        messagesScroll.scrollHeight - messagesScroll.clientHeight
+      );
     }
 
     function scrollToLatest(behavior = "auto") {
@@ -1578,10 +1581,16 @@
           if (token !== bottomScrollToken) return;
 
           if (behavior === "smooth") {
-            messagesScroll.scrollTo({
-              top: messagesScroll.scrollHeight,
-              behavior: "smooth"
-            });
+            const anchor = document.getElementById("messagesScrollAnchor");
+            if (anchor) {
+              anchor.scrollIntoView({
+                block: "end",
+                inline: "nearest",
+                behavior: "smooth"
+              });
+            } else {
+              scrollToLatestNow();
+            }
           } else {
             scrollToLatestNow();
           }
@@ -1916,6 +1925,11 @@ function renderError(message) {
               </p>
             </div>
           </div>
+          <div
+            class="messages-scroll-anchor"
+            id="messagesScrollAnchor"
+            aria-hidden="true"
+          ></div>
         `;
 
         return;
@@ -2148,7 +2162,14 @@ function renderError(message) {
       }
 
       messagesEl.innerHTML =
-        html;
+        html +
+        `
+          <div
+            class="messages-scroll-anchor"
+            id="messagesScrollAnchor"
+            aria-hidden="true"
+          ></div>
+        `;
 
       setupVisibleMessageObserver();
     }
