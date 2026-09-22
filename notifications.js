@@ -33,12 +33,17 @@
     const client = await getClient();
     if (!client || !notificationUser || !subscription) return;
 
-    await client.from("push_subscriptions").upsert({
+    const { error } = await client.from("push_subscriptions").upsert({
       user_id: notificationUser.id,
       endpoint: subscription.endpoint,
       subscription: subscription.toJSON(),
-      preview_enabled: previewEnabled
+      preview_enabled: previewEnabled,
+      updated_at: new Date().toISOString()
     }, { onConflict: "endpoint" });
+
+    if (error) {
+      throw error;
+    }
   }
 
   async function registerNotifications(user) {
@@ -61,6 +66,9 @@
         const previewEnabled = await getPreviewEnabled();
         await syncSubscription(existing, previewEnabled);
       }
+
+      // Make sure the worker is active before any later push operation.
+      await navigator.serviceWorker.ready;
 
       return notificationRegistration;
     } catch (error) {
@@ -107,12 +115,16 @@
     const existing =
       await notificationRegistration.pushManager.getSubscription();
 
-    const subscription = existing || await notificationRegistration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: base64ToUint8Array(publicKey)
-    });
+    let subscription = existing;
 
-    await syncSubscription(subscription);
+    if (!subscription) {
+      subscription = await notificationRegistration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: base64ToUint8Array(publicKey)
+      });
+    }
+
+    await syncSubscription(subscription, await getPreviewEnabled());
     return true;
   }
 
