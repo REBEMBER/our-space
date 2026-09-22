@@ -2124,6 +2124,8 @@ function renderError(message) {
 
                 ${menuHtml}
 
+                ${!deleted ? `\${reactionPickerHtml(message)}` : ""}
+
               </div>
 
             </div>
