@@ -15,6 +15,9 @@
       if (!userId) return;
       sessionStorage.setItem(this.keyFor(userId), "1");
     },
+    lock() {
+      this.clearAll();
+    },
     clearAll() {
       for (let i = sessionStorage.length - 1; i >= 0; i--) {
         const key = sessionStorage.key(i);
