@@ -137,7 +137,15 @@
       }catch(error){
         console.error("Unlock verification error:",error);
       }
-      if(code === effectiveCode) window.location.href="index.html";
+      if(code === effectiveCode){
+        const { data:{ user } } = await authClient.auth.getUser();
+        if(!user){
+          window.location.href="/login.html";
+          return;
+        }
+        sessionStorage.setItem("our_space_calculator_unlocked:"+user.id,"1");
+        window.location.href="/index.html";
+      }
     }
 
     loadAccountSettings();
