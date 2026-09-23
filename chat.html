@@ -24,7 +24,10 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/gateway.js?v=2"></script>
 <style>html.gateway-pending body{visibility:hidden}</style>
-<script>document.documentElement.classList.add("gateway-pending");</script>
+<style>html.chat-pending body{visibility:hidden}</style>
+<script>
+  document.documentElement.classList.add("gateway-pending","chat-pending");
+</script>
 
   <style>
     :root{
@@ -116,7 +119,7 @@
     .messages-scroll{
       position:relative;flex:1 1 auto;min-height:0;width:100%;overflow-y:auto;
       padding:4px 0 0;-webkit-overflow-scrolling:touch;
-      overscroll-behavior:contain;overflow-anchor:none;
+      overscroll-behavior:contain;overflow-anchor:none;scroll-behavior:auto;
       scrollbar-width:thin;scrollbar-color:rgba(21,43,70,.12) transparent;
     }
     .messages-scroll::-webkit-scrollbar{width:7px}
@@ -127,6 +130,7 @@
       display:flex;flex-direction:column;justify-content:flex-start;
     }
     .date-divider{display:flex;justify-content:center;margin:18px 0 11px}
+    .chat-bottom-sentinel{height:1px;min-height:1px;width:1px;pointer-events:none}
     .date-divider span{
       min-height:24px;padding:0 10px;display:inline-flex;align-items:center;
       border:1px solid var(--soft-border);border-radius:999px;
@@ -685,6 +689,7 @@
     let bottomScrollFrame = 0;
     let bottomScrollToken = 0;
     let bottomScrollTimers = [];
+    let chatInitialising = true;
 
     /* ==========================================
        HELPERS
@@ -712,17 +717,17 @@
     // The message viewport ends naturally above the composer because both
     // elements participate in the same flex layout. The browser therefore
     // computes the true maximum scrollTop without any spacer or overlay math.
-    function getBottomSentinel() {
-      return document.getElementById("chatBottomSentinel");
+    function getScrollDistanceFromBottom() {
+      return Math.max(
+        0,
+        messagesScroll.scrollHeight -
+        messagesScroll.clientHeight -
+        messagesScroll.scrollTop
+      );
     }
 
     function isAtBottom() {
-      const distance =
-        messagesScroll.scrollHeight -
-        messagesScroll.clientHeight -
-        messagesScroll.scrollTop;
-
-      return distance <= 20;
+      return getScrollDistanceFromBottom() <= 20;
     }
 
     function cancelBottomLock() {
@@ -738,24 +743,13 @@
       bottomScrollTimers = [];
     }
 
-    function scrollToLatestNow() {
-      const sentinel = getBottomSentinel();
-
-      if (sentinel) {
-        sentinel.scrollIntoView({
-          block: "end",
-          inline: "nearest",
-          behavior: "auto"
-        });
-      }
-
-      // The sentinel is authoritative; this assignment is a cheap final
-      // correction for browsers that round scrollIntoView differently.
-      messagesScroll.scrollTop =
-        Math.max(0, messagesScroll.scrollHeight - messagesScroll.clientHeight);
+    function forceBottomPosition() {
+      // Do not call getBoundingClientRect() here. Reading layout immediately
+      // before writing scrollTop caused avoidable synchronous reflow.
+      messagesScroll.scrollTop = messagesScroll.scrollHeight;
     }
 
-    function scrollToLatest(behavior = "auto") {
+    function scrollToLatest() {
       stickToBottom = true;
       const token = ++bottomScrollToken;
 
@@ -764,41 +758,24 @@
       }
 
       bottomScrollFrame = requestAnimationFrame(() => {
-        bottomScrollFrame = requestAnimationFrame(() => {
-          bottomScrollFrame = 0;
+        bottomScrollFrame = 0;
 
-          if (token !== bottomScrollToken) return;
-
-          const sentinel = getBottomSentinel();
-
-          if (sentinel && behavior === "smooth") {
-            sentinel.scrollIntoView({
-              block: "end",
-              inline: "nearest",
-              behavior: "smooth"
-            });
-          } else {
-            scrollToLatestNow();
-          }
-        });
+        if (token !== bottomScrollToken) return;
+        forceBottomPosition();
       });
 
       bottomScrollTimers.forEach(clearTimeout);
       bottomScrollTimers = [
         setTimeout(() => {
-          if (token === bottomScrollToken) {
+          if (token === bottomScrollToken && !chatInitialising) {
             stickToBottom = false;
             bottomScrollTimers = [];
           }
-        }, 700)
+        }, 500)
       ];
-
-      return token;
     }
 
-    // Keep the viewport pinned while the browser finishes image decoding,
-    // font/layout work, or keyboard/composer reflow after a new message.
-    function lockToLatestForSettling() {
+    function lockToLatestForSettling(duration = 1400) {
       stickToBottom = true;
       const token = ++bottomScrollToken;
 
@@ -812,14 +789,17 @@
 
       const settle = () => {
         if (!stickToBottom || token !== bottomScrollToken) return;
-        scrollToLatestNow();
+        forceBottomPosition();
       };
 
+      // Paint the DOM once, then correct the scroll position on the next
+      // couple of frames. This is hidden during the initial entry.
       requestAnimationFrame(() => {
+        settle();
         requestAnimationFrame(settle);
       });
 
-      [40, 100, 220, 450, 800].forEach((delay) => {
+      [60, 150, 300, 550, 900].forEach((delay) => {
         bottomScrollTimers.push(setTimeout(settle, delay));
       });
 
@@ -829,11 +809,12 @@
             stickToBottom = false;
             bottomScrollTimers = [];
           }
-        }, 1000)
+        }, duration)
       );
     }
 
     function userStartedScrollingChat() {
+      if (chatInitialising) return;
       cancelBottomLock();
     }
 
@@ -848,14 +829,9 @@
     });
 
     messagesScroll.addEventListener("scroll", () => {
-      if (!stickToBottom) return;
+      if (!stickToBottom || chatInitialising) return;
 
-      const distance =
-        messagesScroll.scrollHeight -
-        messagesScroll.clientHeight -
-        messagesScroll.scrollTop;
-
-      if (distance > 28) {
+      if (getScrollDistanceFromBottom() > 28) {
         cancelBottomLock();
       }
     }, { passive: true });
@@ -945,7 +921,7 @@
     }
 
     function scrollToLatestAfterImages() {
-      lockToLatestForSettling();
+      lockToLatestForSettling(1000);
     }
 
     function closeMenus() {
@@ -1060,7 +1036,59 @@
       { passive: true }
     );
 
-function renderError(message) {
+async function revealInitialChat() {
+      stickToBottom = true;
+      chatInitialising = true;
+
+      // Give the browser a chance to commit the rendered transcript. Images
+      // already in/near the viewport get a short opportunity to decode, while
+      // a hard cap prevents a single broken image from blocking entry.
+      const images = Array.from(
+        messagesEl.querySelectorAll("img.message-image")
+      );
+
+      await Promise.race([
+        Promise.all(
+          images.map((img) =>
+            img.complete
+              ? Promise.resolve()
+              : new Promise((resolve) => {
+                  let done = false;
+                  const finish = () => {
+                    if (done) return;
+                    done = true;
+                    img.removeEventListener("load", finish);
+                    img.removeEventListener("error", finish);
+                    resolve();
+                  };
+                  img.addEventListener("load", finish, { once: true });
+                  img.addEventListener("error", finish, { once: true });
+                })
+          )
+        ),
+        new Promise((resolve) => setTimeout(resolve, 700))
+      ]);
+
+      for (let i = 0; i < 3; i++) {
+        await new Promise((resolve) =>
+          requestAnimationFrame(() => {
+            forceBottomPosition();
+            resolve();
+          })
+        );
+      }
+
+      document.documentElement.classList.remove("chat-pending","gateway-pending");
+      chatInitialising = false;
+
+      // Keep the true bottom locked briefly after reveal so delayed image
+      // decoding or mobile viewport adjustments cannot leave the user above
+      // the final message.
+      lockToLatestForSettling(900);
+    }
+
+    /* Initial display / reveal */
+    function renderError(message) {
       messagesEl.innerHTML = `
         <div class="error-card">
           <strong>Unable to load the chat</strong>
@@ -1332,7 +1360,7 @@ function renderError(message) {
       }
 
       html += `
-        <div id="chatBottomSentinel" aria-hidden="true"></div>
+        <div id="chatBottomSentinel" class="chat-bottom-sentinel" aria-hidden="true"></div>
       `;
 
       messagesEl.innerHTML = html;
@@ -1712,7 +1740,7 @@ function renderError(message) {
       renderMessages();
 
       if (shouldScroll) {
-        scrollToLatestAfterImages();
+        lockToLatestForSettling(1100);
       }
     }
 
@@ -2480,11 +2508,17 @@ function renderError(message) {
       // Gate the reply coach by the canonical profile username, not only by
       // a hard-coded UUID. This keeps the UI aligned with the same identity
       // rule enforced by the AI Edge Function.
-      const { data: profile, error: profileError } = await client
+      const profilePromise = client
         .from("user_profiles")
         .select("username")
         .eq("user_id", currentUser.id)
         .maybeSingle();
+
+      window.OurSpaceTheme.syncFromUser(currentUser);
+      headerSubtitle.textContent = "Private chat";
+
+      const [{ data: profile, error: profileError }] =
+        await Promise.all([profilePromise, loadMessages(true)]);
 
       const isMohammadAccount =
         !profileError &&
@@ -2497,15 +2531,13 @@ function renderError(message) {
         clearReplySuggestion();
       }
 
-      window.OurSpaceTheme.syncFromUser(currentUser);
+      await revealInitialChat();
 
-      headerSubtitle.textContent =
-        "Private chat";
-
-      await loadMessages(true);
-
+      // Non-critical startup work must not block the first usable frame.
       if (window.OurSpaceNotifications) {
-        await window.OurSpaceNotifications.register(currentUser);
+        window.OurSpaceNotifications.register(currentUser).catch((error) => {
+          console.warn("Notification registration failed:", error);
+        });
       }
 
       subscribeRealtime();
