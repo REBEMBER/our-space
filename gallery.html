@@ -12,23 +12,49 @@
   <title>Our Space — Gallery</title>
   <style>
     :root{
-      --bg:#F8F0EC;--navy:#152B46;--peach:#F3B29F;--blue:#DCEAF5;
-      --white:#fff;--text:#26313D;--muted:#7A8794;--border:rgba(21,43,70,.09);
+      --bg:#F8F0EC;--navy:#152B46;--navy-2:#193651;--peach:#F3B29F;--blue:#DCEAF5;
+      --surface:#FFFFFF;--text:#26313D;--muted:#7A8794;--border:rgba(21,43,70,.09);
+      --soft:rgba(255,255,255,.82);--danger:#A94F4F;
+    }
+    html[data-theme="dark"]{
+      --bg:#0B121B;--navy:#F1F6FA;--navy-2:#233649;--peach:#EFA58C;--blue:#263B50;
+      --surface:#182431;--text:#EDF3F7;--muted:#A6B5C1;--border:rgba(237,243,247,.14);
+      --soft:rgba(24,36,49,.92);--danger:#F29A9A;
+    }
+    html[data-theme="ocean"]{
+      --bg:#ECF7FC;--navy:#0E4266;--navy-2:#17567C;--peach:#72CAE6;--blue:#D3EDF8;
+      --surface:#FFFFFF;--text:#193547;--muted:#6A8495;--border:rgba(14,66,102,.12);
+      --soft:rgba(255,255,255,.86);--danger:#A94F4F;
+    }
+    html[data-theme="forest"]{
+      --bg:#EEF6F1;--navy:#164638;--navy-2:#286554;--peach:#DDA187;--blue:#D7EAE1;
+      --surface:#FFFFFF;--text:#253A32;--muted:#71857D;--border:rgba(22,70,56,.12);
+      --soft:rgba(255,255,255,.86);--danger:#A94F4F;
+    }
+    html[data-theme="blush"]{
+      --bg:#FFF1F5;--navy:#762B49;--navy-2:#9B3F62;--peach:#F3A2BC;--blue:#FADCE7;
+      --surface:#FFFFFF;--text:#3D2731;--muted:#8D6A78;--border:rgba(118,43,73,.12);
+      --soft:rgba(255,255,255,.88);--danger:#B64C63;
+    }
+    html[data-theme="sunset"]{
+      --bg:#FFF4EC;--navy:#71381F;--navy-2:#9B583B;--peach:#F4A77E;--blue:#FBE0D1;
+      --surface:#FFFFFF;--text:#3E2A22;--muted:#8A6F63;--border:rgba(113,56,31,.12);
+      --soft:rgba(255,255,255,.88);--danger:#A34D3F;
     }
     *{box-sizing:border-box}
-    html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    html,body{margin:0;min-height:100%;background:radial-gradient(650px 420px at 100% 0%,color-mix(in srgb,var(--peach) 26%,transparent),transparent 70%),radial-gradient(620px 420px at 0% 100%,color-mix(in srgb,var(--blue) 70%,transparent),transparent 70%),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
     body{padding:18px}
     button{font:inherit;cursor:pointer}
     .app{width:min(100%,1080px);margin:0 auto}
     .header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:6px 0 18px}
     .header-left{display:flex;align-items:center;gap:10px}
-    .back-button{width:40px;height:40px;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,.86);color:var(--navy);display:grid;place-items:center}
+    .back-button{width:40px;height:40px;border:1px solid var(--border);border-radius:12px;background:var(--soft);color:var(--navy);display:grid;place-items:center}
     .back-button svg{width:18px;height:18px}
     .title{margin:0;color:var(--navy);font-size:20px;font-weight:850}
     .subtitle{margin:4px 0 0;color:var(--muted);font-size:11px}
-    .refresh-button{height:40px;padding:0 12px;border:1px solid var(--border);border-radius:12px;background:var(--white);color:var(--navy);font-size:10px;font-weight:800}
+    .refresh-button{height:40px;padding:0 12px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--navy);font-size:10px;font-weight:800}
     .gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-    .photo-card{position:relative;overflow:hidden;min-height:220px;border-radius:20px;background:var(--white);border:1px solid var(--border);box-shadow:0 10px 28px rgba(21,43,70,.06)}
+    .photo-card{position:relative;overflow:hidden;min-height:220px;border-radius:20px;background:var(--surface);border:1px solid var(--border);box-shadow:0 10px 28px color-mix(in srgb,var(--navy) 7%,transparent)}
     .photo-card a{display:block;width:100%;height:100%}
     .photo-card img{display:block;width:100%;height:100%;min-height:220px;object-fit:cover;background:var(--blue)}
     .photo-delete{position:absolute;right:10px;top:10px;width:34px;height:34px;border-radius:11px;border:1px solid rgba(255,255,255,.7);background:rgba(21,43,70,.82);color:#fff;display:grid;place-items:center;cursor:pointer;box-shadow:0 8px 20px rgba(21,43,70,.2);backdrop-filter:blur(8px)}
@@ -42,15 +68,15 @@
     .state strong{display:block;margin-bottom:7px;color:var(--navy);font-size:16px}
     @media(max-width:760px){.gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.photo-card,.photo-card img{min-height:180px}}
     @media(max-width:430px){body{padding:12px}.photo-card,.photo-card img{min-height:145px}.title{font-size:18px}}
-    .gallery-delete-layer{position:fixed;inset:0;z-index:100;display:none;place-items:center;padding:18px;background:rgba(21,43,70,.18);backdrop-filter:blur(8px)}
+    .gallery-delete-layer{position:fixed;inset:0;z-index:100;display:none;place-items:center;padding:18px;background:color-mix(in srgb,var(--navy) 18%,transparent);backdrop-filter:blur(8px)}
     .gallery-delete-layer.open{display:grid}
-    .gallery-delete-sheet{width:min(100%,340px);padding:20px;border-radius:22px;background:#fff;border:1px solid rgba(21,43,70,.1);box-shadow:0 24px 70px rgba(21,43,70,.22)}
+    .gallery-delete-sheet{width:min(100%,340px);padding:20px;border-radius:22px;background:var(--surface);border:1px solid var(--border);box-shadow:0 24px 70px color-mix(in srgb,var(--navy) 22%,transparent)}
     .gallery-delete-title{color:#152B46;font-size:16px;font-weight:850}
     .gallery-delete-copy{margin-top:7px;color:#7A8794;font-size:12px;line-height:1.5}
     .gallery-delete-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:18px}
     .gallery-delete-cancel,.gallery-delete-confirm{height:44px;border-radius:13px;font-size:12px;font-weight:800;cursor:pointer}
-    .gallery-delete-cancel{background:#F7F2EF;color:#152B46}
-    .gallery-delete-confirm{background:#B54A3C;color:#fff}
+    .gallery-delete-cancel{background:color-mix(in srgb,var(--blue) 35%,var(--surface));color:var(--navy)}
+    .gallery-delete-confirm{background:var(--danger);color:#fff}
     .gallery-delete-confirm:disabled{opacity:.55;cursor:wait}
   </style>
 </head>
