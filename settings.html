@@ -55,6 +55,12 @@
       --surface-soft:rgba(255,255,255,.86);--success:#4B725E;--danger:#A34D3F;
       --action:#71381F;--action-text:#FFFFFF;--hero-a:#71381F;--hero-b:#9B583B;
     }
+
+    html[data-theme="graphite"]{--bg:#F4F5F7;--navy:#20242B;--navy-light:#3B414B;--peach:#AAB6C4;--blue:#E4E8ED;--white:#FFF;--text:#252A31;--muted:#737B86;--border:rgba(32,36,43,.12);--surface-soft:rgba(255,255,255,.88);--success:#47745E;--danger:#A64B55;--action:#20242B;--action-text:#FFF;--hero-a:#20242B;--hero-b:#3B414B;}
+    html[data-theme="sky"]{--bg:#F1FBFC;--navy:#176B87;--navy-light:#278DAA;--peach:#7ED8E5;--blue:#DDF5F8;--white:#FFF;--text:#1D3D47;--muted:#6D8991;--border:rgba(23,107,135,.12);--surface-soft:rgba(255,255,255,.88);--success:#47745E;--danger:#A64B55;--action:#176B87;--action-text:#FFF;--hero-a:#176B87;--hero-b:#278DAA;}
+    html[data-theme="lavender"]{--bg:#F7F5FC;--navy:#5B4B82;--navy-light:#7865A5;--peach:#C9B8F2;--blue:#EAE4FA;--white:#FFF;--text:#322D40;--muted:#7D748D;--border:rgba(91,75,130,.12);--surface-soft:rgba(255,255,255,.88);--success:#47745E;--danger:#A64B55;--action:#5B4B82;--action-text:#FFF;--hero-a:#5B4B82;--hero-b:#7865A5;}
+    html[data-theme="citrus"]{--bg:#FFFCF0;--navy:#5E651E;--navy-light:#7B8429;--peach:#F3C85B;--blue:#F8EFC8;--white:#FFF;--text:#35371F;--muted:#81815F;--border:rgba(94,101,30,.13);--surface-soft:rgba(255,255,255,.88);--success:#47745E;--danger:#A64B55;--action:#5E651E;--action-text:#FFF;--hero-a:#5E651E;--hero-b:#7B8429;}
+
     *{box-sizing:border-box}
     body{margin:0;min-height:100vh;color:var(--text);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(650px 420px at 100% 0%,color-mix(in srgb,var(--peach) 30%,transparent),transparent 70%),radial-gradient(620px 420px at 0% 100%,color-mix(in srgb,var(--blue) 78%,transparent),transparent 70%),var(--bg)}
     button,input{font:inherit}
@@ -72,12 +78,12 @@
     .section-head{margin-bottom:18px}
     .section-title{margin:0;color:var(--navy);font-size:17px;font-weight:850;letter-spacing:-.025em}
     .section-description{margin:5px 0 0;color:var(--muted);font-size:11px;line-height:1.55}
-    .theme-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
-    .theme-option{border:1px solid var(--border);border-radius:17px;padding:11px;background:var(--surface-soft);color:var(--text);cursor:pointer;text-align:left}
+    .theme-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+    .theme-option{border:1px solid var(--border);border-radius:15px;padding:8px;background:var(--surface-soft);color:var(--text);cursor:pointer;text-align:left}
     .theme-option.active{border-color:var(--navy);box-shadow:0 0 0 2px color-mix(in srgb,var(--navy) 12%,transparent)}
-    .theme-preview{height:74px;border-radius:12px;padding:9px;display:flex;justify-content:space-between;background:var(--preview-bg)}
+    .theme-preview{height:62px;border-radius:12px;padding:9px;display:flex;justify-content:space-between;background:var(--preview-bg)}
     .theme-preview-main{width:58%;height:100%;border-radius:9px;background:var(--preview-surface)}
-    .theme-preview-dot{width:24px;height:24px;border-radius:8px;background:var(--preview-accent)}
+    .theme-preview-dot{width:20px;height:20px;border-radius:8px;background:var(--preview-accent)}
     .theme-option[data-theme-option="warm"] .theme-preview{--preview-bg:#F8F0EC;--preview-surface:#152B46;--preview-accent:#F3B29F}
     .theme-option[data-theme-option="dark"] .theme-preview{--preview-bg:#101722;--preview-surface:#EAF1F7;--preview-accent:#E7A58F}
     .theme-option[data-theme-option="ocean"] .theme-preview{--preview-bg:#EEF6FB;--preview-surface:#123B5D;--preview-accent:#8BCDE5}
@@ -136,6 +142,10 @@
         <button class="theme-option" data-theme-option="forest" type="button"><div class="theme-preview"><div class="theme-preview-main"></div><div class="theme-preview-dot"></div></div><div class="theme-name">Forest</div><div class="theme-note">Deep green</div></button>
         <button class="theme-option" data-theme-option="blush" type="button"><div class="theme-preview"><div class="theme-preview-main"></div><div class="theme-preview-dot"></div></div><div class="theme-name">Blush</div><div class="theme-note">Soft pink</div></button>
         <button class="theme-option" data-theme-option="sunset" type="button"><div class="theme-preview"><div class="theme-preview-main"></div><div class="theme-preview-dot"></div></div><div class="theme-name">Sunset</div><div class="theme-note">Warm terracotta</div></button>
+        <button class="theme-option" data-theme-option="graphite" type="button"><div class="theme-preview"><div class="theme-preview-main"></div><div class="theme-preview-dot"></div></div><div class="theme-name">Graphite</div><div class="theme-note">Clean neutral</div></button>
+        <button class="theme-option" data-theme-option="sky" type="button"><div class="theme-preview"><div class="theme-preview-main"></div><div class="theme-preview-dot"></div></div><div class="theme-name">Sky</div><div class="theme-note">Fresh cyan</div></button>
+        <button class="theme-option" data-theme-option="lavender" type="button"><div class="theme-preview"><div class="theme-preview-main"></div><div class="theme-preview-dot"></div></div><div class="theme-name">Lavender</div><div class="theme-note">Soft violet</div></button>
+        <button class="theme-option" data-theme-option="citrus" type="button"><div class="theme-preview"><div class="theme-preview-main"></div><div class="theme-preview-dot"></div></div><div class="theme-name">Citrus</div><div class="theme-note">Bright & warm</div></button>
       </div>
       <div class="status" id="themeStatus"></div>
     </section>
@@ -460,3 +470,9 @@
   </script>
 </body>
 </html>
+<style>
+    .theme-option[data-theme-option="graphite"] .theme-preview{--preview-bg:#F4F5F7;--preview-surface:#20242B;--preview-accent:#AAB6C4}
+    .theme-option[data-theme-option="sky"] .theme-preview{--preview-bg:#F1FBFC;--preview-surface:#176B87;--preview-accent:#7ED8E5}
+    .theme-option[data-theme-option="lavender"] .theme-preview{--preview-bg:#F7F5FC;--preview-surface:#5B4B82;--preview-accent:#C9B8F2}
+    .theme-option[data-theme-option="citrus"] .theme-preview{--preview-bg:#FFFCF0;--preview-surface:#5E651E;--preview-accent:#F3C85B}
+  </style>
