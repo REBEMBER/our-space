@@ -104,6 +104,7 @@
 
   <!-- Required before calculator.js logic: the page uses supabase.createClient(). -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/gateway.js?v=2"></script>
 
   <script>
     const SUPABASE_URL = "https://ywflohxufmfydkpkkqly.supabase.co";
@@ -115,6 +116,12 @@
       SUPABASE_PUBLISHABLE_KEY,
       { auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true } }
     );
+
+    // The calculator is mandatory every time Our Space is entered.
+    // A previous app session must never silently bypass it.
+    window.addEventListener("pageshow", () => {
+      try { window.OurSpaceGateway?.lock?.(); } catch {}
+    });
 
     async function loadAccountSettings() {
       try {
@@ -143,7 +150,7 @@
           window.location.href="/login.html";
           return;
         }
-        sessionStorage.setItem("our_space_calculator_unlocked:"+user.id,"1");
+        window.OurSpaceGateway?.unlock?.(user.id);
         window.location.href="/index.html";
       }
     }
