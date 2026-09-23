@@ -7,12 +7,12 @@
   const THEME_META_COLORS = {
     warm: "#F8F0EC",
     dark: "#0B121B",
-    ocean: "#ECF7FC",
-    forest: "#EEF6F1",
+    ocean: "#EAF8FA",
+    forest: "#F0F7EA",
     blush: "#FFF1F5",
     sunset: "#FFF4EC",
     graphite: "#F4F5F7",
-    sky: "#F1FBFC",
+    sky: "#F0F6FF",
     lavender: "#F7F5FC",
     citrus: "#FFFCF0"
   };
