@@ -78,16 +78,18 @@
     .section-head{margin-bottom:18px}
     .section-title{margin:0;color:var(--navy);font-size:17px;font-weight:850;letter-spacing:-.025em}
     .section-description{margin:5px 0 0;color:var(--muted);font-size:11px;line-height:1.55}
-    .theme-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
-    .theme-option{border:1px solid var(--border);border-radius:15px;padding:8px;background:var(--surface-soft);color:var(--text);cursor:pointer;text-align:left}
+    .theme-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+    .theme-option{border:1px solid var(--border);border-radius:13px;padding:6px;background:var(--surface-soft);color:var(--text);cursor:pointer;text-align:left;min-width:0}
     .theme-option.active{border-color:var(--navy);box-shadow:0 0 0 2px color-mix(in srgb,var(--navy) 12%,transparent)}
-    .theme-preview{height:62px;border-radius:12px;padding:9px;display:flex;justify-content:space-between;background:var(--preview-bg)}
-    .theme-preview-main{width:58%;height:100%;border-radius:9px;background:var(--preview-surface)}
-    .theme-preview-dot{width:20px;height:20px;border-radius:8px;background:var(--preview-accent)}
+    .theme-preview{height:48px;border-radius:9px;padding:6px;display:flex;justify-content:space-between;background:var(--preview-bg)}
+    .theme-preview-main{width:58%;height:100%;border-radius:7px;background:var(--preview-surface)}
+    .theme-preview-dot{width:12px;height:12px;border-radius:4px;background:var(--preview-accent);flex:0 0 12px}
+    .theme-name{margin-top:7px;font-size:11px;font-weight:800;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .theme-note{margin-top:2px;color:var(--muted);font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .theme-option[data-theme-option="warm"] .theme-preview{--preview-bg:#F8F0EC;--preview-surface:#152B46;--preview-accent:#F3B29F}
     .theme-option[data-theme-option="dark"] .theme-preview{--preview-bg:#101722;--preview-surface:#EAF1F7;--preview-accent:#E7A58F}
-    .theme-option[data-theme-option="ocean"] .theme-preview{--preview-bg:#EEF6FB;--preview-surface:#123B5D;--preview-accent:#8BCDE5}
-    .theme-option[data-theme-option="forest"] .theme-preview{--preview-bg:#EEF6F1;--preview-surface:#164638;--preview-accent:#DDA187}
+    .theme-option[data-theme-option="ocean"] .theme-preview{--preview-bg:#EAF8FA;--preview-surface:#087F8C;--preview-accent:#55D6C8}
+    .theme-option[data-theme-option="forest"] .theme-preview{--preview-bg:#F0F7EA;--preview-surface:#31572C;--preview-accent:#A4C95B}
     .theme-option[data-theme-option="blush"] .theme-preview{--preview-bg:#FFF1F5;--preview-surface:#762B49;--preview-accent:#F3A2BC}
     .theme-option[data-theme-option="sunset"] .theme-preview{--preview-bg:#FFF4EC;--preview-surface:#71381F;--preview-accent:#F4A77E}
     .theme-name{margin-top:9px;font-size:12px;font-weight:800;color:var(--navy)}
@@ -472,7 +474,15 @@
 </html>
 <style>
     .theme-option[data-theme-option="graphite"] .theme-preview{--preview-bg:#F4F5F7;--preview-surface:#20242B;--preview-accent:#AAB6C4}
-    .theme-option[data-theme-option="sky"] .theme-preview{--preview-bg:#F1FBFC;--preview-surface:#176B87;--preview-accent:#7ED8E5}
+    .theme-option[data-theme-option="sky"] .theme-preview{--preview-bg:#F0F6FF;--preview-surface:#315FA8;--preview-accent:#79AFFF}
+    .theme-option[data-theme-option="lavender"] .theme-preview{--preview-bg:#F7F5FC;--preview-surface:#5B4B82;--preview-accent:#C9B8F2}
+    .theme-option[data-theme-option="citrus"] .theme-preview{--preview-bg:#FFFCF0;--preview-surface:#5E651E;--preview-accent:#F3C85B}
+  </style>
+<style>
+    @media(max-width:700px){.theme-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.theme-preview{height:54px}}
+    .theme-option[data-theme-option="dark"] .theme-preview{--preview-bg:#0B121B;--preview-surface:#25374A;--preview-accent:#F1B08E}
+    .theme-option[data-theme-option="graphite"] .theme-preview{--preview-bg:#F4F5F7;--preview-surface:#20242B;--preview-accent:#AAB6C4}
+    .theme-option[data-theme-option="sky"] .theme-preview{--preview-bg:#F0F6FF;--preview-surface:#315FA8;--preview-accent:#79AFFF}
     .theme-option[data-theme-option="lavender"] .theme-preview{--preview-bg:#F7F5FC;--preview-surface:#5B4B82;--preview-accent:#C9B8F2}
     .theme-option[data-theme-option="citrus"] .theme-preview{--preview-bg:#FFFCF0;--preview-surface:#5E651E;--preview-accent:#F3C85B}
   </style>
