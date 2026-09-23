@@ -140,7 +140,10 @@
     }
 
     /* MESSAGE BUBBLES */
-    .message-row{width:100%;display:flex;position:relative;margin:3px 0}
+    .message-row{
+      width:100%;display:flex;position:relative;margin:3px 0;
+      content-visibility:auto;contain-intrinsic-size:auto 58px;
+    }
     .message-row.mine{justify-content:flex-end}
     .message-row.theirs{justify-content:flex-start}
     .message-content{position:relative;max-width:min(76%,560px)}
@@ -744,8 +747,6 @@
     }
 
     function forceBottomPosition() {
-      // Do not call getBoundingClientRect() here. Reading layout immediately
-      // before writing scrollTop caused avoidable synchronous reflow.
       messagesScroll.scrollTop = messagesScroll.scrollHeight;
     }
 
@@ -759,23 +760,17 @@
 
       bottomScrollFrame = requestAnimationFrame(() => {
         bottomScrollFrame = 0;
-
-        if (token !== bottomScrollToken) return;
+        if (token !== bottomScrollToken || !stickToBottom) return;
         forceBottomPosition();
       });
 
-      bottomScrollTimers.forEach(clearTimeout);
-      bottomScrollTimers = [
-        setTimeout(() => {
-          if (token === bottomScrollToken && !chatInitialising) {
-            stickToBottom = false;
-            bottomScrollTimers = [];
-          }
-        }, 500)
-      ];
+      // Intentionally do not use a timeout here. Once the app decides that
+      // the conversation should follow the latest message, it stays locked
+      // until the user explicitly scrolls. This prevents late image/layout
+      // changes from leaving the viewport above the last message.
     }
 
-    function lockToLatestForSettling(duration = 1400) {
+    function lockToLatestForSettling() {
       stickToBottom = true;
       const token = ++bottomScrollToken;
 
@@ -792,25 +787,10 @@
         forceBottomPosition();
       };
 
-      // Paint the DOM once, then correct the scroll position on the next
-      // couple of frames. This is hidden during the initial entry.
       requestAnimationFrame(() => {
         settle();
         requestAnimationFrame(settle);
       });
-
-      [60, 150, 300, 550, 900].forEach((delay) => {
-        bottomScrollTimers.push(setTimeout(settle, delay));
-      });
-
-      bottomScrollTimers.push(
-        setTimeout(() => {
-          if (token === bottomScrollToken) {
-            stickToBottom = false;
-            bottomScrollTimers = [];
-          }
-        }, duration)
-      );
     }
 
     function userStartedScrollingChat() {
@@ -921,7 +901,7 @@
     }
 
     function scrollToLatestAfterImages() {
-      lockToLatestForSettling(1000);
+      lockToLatestForSettling();
     }
 
     function closeMenus() {
@@ -968,12 +948,12 @@
     });
 
     const composerResizeObserver = new ResizeObserver(() => {
-      const wasAtBottom = isAtBottom();
-
       syncLayoutMetrics();
 
-      if (wasAtBottom) {
-        scrollToLatest();
+      if (stickToBottom) {
+        requestAnimationFrame(() => {
+          if (stickToBottom) forceBottomPosition();
+        });
       }
     });
 
@@ -993,6 +973,27 @@
 
     if (messagesEl) {
       messagesContentResizeObserver.observe(messagesEl);
+
+      // Images change scrollHeight after they decode. ResizeObserver on the
+      // fixed viewport cannot see that content-size change, so listen directly
+      // for image load/error events bubbling from the transcript.
+      messagesEl.addEventListener("load", (event) => {
+        if (event.target instanceof HTMLImageElement && stickToBottom) {
+          requestAnimationFrame(() => {
+            if (stickToBottom) forceBottomPosition();
+          });
+        }
+      }, true);
+    }
+
+    if (document.fonts?.ready) {
+      document.fonts.ready.then(() => {
+        if (stickToBottom) {
+          requestAnimationFrame(() => {
+            if (stickToBottom) forceBottomPosition();
+          });
+        }
+      }).catch(() => {});
     }
 
     syncLayoutMetrics();
@@ -1008,11 +1009,10 @@
       viewportSyncFrame = requestAnimationFrame(() => {
         viewportSyncFrame = 0;
 
-        const wasAtBottom = isAtBottom();
         syncLayoutMetrics();
 
-        if (wasAtBottom) {
-          scrollToLatest();
+        if (stickToBottom) {
+          forceBottomPosition();
         }
       });
     }
@@ -1084,7 +1084,7 @@ async function revealInitialChat() {
       // Keep the true bottom locked briefly after reveal so delayed image
       // decoding or mobile viewport adjustments cannot leave the user above
       // the final message.
-      lockToLatestForSettling(900);
+      lockToLatestForSettling();
     }
 
     /* Initial display / reveal */
@@ -1741,7 +1741,7 @@ async function revealInitialChat() {
       renderMessages();
 
       if (shouldScroll) {
-        lockToLatestForSettling(1100);
+        lockToLatestForSettling();
       }
     }
 
