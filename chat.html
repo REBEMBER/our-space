@@ -1794,14 +1794,39 @@ async function revealInitialChat() {
       }
 
       input.value = "";
-      input.style.height =
-        "40px";
+      input.style.height = "40px";
       syncLayoutMetrics();
 
-      await loadMessages(true);
+      // The database write already returned the authoritative row. Do not
+      // re-query the entire conversation just to display the message.
+      // Realtime will deliver the same insert to the other device.
+      if (sentMessage) {
+        const alreadyPresent = messages.some(
+          (item) => Number(item.id) === Number(sentMessage.id)
+        );
+
+        if (!alreadyPresent) {
+          messages.push({
+            ...sentMessage,
+            message_type: "text",
+            media_path: null,
+            deleted_at: null,
+            deleted_by: null,
+            seen_at: null
+          });
+          messages.sort(
+            (a, b) => new Date(a.created_at) - new Date(b.created_at)
+          );
+          renderMessages();
+        }
+
+        scrollToLatest();
+      }
 
       if (sentMessage && window.OurSpaceNotifications) {
-        await window.OurSpaceNotifications.sendMessage(sentMessage);
+        window.OurSpaceNotifications.sendMessage(sentMessage).catch((error) => {
+          console.warn("Message notification failed:", error);
+        });
       }
 
       if (!preserveReplySuggestion) {
