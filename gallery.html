@@ -6,6 +6,9 @@
   <link rel="manifest" href="/manifest.json">
   <script src="/theme.js?v=final"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/gateway.js?v=1"></script>
+<style>html.gateway-pending body{visibility:hidden}</style>
+<script>document.documentElement.classList.add("gateway-pending");</script>
   <title>Our Space — Gallery</title>
   <style>
     :root{
@@ -112,6 +115,7 @@
         window.location.href = "login.html";
         return;
       }
+      if (!await window.OurSpaceGateway.requireUnlock(client)) return;
 
       let isMohammad = false;
       const { data:profile } = await client
