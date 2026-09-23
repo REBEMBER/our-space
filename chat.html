@@ -670,6 +670,8 @@
     let currentUser = null;
     let messages = [];
     let realtimeChannel = null;
+    let realtimeHealthy = false;
+    let fallbackSyncTimer = null;
     let visibleMessageObserver = null;
     let isChatVisible = document.visibilityState === "visible";
     let replySuggestions = [];
@@ -710,13 +712,17 @@
     // The message viewport ends naturally above the composer because both
     // elements participate in the same flex layout. The browser therefore
     // computes the true maximum scrollTop without any spacer or overlay math.
+    function getBottomSentinel() {
+      return document.getElementById("chatBottomSentinel");
+    }
+
     function isAtBottom() {
       const distance =
         messagesScroll.scrollHeight -
         messagesScroll.clientHeight -
         messagesScroll.scrollTop;
 
-      return distance <= 16;
+      return distance <= 20;
     }
 
     function cancelBottomLock() {
@@ -733,10 +739,18 @@
     }
 
     function scrollToLatestNow() {
-      syncLayoutMetrics();
+      const sentinel = getBottomSentinel();
 
-      // The flex layout gives the scroll viewport exactly the visible space
-      // above the composer, so this is the true visible bottom of the chat.
+      if (sentinel) {
+        sentinel.scrollIntoView({
+          block: "end",
+          inline: "nearest",
+          behavior: "auto"
+        });
+      }
+
+      // The sentinel is authoritative; this assignment is a cheap final
+      // correction for browsers that round scrollIntoView differently.
       messagesScroll.scrollTop =
         Math.max(0, messagesScroll.scrollHeight - messagesScroll.clientHeight);
     }
@@ -755,12 +769,12 @@
 
           if (token !== bottomScrollToken) return;
 
-          if (behavior === "smooth") {
-            messagesScroll.scrollTo({
-              top: Math.max(
-                0,
-                messagesScroll.scrollHeight - messagesScroll.clientHeight
-              ),
+          const sentinel = getBottomSentinel();
+
+          if (sentinel && behavior === "smooth") {
+            sentinel.scrollIntoView({
+              block: "end",
+              inline: "nearest",
               behavior: "smooth"
             });
           } else {
@@ -769,9 +783,6 @@
         });
       });
 
-      // Normal realtime/composer-driven scrolls only need a short
-      // stabilization window. Explicit entry/photo settling uses the
-      // longer lock below.
       bottomScrollTimers.forEach(clearTimeout);
       bottomScrollTimers = [
         setTimeout(() => {
@@ -779,15 +790,14 @@
             stickToBottom = false;
             bottomScrollTimers = [];
           }
-        }, 1200)
+        }, 700)
       ];
 
       return token;
     }
 
-    // A forced bottom lock is used only when the app itself knows that the
-    // user should be at the latest message (chat entry / sending a photo).
-    // It survives image decoding and any resulting layout reflow.
+    // Keep the viewport pinned while the browser finishes image decoding,
+    // font/layout work, or keyboard/composer reflow after a new message.
     function lockToLatestForSettling() {
       stickToBottom = true;
       const token = ++bottomScrollToken;
@@ -809,13 +819,8 @@
         requestAnimationFrame(settle);
       });
 
-      // Image loading and decoding can change scrollHeight well after the
-      // first paint. ResizeObserver below handles exact changes; these
-      // bounded passes cover browser scheduling gaps as well.
-      [50, 120, 250, 500, 900, 1400].forEach((delay) => {
-        bottomScrollTimers.push(
-          setTimeout(settle, delay)
-        );
+      [40, 100, 220, 450, 800].forEach((delay) => {
+        bottomScrollTimers.push(setTimeout(settle, delay));
       });
 
       bottomScrollTimers.push(
@@ -824,7 +829,7 @@
             stickToBottom = false;
             bottomScrollTimers = [];
           }
-        }, 1800)
+        }, 1000)
       );
     }
 
@@ -843,8 +848,6 @@
     });
 
     messagesScroll.addEventListener("scroll", () => {
-      // If the user manually moves away from the bottom, don't let a
-      // late image/layout callback pull them back down.
       if (!stickToBottom) return;
 
       const distance =
@@ -852,7 +855,7 @@
         messagesScroll.clientHeight -
         messagesScroll.scrollTop;
 
-      if (distance > 24) {
+      if (distance > 28) {
         cancelBottomLock();
       }
     }, { passive: true });
@@ -1210,7 +1213,7 @@ function renderError(message) {
                       class="message-image"
                       src="${escapeHtml(message.media_url)}"
                       alt="Photo"
-                      loading="eager"
+                      loading="lazy"
                       decoding="async"
                     >
                   </a>
@@ -1327,6 +1330,10 @@ function renderError(message) {
           </div>
         `;
       }
+
+      html += `
+        <div id="chatBottomSentinel" aria-hidden="true"></div>
+      `;
 
       messagesEl.innerHTML = html;
 
@@ -2186,11 +2193,14 @@ function renderError(message) {
         .subscribe((status, error) => {
           console.log("Our Space realtime:", status, error || "");
 
+          realtimeHealthy = status === "SUBSCRIBED";
+
           if (
             status === "CHANNEL_ERROR" ||
             status === "TIMED_OUT" ||
             status === "CLOSED"
           ) {
+            realtimeHealthy = false;
             setTimeout(() => {
               if (document.visibilityState === "visible") {
                 subscribeRealtime();
@@ -2500,8 +2510,18 @@ function renderError(message) {
 
       subscribeRealtime();
 
-      // Keep both accounts synchronized even if a realtime event is delayed.
-      setInterval(syncMessagesSilently, 500);
+      // Realtime is the primary transport. Poll only as a low-frequency
+      // fallback when the realtime channel is not healthy.
+      if (fallbackSyncTimer) clearInterval(fallbackSyncTimer);
+      fallbackSyncTimer = setInterval(() => {
+        if (
+          currentUser &&
+          document.visibilityState === "visible" &&
+          !realtimeHealthy
+        ) {
+          syncMessagesSilently();
+        }
+      }, 4000);
 
       input.focus();
     }
