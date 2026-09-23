@@ -11,6 +11,9 @@
 <title>Our Space AI</title>
 <script src="/theme.js?v=final"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/gateway.js?v=1"></script>
+<style>html.gateway-pending body{visibility:hidden}</style>
+<script>document.documentElement.classList.add("gateway-pending");</script>
 <style>
 :root{--bg:#F8F0EC;--surface:#fff;--soft:#FFF8F5;--navy:#152B46;--text:#26313D;--muted:#7A8794;--border:rgba(21,43,70,.10);--accent:#F3B29F;--user:#152B46;--userText:#fff}
 html[data-theme="dark"]{--bg:#0B121B;--surface:#182431;--soft:#202F3E;--navy:#F1F6FA;--text:#EDF3F7;--muted:#A6B5C1;--border:rgba(237,243,247,.14);--accent:#EFA58C;--user:#F1F6FA;--userText:#0B121B}
@@ -439,6 +442,8 @@ $("memoryModal").addEventListener("click",e=>{if(e.target===$("memoryModal"))$("
 
 async function init(){
   if(!await session()){location.href="login.html";return}
+  if(!window.OurSpaceGateway.isUnlocked(currentUser.id)){location.href="/calculator.html";return}
+  document.documentElement.classList.remove("gateway-pending");
   $("username").textContent=currentUser?.user_metadata?.username||"Private AI";
   window.OurSpaceTheme?.apply?.(window.OurSpaceTheme.getCookie?.()||"warm");
   await loadChats();
