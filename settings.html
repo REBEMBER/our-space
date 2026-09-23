@@ -14,6 +14,9 @@
   <title>Our Space — Settings</title>
   <script src="/theme.js?v=final"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/gateway.js?v=1"></script>
+  <style>html.gateway-pending body{visibility:hidden}</style>
+  <script>document.documentElement.classList.add("gateway-pending");</script>
   <script src="/notifications.js"></script>
   <style>
     :root{
@@ -324,6 +327,7 @@
         console.warn("Notification cleanup during logout failed:",error);
       }
 
+      window.OurSpaceGateway?.clearAll?.();
       const {error}=await client.auth.signOut({scope:"local"});
       if(error){console.error("Logout error:",error);setStatus(status,error.message||"Could not log out.","error");return;}
       window.location.href="login.html";
@@ -332,6 +336,8 @@
     async function start(){
       const {data:{user},error}=await client.auth.getUser();
       if(error||!user){window.location.href="login.html";return;}
+      if(!window.OurSpaceGateway.isUnlocked(user.id)){window.location.href="/calculator.html";return;}
+      document.documentElement.classList.remove("gateway-pending");
       document.getElementById("accountEmail").textContent=user.email||"Private account";
       applyTheme(window.OurSpaceTheme.syncFromUser(user));
 
