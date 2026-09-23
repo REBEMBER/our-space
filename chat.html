@@ -1145,54 +1145,35 @@
     );
 
 async function revealInitialChat() {
-      stickToBottom = true;
+      // The first visible frame must already be at the latest message.
+      // Do NOT animate into the bottom: WhatsApp-style chat entry is position-first.
       chatInitialising = true;
+      stickToBottom = true;
+      hideNewMessages();
 
-      // Give the browser a chance to commit the rendered transcript. Images
-      // already in/near the viewport get a short opportunity to decode, while
-      // a hard cap prevents a single broken image from blocking entry.
-      const images = Array.from(
-        messagesEl.querySelectorAll('img.message-image[loading="eager"]')
-      );
+      // renderMessages() has already completed while the page is hidden.
+      // Set the final scroll position synchronously, before removing chat-pending.
+      forceBottomPosition();
 
-      await Promise.race([
-        Promise.all(
-          images.map((img) =>
-            img.complete
-              ? Promise.resolve()
-              : new Promise((resolve) => {
-                  let done = false;
-                  const finish = () => {
-                    if (done) return;
-                    done = true;
-                    img.removeEventListener("load", finish);
-                    img.removeEventListener("error", finish);
-                    resolve();
-                  };
-                  img.addEventListener("load", finish, { once: true });
-                  img.addEventListener("error", finish, { once: true });
-                })
-          )
-        ),
-        new Promise((resolve) => setTimeout(resolve, 450))
-      ]);
-
-      for (let i = 0; i < 3; i++) {
-        await new Promise((resolve) =>
-          requestAnimationFrame(() => {
-            forceBottomPosition();
-            resolve();
-          })
-        );
-      }
-
+      // Let the browser paint the already-positioned chat immediately.
       document.documentElement.classList.remove("chat-pending","gateway-pending");
-      chatInitialising = false;
 
-      // Keep the true bottom locked briefly after reveal so delayed image
-      // decoding or mobile viewport adjustments cannot leave the user above
-      // the final message.
-      lockToLatestForSettling();
+      // Protect the first few layout passes from late image decoding,
+      // font metrics, mobile viewport changes, or composer measurement.
+      const settle = () => {
+        if (!stickToBottom) return;
+        forceBottomPosition();
+      };
+
+      settle();
+
+      requestAnimationFrame(() => {
+        settle();
+        requestAnimationFrame(() => {
+          settle();
+          chatInitialising = false;
+        });
+      });
     }
 
     /* Initial display / reveal */
