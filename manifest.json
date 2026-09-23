@@ -2,7 +2,7 @@
   "name": "Our Space",
   "short_name": "Our Space",
   "description": "Private space for two",
-  "start_url": "/index.html",
+  "start_url": "/calculator.html",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
