@@ -35,6 +35,9 @@
     .photo-delete:hover{background:#B54A3C}
     .photo-card{position:relative}
     .photo-date{position:absolute;left:8px;bottom:8px;padding:5px 7px;border-radius:8px;background:rgba(21,43,70,.72);color:#fff;font-size:8px;font-weight:700}
+    .photo-card.deleted img{filter:grayscale(.18) brightness(.72)}
+    .photo-card.deleted::after{content:"";position:absolute;inset:0;background:rgba(21,43,70,.12);pointer-events:none}
+    .photo-deleted-badge{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:3;padding:8px 12px;border-radius:999px;background:rgba(21,43,70,.84);color:#fff;font-size:10px;font-weight:850;letter-spacing:.02em;box-shadow:0 10px 26px rgba(21,43,70,.24);pointer-events:none}
     .state{padding:60px 20px;text-align:center;color:var(--muted)}
     .state strong{display:block;margin-bottom:7px;color:var(--navy);font-size:16px}
     @media(max-width:760px){.gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.photo-card,.photo-card img{min-height:180px}}
@@ -90,6 +93,8 @@
     );
 
     const galleryEl = document.getElementById("gallery");
+    let currentUser = null;
+    let galleryRealtimeChannel = null;
 
     function escapeHtml(value) {
       return String(value ?? "")
@@ -117,14 +122,7 @@
       }
       if (!await window.OurSpaceGateway.requireUnlock(client)) return;
 
-      let isMohammad = false;
-      const { data:profile } = await client
-        .from("user_profiles")
-        .select("username")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      isMohammad = String(profile?.username || "").toLowerCase() === "mohammad";
+      currentUser = user;
 
       if (window.OurSpaceTheme?.syncFromUser) {
         window.OurSpaceTheme.syncFromUser(user);
@@ -171,12 +169,15 @@
       galleryEl.innerHTML = rows.map((row) => {
         const url = urlByPath.get(row.media_path);
         if (!url) return "";
-        const canDelete = isMohammad && row.sender_id === user.id && !row.deleted_at;
+        const deleted = Boolean(row.deleted_at);
+        const canDelete = !deleted;
+        const cardClass = deleted ? "photo-card deleted" : "photo-card";
 
-        return '<article class="photo-card">' +
+        return '<article class="' + cardClass + '">' +
           '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener noreferrer">' +
           '<img src="' + escapeHtml(url) + '" alt="Shared photo" loading="lazy" decoding="async">' +
           '<span class="photo-date">' + escapeHtml(formatDate(row.created_at)) + '</span>' +
+          (deleted ? '<span class="photo-deleted-badge">Deleted</span>' : '') +
           '</a>' +
           (canDelete
             ? '<button class="photo-delete" type="button" data-gallery-delete="' + row.id + '" aria-label="Delete photo" title="Delete photo">' +
@@ -203,7 +204,7 @@
 
     galleryEl.addEventListener("click", (event) => {
       const button = event.target.closest("[data-gallery-delete]");
-      if (!button || !isMohammad) return;
+      if (!button || !currentUser) return;
       event.preventDefault();
       event.stopPropagation();
       openGalleryDelete(button.dataset.galleryDelete);
@@ -218,7 +219,7 @@
     document.getElementById("galleryDeleteConfirm").addEventListener("click", async () => {
       const button = document.getElementById("galleryDeleteConfirm");
       const messageId = pendingGalleryDeleteId;
-      if (!messageId || !isMohammad || !user) return;
+      if (!messageId || !currentUser) return;
 
       const row = { id: messageId };
       const galleryMessage = Array.from(document.querySelectorAll("[data-gallery-delete]"))
@@ -230,27 +231,23 @@
           .from("messages")
           .select("media_path,sender_id")
           .eq("id", row.id)
-          .eq("sender_id", user.id)
           .maybeSingle();
 
         if (mediaLookupError || !mediaRow?.media_path) {
           throw mediaLookupError || new Error("Could not find the photo.");
         }
 
-        const mediaPath = mediaRow.media_path;
+        if (!mediaRow?.media_path) {
+          throw new Error("Could not find the photo.");
+        }
 
         const { data:changed, error:rpcError } = await client.rpc("delete_message_for_everyone", { p_message_id: row.id });
         if (rpcError || changed === false) {
           throw rpcError || new Error("Could not delete the photo.");
         }
 
-        const { error:storageError } = await client
-          .storage
-          .from("chat-media")
-          .remove([mediaPath]);
-
-        if (storageError) throw storageError;
-
+        // Keep the storage object. Mohammad retains the original photo as
+        // the visible Deleted record; Salma loses the row through RLS.
         if (galleryMessage) {
           galleryMessage.closest(".photo-card")?.remove();
         }
@@ -270,6 +267,22 @@
     });
 
     document.getElementById("refreshButton").addEventListener("click", loadGallery);
+
+    function subscribeGalleryRealtime() {
+      if (galleryRealtimeChannel) {
+        client.removeChannel(galleryRealtimeChannel);
+      }
+      galleryRealtimeChannel = client
+        .channel("our-space-gallery-" + SPACE_ID, { config:{ private:true } })
+        .on("postgres_changes", { event:"*", schema:"public", table:"messages" }, (payload) => {
+          const row = payload.new || payload.old || {};
+          if (row.space_id && String(row.space_id) !== String(SPACE_ID)) return;
+          if (row.message_type === "image" || payload.eventType === "DELETE") {
+            loadGallery().then(() => subscribeGalleryRealtime());
+          }
+        })
+        .subscribe();
+    }
 
     client.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_OUT" || !session) {
