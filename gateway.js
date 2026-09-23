@@ -1,4 +1,5 @@
 /* Our Space calculator gateway
+ * v2 — full-route protection
  * The calculator is the front door to the private app.
  * Unlock is intentionally tab-scoped (sessionStorage), never localStorage.
  */
