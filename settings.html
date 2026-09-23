@@ -57,10 +57,8 @@
     }
 
     html[data-theme="graphite"]{--bg:#F4F5F7;--navy:#20242B;--navy-light:#3B414B;--peach:#AAB6C4;--blue:#E4E8ED;--white:#FFF;--text:#252A31;--muted:#737B86;--border:rgba(32,36,43,.12);--surface-soft:rgba(255,255,255,.88);--success:#47745E;--danger:#A64B55;--action:#20242B;--action-text:#FFF;--hero-a:#20242B;--hero-b:#3B414B;}
-    html[data-theme="sky"]{--bg:#F1FBFC;--navy:#176B87;--navy-light:#278DAA;--peach:#7ED8E5;--blue:#DDF5F8;--white:#FFF;--text:#1D3D47;--muted:#6D8991;--border:rgba(23,107,135,.12);--surface-soft:rgba(255,255,255,.88);--success:#47745E;--danger:#A64B55;--action:#176B87;--action-text:#FFF;--hero-a:#176B87;--hero-b:#278DAA;}
-    html[data-theme="lavender"]{--bg:#F7F5FC;--navy:#5B4B82;--navy-light:#7865A5;--peach:#C9B8F2;--blue:#EAE4FA;--white:#FFF;--text:#322D40;--muted:#7D748D;--border:rgba(91,75,130,.12);--surface-soft:rgba(255,255,255,.88);--success:#47745E;--danger:#A64B55;--action:#5B4B82;--action-text:#FFF;--hero-a:#5B4B82;--hero-b:#7865A5;}
-    html[data-theme="citrus"]{--bg:#FFFCF0;--navy:#5E651E;--navy-light:#7B8429;--peach:#F3C85B;--blue:#F8EFC8;--white:#FFF;--text:#35371F;--muted:#81815F;--border:rgba(94,101,30,.13);--surface-soft:rgba(255,255,255,.88);--success:#47745E;--danger:#A64B55;--action:#5E651E;--action-text:#FFF;--hero-a:#5E651E;--hero-b:#7B8429;}
-
+        html[data-theme="lavender"]{--bg:#F7F5FC;--navy:#5B4B82;--navy-light:#7865A5;--peach:#C9B8F2;--blue:#EAE4FA;--white:#FFF;--text:#322D40;--muted:#7D748D;--border:rgba(91,75,130,.12);--surface-soft:rgba(255,255,255,.88);--success:#47745E;--danger:#A64B55;--action:#5B4B82;--action-text:#FFF;--hero-a:#5B4B82;--hero-b:#7865A5;}
+    
     *{box-sizing:border-box}
     body{margin:0;min-height:100vh;color:var(--text);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(650px 420px at 100% 0%,color-mix(in srgb,var(--peach) 30%,transparent),transparent 70%),radial-gradient(620px 420px at 0% 100%,color-mix(in srgb,var(--blue) 78%,transparent),transparent 70%),var(--bg)}
     button,input{font:inherit}
@@ -145,9 +143,7 @@
         <button class="theme-option" data-theme-option="blush" type="button"><div class="theme-preview"><div class="theme-preview-main"></div><div class="theme-preview-dot"></div></div><div class="theme-name">Blush</div><div class="theme-note">Soft pink</div></button>
         <button class="theme-option" data-theme-option="sunset" type="button"><div class="theme-preview"><div class="theme-preview-main"></div><div class="theme-preview-dot"></div></div><div class="theme-name">Sunset</div><div class="theme-note">Warm terracotta</div></button>
         <button class="theme-option" data-theme-option="graphite" type="button"><div class="theme-preview"><div class="theme-preview-main"></div><div class="theme-preview-dot"></div></div><div class="theme-name">Graphite</div><div class="theme-note">Clean neutral</div></button>
-        <button class="theme-option" data-theme-option="sky" type="button"><div class="theme-preview"><div class="theme-preview-main"></div><div class="theme-preview-dot"></div></div><div class="theme-name">Sky</div><div class="theme-note">Fresh cyan</div></button>
         <button class="theme-option" data-theme-option="lavender" type="button"><div class="theme-preview"><div class="theme-preview-main"></div><div class="theme-preview-dot"></div></div><div class="theme-name">Lavender</div><div class="theme-note">Soft violet</div></button>
-        <button class="theme-option" data-theme-option="citrus" type="button"><div class="theme-preview"><div class="theme-preview-main"></div><div class="theme-preview-dot"></div></div><div class="theme-name">Citrus</div><div class="theme-note">Bright & warm</div></button>
       </div>
       <div class="status" id="themeStatus"></div>
     </section>
