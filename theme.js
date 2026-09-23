@@ -1,5 +1,5 @@
 (() => {
-  const THEMES = ["warm","dark","ocean","forest","blush","sunset","graphite","sky","lavender","citrus"];
+  const THEMES = ["warm","dark","ocean","forest","blush","sunset","graphite","lavender"];
   const DEFAULT_THEME = "warm";
   const BUILD_MARKER = "2026-09-23-ui-sync";
   const COOKIE = "our_space_theme";
@@ -12,9 +12,7 @@
     blush: "#FFF1F5",
     sunset: "#FFF4EC",
     graphite: "#F4F5F7",
-    sky: "#F0F6FF",
-    lavender: "#F7F5FC",
-    citrus: "#FFFCF0"
+    lavender: "#F7F5FC"
   };
   const validTheme = (theme) => THEMES.includes(theme);
 
