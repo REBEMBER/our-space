@@ -221,8 +221,13 @@ $("mobileSettings").addEventListener("click",()=>go("settings.html"));
 async function checkAuthentication(){
   const {data:{user},error}=await client.auth.getUser();
   if(error||!user){go("login.html");return false}
+  if(!window.OurSpaceGateway.isUnlocked(user.id)){
+    go("calculator.html");
+    return false;
+  }
   window.OurSpaceTheme.syncFromUser(user);
   document.documentElement.classList.remove("theme-pending");
+  document.documentElement.classList.remove("gateway-pending");
   return user;
 }
 
