@@ -278,7 +278,7 @@
           const row = payload.new || payload.old || {};
           if (row.space_id && String(row.space_id) !== String(SPACE_ID)) return;
           if (row.message_type === "image" || payload.eventType === "DELETE") {
-            loadGallery().then(() => subscribeGalleryRealtime());
+            loadGallery();
           }
         })
         .subscribe();
@@ -290,7 +290,7 @@
       }
     });
 
-    loadGallery();
+    loadGallery().then(() => subscribeGalleryRealtime());
   </script>
 </body>
 </html>
