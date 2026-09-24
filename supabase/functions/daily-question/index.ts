@@ -11,21 +11,34 @@ const MODELS = [
   "gemini-3.7-flash",
   "gemini-3.6-flash",
   "gemini-3.5-flash",
-  "gemini-3.5-flash-lite",
-  "gemini-3.1-flash-lite",
-  "gemini-2.5-flash",
-  "gemini-2.5-flash-lite"
+  "gemini-2.5-flash"
 ];
 
 const FALLBACK_QUESTIONS = [
-  { category: "appreciation", question: "What is one small thing your partner did recently that made you feel loved?" },
-  { category: "memories", question: "What is a simple memory of the two of you that you would happily relive?" },
-  { category: "future", question: "What is one thing you would love for the two of you to experience together this year?" },
-  { category: "playful", question: "If you could instantly plan one spontaneous date for the two of you, what would it be?" },
-  { category: "connection", question: "What makes you feel most connected to your partner on an ordinary day?" },
-  { category: "communication", question: "What is one thing your partner can do that immediately helps you feel understood?" },
-  { category: "everyday", question: "What is one ordinary moment together that you secretly enjoy more than it seems?" },
-  { category: "discovery", question: "What is something about your partner you feel you are still discovering?" }
+  { category: "appreciation", question: "What is one small thing your partner did recently that made you feel especially appreciated?" },
+  { category: "memories", question: "What is a simple memory of the two of you that still makes you smile when you think about it?" },
+  { category: "future", question: "What is one experience you would genuinely love for the two of you to share in the next year?" },
+  { category: "playful", question: "If you had to plan a completely spontaneous date for tonight, what would you choose?" },
+  { category: "connection", question: "What kind of ordinary moment makes you feel closest to your partner?" },
+  { category: "communication", question: "What is something your partner does that makes you feel truly listened to?" },
+  { category: "everyday", question: "What is one little thing you enjoy doing together more than you probably admit?" },
+  { category: "discovery", question: "What is something about your partner that you feel you understand better now than you did at first?" },
+  { category: "gratitude", question: "What is something about your relationship that you feel grateful for today?" },
+  { category: "growth", question: "What is one way you think the two of you have grown together?" },
+  { category: "dates", question: "What would your ideal low-budget date with your partner look like?" },
+  { category: "little-things", question: "What tiny gesture from your partner can change the mood of your whole day?" },
+  { category: "appreciation", question: "What quality in your partner do you hope they never underestimate?" },
+  { category: "memories", question: "Which early moment in your relationship do you wish you could watch again?" },
+  { category: "future", question: "What is one place you would love to wake up with your partner someday?" },
+  { category: "playful", question: "What silly activity would the two of you probably have way too much fun doing together?" },
+  { category: "connection", question: "When do you feel most comfortable being completely yourself with your partner?" },
+  { category: "communication", question: "What is one thing you wish people understood about how the two of you communicate?" },
+  { category: "everyday", question: "What part of an ordinary day is better simply because your partner is in it?" },
+  { category: "discovery", question: "What is something your partner has taught you without necessarily trying to teach you?" },
+  { category: "gratitude", question: "What is one part of your partner's personality that you feel lucky to experience up close?" },
+  { category: "growth", question: "What is one habit you would love for the two of you to build together?" },
+  { category: "dates", question: "What kind of date would feel completely new for the two of you?" },
+  { category: "little-things", question: "What is one tiny shared routine you would miss if it disappeared?" }
 ];
 
 function json(body: unknown, status = 200) {
@@ -53,9 +66,9 @@ function validQuestion(question: string) {
 }
 
 async function generateQuestion(apiKey: string, history: Array<{question: string; category: string}>) {
-  const recent = history.slice(-80);
+  const recent = history.slice(-120);
   const used = recent.map((x) => "- " + x.question).join("\n");
-  const categories = ["appreciation", "memories", "future", "connection", "communication", "playful", "everyday", "discovery"];
+  const categories = ["appreciation", "memories", "future", "connection", "communication", "playful", "everyday", "discovery", "gratitude", "growth", "dates", "little-things"];
 
   const system = [
     "You create the single daily relationship question for a private couples app.",
@@ -90,7 +103,7 @@ async function generateQuestion(apiKey: string, history: Array<{question: string
               responseMimeType: "application/json"
             }
           }),
-          signal: AbortSignal.timeout(12000)
+          signal: AbortSignal.timeout(8000)
         }
       );
 
@@ -120,7 +133,9 @@ async function generateQuestion(apiKey: string, history: Array<{question: string
   const unused = FALLBACK_QUESTIONS.filter((item) =>
     !recent.some((old) => old.question.trim().toLowerCase() === item.question.toLowerCase())
   );
-  const picked = unused[Math.floor(Math.random() * Math.max(1, unused.length))] || FALLBACK_QUESTIONS[0];
+  const pool = unused.length ? unused : FALLBACK_QUESTIONS;
+  const dayNumber = Math.floor(Date.parse(todayInMorocco() + "T00:00:00") / 86400000);
+  const picked = pool[Math.abs(dayNumber) % pool.length];
   return { ...picked, model: "fallback" };
 }
 
@@ -138,14 +153,19 @@ export default {
       }
 
       const userId = String(ctx.userClaims?.sub || "");
-      const { data: member, error: memberError } = await ctx.supabase
+      const { data: member, error: memberError } = await ctx.supabaseAdmin
         .from("space_members")
         .select("space_id")
         .eq("space_id", spaceId)
         .eq("user_id", userId)
         .maybeSingle();
 
-      if (memberError || !member) return json({ error: "You are not a member of this space." }, 403);
+      if (memberError) {
+        console.error("daily-question membership check:", memberError);
+        return json({ error: "Could not verify your couple space." }, 500);
+      }
+
+      if (!member) return json({ error: "You are not a member of this space." }, 403);
 
       const questionDate = todayInMorocco();
 
