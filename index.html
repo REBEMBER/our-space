@@ -89,7 +89,15 @@ button:focus-visible{outline:3px solid rgba(243,178,159,.65);outline-offset:3px}
 .hero h1 span{color:var(--peach)}
 .hero p{max-width:600px;margin-top:18px;color:var(--hero-soft);font-size:15px;line-height:1.7}
 .open-chat{display:inline-flex;align-items:center;justify-content:center;gap:9px;margin-top:27px;min-height:50px;padding:0 20px;border-radius:15px;background:var(--surface);color:var(--navy);font-size:13px;font-weight:850;cursor:pointer;box-shadow:0 14px 30px rgba(0,0,0,.17)}
+.open-chat{position:relative}
 .open-chat svg{width:18px;height:18px}
+.open-chat-unread{
+  position:absolute;top:-8px;right:-8px;min-width:23px;height:23px;padding:0 6px;
+  display:none;align-items:center;justify-content:center;border-radius:999px;
+  background:#E5484D;color:#fff;border:2px solid var(--navy);
+  font-size:10px;line-height:1;font-weight:950;box-shadow:0 5px 14px rgba(229,72,77,.30);
+}
+.open-chat-unread.visible{display:flex}
 .rs-streak{
   margin-top:18px;width:max-content;min-width:214px;padding:9px 12px;
   display:flex;align-items:center;gap:10px;border:1px solid rgba(255,255,255,.15);
@@ -228,7 +236,8 @@ button:focus-visible{outline:3px solid rgba(243,178,159,.65);outline-offset:3px}
         </div>
       </div>
 
-      <button class="open-chat" id="openChatButton" type="button">
+      <button class="open-chat" id="openChatButton" type="button" aria-label="Open chat">
+        <span class="open-chat-unread" id="openChatUnread" aria-label="Unread messages">0</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
           <path d="M7 9h10"/><path d="M7 13h6"/>
           <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H17.5A2.5 2.5 0 0 1 20 5.5V13.5A2.5 2.5 0 0 1 17.5 16H11L6.5 20V16H6.5A2.5 2.5 0 0 1 4 13.5Z"/>
@@ -312,6 +321,63 @@ let dailyProfileNames={};
 let dailyPollTimer=null;
 let dailyRealtimeChannel=null;
 let dailyLoadToken=0;
+
+let unreadPollTimer=null;
+let unreadRealtimeChannel=null;
+let unreadCurrentUser=null;
+
+async function refreshUnreadMessages(){
+  if(!unreadCurrentUser?.id)return;
+  try{
+    const {count,error}=await client
+      .from("messages")
+      .select("id",{count:"exact",head:true})
+      .eq("space_id",DAILY_SPACE_ID)
+      .neq("sender_id",unreadCurrentUser.id)
+      .is("seen_at",null)
+      .is("deleted_at",null);
+
+    if(error)throw error;
+
+    const badge=$("openChatUnread");
+    if(!badge)return;
+    const n=Math.max(0,Number(count||0));
+    if(n>0){
+      badge.textContent=n>99?"99+":String(n);
+      badge.classList.add("visible");
+      badge.setAttribute("aria-label",n+" unread message"+(n===1?"":"s"));
+    }else{
+      badge.textContent="0";
+      badge.classList.remove("visible");
+      badge.setAttribute("aria-label","No unread messages");
+    }
+  }catch(error){
+    console.warn("Unread message count failed:",error);
+  }
+}
+
+function startUnreadSync(user){
+  unreadCurrentUser=user;
+  refreshUnreadMessages();
+
+  if(unreadPollTimer)clearInterval(unreadPollTimer);
+  unreadPollTimer=setInterval(refreshUnreadMessages,5000);
+
+  if(unreadRealtimeChannel){
+    client.removeChannel(unreadRealtimeChannel);
+    unreadRealtimeChannel=null;
+  }
+
+  unreadRealtimeChannel=client
+    .channel("home-unread-"+DAILY_SPACE_ID)
+    .on("postgres_changes",{
+      event:"*",
+      schema:"public",
+      table:"messages",
+      filter:"space_id=eq."+DAILY_SPACE_ID
+    },()=>refreshUnreadMessages())
+    .subscribe();
+}
 
 function escapeHtml(value){
   return String(value??"").replace(/[&<>"']/g,(char)=>({
