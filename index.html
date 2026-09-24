@@ -91,21 +91,20 @@ button:focus-visible{outline:3px solid rgba(243,178,159,.65);outline-offset:3px}
 .open-chat{display:inline-flex;align-items:center;justify-content:center;gap:9px;margin-top:27px;min-height:50px;padding:0 20px;border-radius:15px;background:var(--surface);color:var(--navy);font-size:13px;font-weight:850;cursor:pointer;box-shadow:0 14px 30px rgba(0,0,0,.17)}
 .open-chat svg{width:18px;height:18px}
 .rs-streak{
-  margin-top:18px;width:max-content;min-width:214px;padding:10px 13px;
-  display:flex;align-items:center;gap:11px;border:1px solid rgba(255,255,255,.14);
-  border-radius:16px;background:rgba(255,255,255,.10);
-  box-shadow:0 10px 28px rgba(0,0,0,.10);backdrop-filter:blur(12px);
+  margin-top:18px;width:max-content;min-width:214px;padding:9px 12px;
+  display:flex;align-items:center;gap:10px;border:1px solid rgba(255,255,255,.15);
+  border-radius:14px;background:rgba(255,255,255,.11);
+  box-shadow:0 8px 24px rgba(0,0,0,.10);backdrop-filter:blur(12px);
   -webkit-backdrop-filter:blur(12px);
 }
 .rs-streak-flame{
-  width:36px;height:36px;flex:0 0 36px;border-radius:11px;
+  width:34px;height:34px;flex:0 0 34px;border-radius:10px;
   display:grid;place-items:center;background:rgba(243,178,159,.18);color:var(--peach);
 }
-.rs-streak-flame svg{width:20px;height:20px;fill:currentColor;stroke:currentColor}
+.rs-streak-flame svg{width:19px;height:19px;fill:currentColor;stroke:currentColor}
 .rs-streak-copy{display:flex;align-items:baseline;gap:6px;min-width:0}
-.rs-streak-number{color:var(--hero-text);font-size:22px;line-height:1;font-weight:900;letter-spacing:-.045em}
-.rs-streak-label{color:var(--hero-soft);font-size:11px;font-weight:800}
-.rs-streak-since{margin-top:3px;color:rgba(255,255,255,.58);font-size:8.5px;font-weight:700}
+.rs-streak-number{color:var(--hero-text);font-size:21px;line-height:1;font-weight:900;letter-spacing:-.045em}
+.rs-streak-label{color:var(--hero-soft);font-size:10.5px;font-weight:800}
 .actions{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:16px}
 .action-card{position:relative;overflow:hidden;min-height:190px;padding:23px;border-radius:24px;border:1px solid var(--line);cursor:pointer;box-shadow:var(--shadow);transition:transform .18s ease,box-shadow .18s ease}
 .action-card:hover{transform:translateY(-2px);box-shadow:0 22px 48px rgba(21,43,70,.11)}
@@ -190,7 +189,6 @@ button:focus-visible{outline:3px solid rgba(243,178,159,.65);outline-offset:3px}
             <span class="rs-streak-number" id="rsStreakNumber">0</span>
             <span class="rs-streak-label">day streak</span>
           </div>
-          <div class="rs-streak-since">Since March 15, 2026</div>
         </div>
       </div>
 
