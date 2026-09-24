@@ -795,6 +795,7 @@ client.auth.onAuthStateChange((event,session)=>{
   // A slow profile query can never block the Daily Question.
   void loadProfile(user);
   void loadDailyQuestion(user);
+  startUnreadSync(user);
 })();
 </script>
 </body>
