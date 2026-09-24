@@ -333,25 +333,40 @@ async function refreshMessageCounter(){
       .eq("space_id",DAILY_SPACE_ID);
     if(memberError)throw memberError;
 
-    const partnerId=(members||[]).map(row=>row.user_id).find(id=>id!==dailyCurrentUser.id);
-    const mine=client.from("messages").select("id",{count:"exact",head:true})
-      .eq("space_id",DAILY_SPACE_ID).eq("sender_id",dailyCurrentUser.id).is("deleted_at",null);
-    const hers=partnerId
-      ? client.from("messages").select("id",{count:"exact",head:true})
-          .eq("space_id",DAILY_SPACE_ID).eq("sender_id",partnerId).is("deleted_at",null)
-      : Promise.resolve({count:0,error:null});
+    const memberIds=(members||[]).map(row=>row.user_id).filter(Boolean);
+    const {data:profiles,error:profileError}=await client
+      .from("user_profiles")
+      .select("user_id,username")
+      .in("user_id",memberIds);
+    if(profileError)throw profileError;
 
-    const [myResult,herResult]=await Promise.all([mine,hers]);
-    if(myResult.error)throw myResult.error;
-    if(herResult.error)throw herResult.error;
+    const namesById={};
+    (profiles||[]).forEach(profile=>{
+      namesById[profile.user_id]=(profile.username||"").trim().toLowerCase();
+    });
 
-    const mineCount=Number(myResult.count||0);
-    const herCount=Number(herResult.count||0);
-    const total=mineCount+herCount;
+    const mohammadId=memberIds.find(id=>namesById[id]==="mohammad");
+    const salmaId=memberIds.find(id=>namesById[id]==="salma");
+
+    if(!mohammadId||!salmaId){
+      throw new Error("Could not identify Mohammad and Salma for the message counter.");
+    }
+
+    const mohammadResult=await client.from("messages").select("id",{count:"exact",head:true})
+      .eq("space_id",DAILY_SPACE_ID).eq("sender_id",mohammadId).is("deleted_at",null);
+    const salmaResult=await client.from("messages").select("id",{count:"exact",head:true})
+      .eq("space_id",DAILY_SPACE_ID).eq("sender_id",salmaId).is("deleted_at",null);
+
+    if(mohammadResult.error)throw mohammadResult.error;
+    if(salmaResult.error)throw salmaResult.error;
+
+    const mohammadCount=Number(mohammadResult.count||0);
+    const salmaCount=Number(salmaResult.count||0);
+    const total=mohammadCount+salmaCount;
 
     $("messageCounterTotal").textContent=total.toLocaleString()+" msg"+(total===1?"":"s");
-    $("messageCounterSplit").textContent="Mohammad "+mineCount.toLocaleString()+" · Salma "+herCount.toLocaleString();
-    $("messageCounter").setAttribute("aria-label",total+" messages: "+mineCount+" from Mohammad and "+herCount+" from Salma");
+    $("messageCounterSplit").textContent="Mohammad "+mohammadCount.toLocaleString()+" · Salma "+salmaCount.toLocaleString();
+    $("messageCounter").setAttribute("aria-label",total+" messages: "+mohammadCount+" from Mohammad and "+salmaCount+" from Salma");
   }catch(error){
     console.warn("Message counter failed:",error);
   }
