@@ -422,40 +422,62 @@ async function submitDailyAnswer(){
 }
 async function loadDailyQuestion(user){
   dailyCurrentUser=user;
-  $("dailyQuestionText").textContent="Preparing today's question...";
+  $("dailyQuestionText").textContent="Loading today's question...";
 
-  // Start profiles and the question request at the same time.
-  const profilePromise=(async()=>{
-    const {data:members}=await client.from("space_members")
-      .select("user_id").eq("space_id",DAILY_SPACE_ID);
-    const memberIds=(members||[]).map(row=>row.user_id).filter(Boolean);
-    if(memberIds.length){
-      const {data:profiles}=await client.from("user_profiles")
-        .select("user_id,username").in("user_id",memberIds);
-      (profiles||[]).forEach(row=>{dailyProfileNames[row.user_id]=row.username;});
-    }
+  // Profiles are secondary. Never let them block the question itself.
+  (async()=>{
+    try{
+      const {data:members}=await client.from("space_members")
+        .select("user_id").eq("space_id",DAILY_SPACE_ID);
+      const memberIds=(members||[]).map(row=>row.user_id).filter(Boolean);
+      if(memberIds.length){
+        const {data:profiles}=await client.from("user_profiles")
+          .select("user_id,username").in("user_id",memberIds);
+        (profiles||[]).forEach(row=>{dailyProfileNames[row.user_id]=row.username;});
+      }
+    }catch(error){ console.error("daily profiles",error); }
   })();
 
-  const questionPromise=Promise.race([
-    client.functions.invoke("daily-question",{body:{space_id:DAILY_SPACE_ID}}),
-    new Promise((resolve)=>setTimeout(
-      ()=>resolve({data:null,error:new Error("Daily question request timed out.")}),7000
-    ))
-  ]);
+  // IMPORTANT: read an already-created question directly first.
+  // This avoids an unnecessary Edge Function round-trip every time Home opens.
+  const today=new Intl.DateTimeFormat("en-CA",{
+    timeZone:"Africa/Casablanca",year:"numeric",month:"2-digit",day:"2-digit"
+  }).format(new Date());
 
-  const [{data,error}]=await Promise.all([questionPromise,profilePromise]);
+  let {data:existing,error:existingError}=await client.from("daily_questions")
+    .select("id,space_id,question_date,question,category,difficulty,ai_model,created_at")
+    .eq("space_id",DAILY_SPACE_ID)
+    .eq("question_date",today)
+    .maybeSingle();
 
-  if(error||!data?.question){
-    console.error("daily question",error,data);
+  if(existingError){
+    console.error("daily question lookup",existingError);
+  }
+
+  let question=existing;
+
+  // Only generate when today's row genuinely does not exist.
+  if(!question){
+    const result=await Promise.race([
+      client.functions.invoke("daily-question",{body:{space_id:DAILY_SPACE_ID}}),
+      new Promise((resolve)=>setTimeout(
+        ()=>resolve({data:null,error:new Error("Daily question request timed out.")}),6000
+      ))
+    ]);
+    if(result?.data?.question) question=result.data.question;
+    else console.error("daily question generation",result?.error,result?.data);
+  }
+
+  if(!question){
     $("dailyQuestionText").textContent="Today's question could not be loaded.";
     $("dailyAnswerArea").innerHTML=
-      '<div class="daily-error">The question service did not respond. Please try again.</div>'+
+      '<div class="daily-error">We could not load today\'s question.</div>'+
       '<button class="daily-submit" id="dailyRetryButton" type="button" style="margin-top:10px">Try again</button>';
     $("dailyRetryButton").addEventListener("click",()=>loadDailyQuestion(user));
     return;
   }
 
-  dailyQuestion=data.question;
+  dailyQuestion=question;
   await refreshDailyStatus();
   if(!dailyPollTimer)dailyPollTimer=setInterval(refreshDailyStatus,12000);
 }
