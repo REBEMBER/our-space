@@ -113,6 +113,11 @@ button:focus-visible{outline:3px solid rgba(243,178,159,.65);outline-offset:3px}
 .rs-streak-copy{display:flex;align-items:baseline;gap:6px;min-width:0}
 .rs-streak-number{color:var(--hero-text);font-size:21px;line-height:1;font-weight:900;letter-spacing:-.045em}
 .rs-streak-label{color:var(--hero-soft);font-size:10.5px;font-weight:800}
+.message-counter{margin-top:8px;display:flex;align-items:center;gap:7px;width:max-content;padding:5px 8px;border-radius:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10);color:var(--hero-soft);font-size:9px;font-weight:750;opacity:.9}
+.message-counter-icon{width:18px;height:18px;display:grid;place-items:center;border-radius:6px;background:rgba(255,255,255,.08);color:var(--hero-text)}
+.message-counter-icon svg{width:11px;height:11px}
+.message-counter-total{color:var(--hero-text);font-weight:900}
+.message-counter-split{color:var(--hero-soft);white-space:nowrap}
 
 .daily-question-card{
   margin-top:16px;padding:25px;border-radius:24px;border:1px solid var(--line);
@@ -242,6 +247,14 @@ html[data-theme="dark"] .mobile-nav button.active{color:#F1F6FA;}
         </div>
       </div>
 
+      <div class="message-counter" id="messageCounter" aria-label="Message count">
+        <span class="message-counter-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 6.5A3.5 3.5 0 0 1 8.5 3h7A3.5 3.5 0 0 1 19 6.5v6A3.5 3.5 0 0 1 15.5 16H10l-4.5 4v-4.7A3.5 3.5 0 0 1 5 12.5Z"/></svg>
+        </span>
+        <span class="message-counter-total" id="messageCounterTotal">0 msgs</span>
+        <span class="message-counter-split" id="messageCounterSplit">you 0 · her 0</span>
+      </div>
+
     </div>
   </section>
 
@@ -307,6 +320,63 @@ let dailyLoadToken=0;
 let unreadPollTimer=null;
 let unreadRealtimeChannel=null;
 let unreadCurrentUser=null;
+
+let messageCounterPollTimer=null;
+let messageCounterRealtimeChannel=null;
+
+async function refreshMessageCounter(){
+  if(!dailyCurrentUser?.id)return;
+  try{
+    const {data:members,error:memberError}=await client
+      .from("space_members")
+      .select("user_id")
+      .eq("space_id",DAILY_SPACE_ID);
+    if(memberError)throw memberError;
+
+    const partnerId=(members||[]).map(row=>row.user_id).find(id=>id!==dailyCurrentUser.id);
+    const mine=client.from("messages").select("id",{count:"exact",head:true})
+      .eq("space_id",DAILY_SPACE_ID).eq("sender_id",dailyCurrentUser.id).is("deleted_at",null);
+    const hers=partnerId
+      ? client.from("messages").select("id",{count:"exact",head:true})
+          .eq("space_id",DAILY_SPACE_ID).eq("sender_id",partnerId).is("deleted_at",null)
+      : Promise.resolve({count:0,error:null});
+
+    const [myResult,herResult]=await Promise.all([mine,hers]);
+    if(myResult.error)throw myResult.error;
+    if(herResult.error)throw herResult.error;
+
+    const mineCount=Number(myResult.count||0);
+    const herCount=Number(herResult.count||0);
+    const total=mineCount+herCount;
+
+    $("messageCounterTotal").textContent=total.toLocaleString()+" msg"+(total===1?"":"s");
+    $("messageCounterSplit").textContent="you "+mineCount.toLocaleString()+" · her "+herCount.toLocaleString();
+    $("messageCounter").setAttribute("aria-label",total+" messages: "+mineCount+" from you and "+herCount+" from your partner");
+  }catch(error){
+    console.warn("Message counter failed:",error);
+  }
+}
+
+function startMessageCounterSync(){
+  refreshMessageCounter();
+  if(messageCounterPollTimer)clearInterval(messageCounterPollTimer);
+  messageCounterPollTimer=setInterval(refreshMessageCounter,10000);
+
+  if(messageCounterRealtimeChannel){
+    client.removeChannel(messageCounterRealtimeChannel);
+    messageCounterRealtimeChannel=null;
+  }
+
+  messageCounterRealtimeChannel=client
+    .channel("home-message-counter-"+DAILY_SPACE_ID)
+    .on("postgres_changes",{
+      event:"*",
+      schema:"public",
+      table:"messages",
+      filter:"space_id=eq."+DAILY_SPACE_ID
+    },()=>refreshMessageCounter())
+    .subscribe();
+}
 
 async function refreshUnreadMessages(){
   if(!unreadCurrentUser?.id)return;
@@ -788,6 +858,7 @@ client.auth.onAuthStateChange((event,session)=>{
   void loadProfile(user);
   void loadDailyQuestion(user);
   startUnreadSync(user);
+  startMessageCounterSync();
   startDailyDayWatcher();
 })();
 </script>
