@@ -371,28 +371,47 @@ function renderPartner(payload){
 }
 
 function monthKeyDate(year,month,day){return year+"-"+String(month+1).padStart(2,"0")+"-"+String(day).padStart(2,"0");}
+function parseMonthKey(key){const [year,month]=String(key).split("-").map(Number);return {year,month:month-1};}
 function daysInMonth(year,month){return new Date(Date.UTC(year,month+1,0)).getUTCDate();}
 function mondayOffset(year,month){return (new Date(Date.UTC(year,month,1)).getUTCDay()+6)%7;}
 function calendarMonthLabel(year,month){return new Intl.DateTimeFormat(undefined,{month:"long",year:"numeric"}).format(new Date(Date.UTC(year,month,1,12)));}
 function isFutureDate(date){return date>todayMorocco();}
-async function loadCalendar(){
-  const y=state.calendarMonth.getFullYear(),m=state.calendarMonth.getMonth();
+function currentMonthKey(){const d=todayMorocco().split("-").map(Number);return d[0]+"-"+String(d[1]).padStart(2,"0");}
+function setCalendarMonthFromKey(key){
+  const {year,month}=parseMonthKey(key);
+  state.calendarMonth=new Date(Date.UTC(year,month,1,12));
+}
+function renderCalendarShell(){
+  const y=state.calendarMonth.getUTCFullYear(),m=state.calendarMonth.getUTCMonth();
   $("calendarMonth").textContent=calendarMonthLabel(y,m);
-  const startDate=monthKeyDate(y,m,1),endDate=monthKeyDate(y,m,daysInMonth(y,m));
-  const {data,error}=await client.rpc("get_daily_checkin_calendar",{p_space_id:SPACE_ID,p_start:startDate,p_end:endDate});
-  if(error){console.error(error);$("calendarGrid").innerHTML='<div class="error" style="grid-column:1/-1">Could not load this month.</div>';return;}
-  state.calendarRows=Array.isArray(data)?data:[];
-  const byDate=Object.fromEntries(state.calendarRows.map(r=>[r.date,r]));
   const cells=[];
   for(let i=0;i<mondayOffset(y,m);i++) cells.push('<div class="calendar-day empty"></div>');
+  const byDate=Object.fromEntries((state.calendarRows||[]).map(r=>[r.date,r]));
   for(let day=1;day<=daysInMonth(y,m);day++){
     const date=monthKeyDate(y,m,day),row=byDate[date]||{},future=isFutureDate(date),selected=state.selectedDate===date;
     const cls=["calendar-day",row.mine_submitted?"mine":"",row.both_submitted?"both":"",future?"future":"",selected?"selected":""].filter(Boolean).join(" ");
-    cells.push('<button class="'+cls+'" data-calendar-date="'+date+'" aria-label="'+date+(row.both_submitted?' — both checked in':row.mine_submitted?' — you checked in':future?' — future day':' — no check-in')+'" type="button" '+(future?'disabled':'')+'><span class="num">'+day+'</span>'+(row.mine_submitted?'<span class="marker" aria-hidden="true"></span>':'')+'</button>');
+    const marker=row.both_submitted?'<span class="marker" aria-hidden="true"></span>':row.mine_submitted?'<span class="marker" aria-hidden="true"></span>':"";
+    cells.push('<button class="'+cls+'" data-calendar-date="'+date+'" aria-label="'+date+(row.both_submitted?" — both checked in":row.mine_submitted?" — you checked in":future?" — future day":" — no check-in")+'" type="button" '+(future?"disabled":"")+'><span class="num">'+day+'</span>'+marker+'</button>');
   }
   $("calendarGrid").innerHTML=cells.join("");
-  $("nextMonth").disabled=(y>new Date().getFullYear() || (y===new Date().getFullYear() && m>=new Date().getMonth()));
+  const currentKey=currentMonthKey();
+  $("nextMonth").disabled=(y+"-"+String(m+1).padStart(2,"0"))>=currentKey;
   document.querySelectorAll("[data-calendar-date]").forEach(b=>b.addEventListener("click",()=>selectCalendarDate(b.dataset.calendarDate)));
+}
+async function loadCalendar(){
+  renderCalendarShell();
+  const y=state.calendarMonth.getUTCFullYear(),m=state.calendarMonth.getUTCMonth();
+  const startDate=monthKeyDate(y,m,1),endDate=monthKeyDate(y,m,daysInMonth(y,m));
+  const {data,error}=await client.rpc("get_daily_checkin_calendar",{p_space_id:SPACE_ID,p_start:startDate,p_end:endDate});
+  if(error){
+    console.error(error);
+    state.calendarRows=[];
+    renderCalendarShell();
+    $("calendarGrid").insertAdjacentHTML("beforeend",'<div class="error" style="grid-column:1/-1">Could not load this month. Tap Today to retry.</div>');
+    return;
+  }
+  state.calendarRows=Array.isArray(data)?data:[];
+  renderCalendarShell();
 }
 async function selectCalendarDate(date){
   if(!date||isFutureDate(date))return;
@@ -400,9 +419,12 @@ async function selectCalendarDate(date){
   document.querySelectorAll("[data-calendar-date]").forEach(b=>b.classList.toggle("selected",b.dataset.calendarDate===date));
   $("calendarDetail").innerHTML='<h3>'+formatDate(date)+'</h3><p>Loading this day...</p>';
   const {data,error}=await client.rpc("get_daily_checkin",{p_space_id:SPACE_ID,p_date:date});
-  if(error){console.error(error);$("calendarDetail").innerHTML='<h3>'+formatDate(date)+'</h3><p>Could not load this day.</p>';return;}
+  if(error){console.error(error);$("calendarDetail").innerHTML='<h3>'+formatDate(date)+'</h3><p>Could not load this day. Please try again.</p>';return;}
   const p=data||{};
-  if(!p.has_submitted){$("calendarDetail").innerHTML='<h3>'+formatDate(date)+'</h3><p>No check-in saved by you on this day.</p>';return;}
+  if(!p.has_submitted){
+    $("calendarDetail").innerHTML='<h3>'+formatDate(date)+'</h3><p>No check-in saved by you on this day.</p>';
+    return;
+  }
   const s=p.submitted||{};
   let html='<h3>'+formatDate(date)+'</h3><div class="answer-mini">Your day: <strong>'+ratingLabel(s.mood)+'</strong> · Us: <strong>'+s.relationship_rating+'/5</strong> · Connection: <strong>'+s.connection_rating+'/5</strong><br>Vibes: <strong>'+((s.vibes||[]).map(escapeHtml).join(" · ")||"None")+'</strong>'+(s.note?'<br>Note: <strong>“'+escapeHtml(s.note)+'”</strong>':"")+'</div>';
   if(p.partner_submitted&&Array.isArray(p.answers)&&p.answers.length>=2){
@@ -411,16 +433,32 @@ async function selectCalendarDate(date){
   }else html+='<p style="margin-top:10px">Your partner has not submitted this day yet, so their answers stay hidden.</p>';
   $("calendarDetail").innerHTML=html;
 }
-$("prevMonth").addEventListener("click",()=>{state.calendarMonth=new Date(state.calendarMonth.getFullYear(),state.calendarMonth.getMonth()-1,1);loadCalendar();});
-$("nextMonth").addEventListener("click",()=>{if($("nextMonth").disabled)return;state.calendarMonth=new Date(state.calendarMonth.getFullYear(),state.calendarMonth.getMonth()+1,1);loadCalendar();});
-$("todayMonth").addEventListener("click",(event)=>{
+async function goToToday(){
+  const today=todayMorocco();
+  setCalendarMonthFromKey(today.slice(0,7));
+  state.selectedDate=today;
+  $("calendarMonth").textContent=calendarMonthLabel(state.calendarMonth.getUTCFullYear(),state.calendarMonth.getUTCMonth());
+  $("calendarDetail").innerHTML='<h3>'+formatDate(today)+'</h3><p>Loading today...</p>';
+  await loadCalendar();
+  await selectCalendarDate(today);
+}
+$("prevMonth").addEventListener("click",async()=>{
+  const y=state.calendarMonth.getUTCFullYear(),m=state.calendarMonth.getUTCMonth();
+  state.calendarMonth=new Date(Date.UTC(y,m-1,1,12));
+  state.selectedDate=null;
+  await loadCalendar();
+});
+$("nextMonth").addEventListener("click",async()=>{
+  if($("nextMonth").disabled)return;
+  const y=state.calendarMonth.getUTCFullYear(),m=state.calendarMonth.getUTCMonth();
+  state.calendarMonth=new Date(Date.UTC(y,m+1,1,12));
+  state.selectedDate=null;
+  await loadCalendar();
+});
+$("todayMonth").addEventListener("click",async(event)=>{
   event.preventDefault();
   event.stopPropagation();
-  const todayString=todayMorocco();
-  const [year,month]=todayString.split("-").map(Number);
-  state.calendarMonth=new Date(year,month-1,1);
-  state.selectedDate=null;
-  loadCalendar();
+  await goToToday();
 });
 
 $("saveButton").addEventListener("click",async()=>{
