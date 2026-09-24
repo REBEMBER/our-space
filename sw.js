@@ -25,6 +25,24 @@ self.addEventListener("push", (event) => {
     let data = {};
     try { data = event.data ? event.data.json() : {}; } catch (_) {}
 
+    // Keep the installed app icon badge synchronized even when the app
+    // itself is not open. The sender includes the authoritative unread count.
+    if (typeof data.unread_count === "number" && data.unread_count > 0) {
+      try {
+        if ("setAppBadge" in self.navigator) {
+          await self.navigator.setAppBadge(data.unread_count);
+        }
+      } catch (_) {}
+    } else if (data.unread_count === 0) {
+      try {
+        if ("clearAppBadge" in self.navigator) {
+          await self.navigator.clearAppBadge();
+        } else if ("setAppBadge" in self.navigator) {
+          await self.navigator.setAppBadge(0);
+        }
+      } catch (_) {}
+    }
+
     // Do not show a system notification while the actual chat conversation
     // is open and visible. Notifications should still work when the chat is
     // in another tab, backgrounded, minimized, or not open at all.
