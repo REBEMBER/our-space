@@ -343,9 +343,9 @@ function renderDailyQuestion(){
       : "Your answer is saved. Your partner's answer stays hidden until both of you answer.");
     area.innerHTML=
       '<div class="daily-own-answer">'+
-        '<div class="daily-answer-label">Your answer</div>'+\
-        '<div class="daily-answer-copy">'+escapeHtml(dailyStatus.own_answer)+'</div>'+\
-        '<button class="daily-edit" id="dailyEditButton" type="button">Edit answer</button>'+\
+        '<div class="daily-answer-label">Your answer</div>'+
+        '<div class="daily-answer-copy">'+escapeHtml(dailyStatus.own_answer)+'</div>'+
+        '<button class="daily-edit" id="dailyEditButton" type="button">Edit answer</button>'+
       '</div>';
     $("dailyEditButton").addEventListener("click",()=>showDailyEditor(dailyStatus.own_answer));
     return;
@@ -357,10 +357,10 @@ function renderDailyQuestion(){
 function showDailyEditor(value){
   const area=$("dailyAnswerArea");
   area.innerHTML=
-    '<textarea class="daily-answer-input" id="dailyAnswerInput" maxlength="2000" placeholder="Write your answer..."></textarea>'+\
-    '<div class="daily-answer-actions">'+\
-      '<span class="daily-answer-count" id="dailyAnswerCount">0 / 2000</span>'+\
-      '<button class="daily-submit" id="dailySubmitButton" type="button">Submit answer</button>'+\
+    '<textarea class="daily-answer-input" id="dailyAnswerInput" maxlength="2000" placeholder="Write your answer..."></textarea>'+
+    '<div class="daily-answer-actions">'+
+      '<span class="daily-answer-count" id="dailyAnswerCount">0 / 2000</span>'+
+      '<button class="daily-submit" id="dailySubmitButton" type="button">Submit answer</button>'+
     '</div>';
   const input=$("dailyAnswerInput");
   const submit=$("dailySubmitButton");
@@ -388,10 +388,10 @@ async function loadRevealedAnswers(){
   const ownName="You";
   const partnerName=escapeHtml(dailyProfileNames[partner?.user_id]||"Your partner");
   $("dailyAnswerArea").innerHTML=
-    '<div class="daily-reveal">'+\
-      '<div class="daily-reveal-card"><div class="daily-reveal-title">'+ownName+'</div><div class="daily-reveal-answer">'+escapeHtml(own?.answer||"")+'</div></div>'+\
-      '<div class="daily-reveal-card partner"><div class="daily-reveal-title">'+partnerName+'</div><div class="daily-reveal-answer">'+escapeHtml(partner?.answer||"")+'</div></div>'+\
-    '</div>'+\
+    '<div class="daily-reveal">'+
+      '<div class="daily-reveal-card"><div class="daily-reveal-title">'+ownName+'</div><div class="daily-reveal-answer">'+escapeHtml(own?.answer||"")+'</div></div>'+
+      '<div class="daily-reveal-card partner"><div class="daily-reveal-title">'+partnerName+'</div><div class="daily-reveal-answer">'+escapeHtml(partner?.answer||"")+'</div></div>'+
+    '</div>'+
     '<div class="daily-reveal-note">Both answers are now visible to both of you.</div>';
 }
 async function refreshDailyStatus(){
@@ -485,7 +485,8 @@ client.auth.onAuthStateChange((event,session)=>{
 (async()=>{
   const user=await checkAuthentication();
   if(!user)return;
-  await loadProfile(user);\n  await loadDailyQuestion(user);
+  await loadProfile(user);
+  await loadDailyQuestion(user);
 })();
 </script>
 </body>
