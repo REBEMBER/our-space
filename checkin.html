@@ -93,6 +93,33 @@ button:focus-visible{outline:3px solid color-mix(in srgb,var(--peach) 60%,transp
 .answer-vibes{margin-top:10px;font-size:18px;line-height:1.4}
 .answer-note{margin-top:9px;color:var(--text);font-size:11px;line-height:1.55}
 .history{margin-top:14px}
+.calendar-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px}
+.calendar-title{font-size:16px;font-weight:900;color:var(--navy);letter-spacing:-.02em}
+.calendar-actions{display:flex;gap:6px}
+.calendar-btn{width:36px;height:36px;border-radius:11px;background:var(--soft);border:1px solid var(--line);color:var(--navy);cursor:pointer;font-weight:900}
+.calendar-btn:disabled{opacity:.35;cursor:default}
+.calendar-weekdays,.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin-top:10px}
+.calendar-weekdays div{text-align:center;font-size:8px;font-weight:900;color:var(--muted);text-transform:uppercase}
+.calendar-day{position:relative;min-height:58px;border-radius:13px;background:var(--soft);border:1px solid transparent;cursor:pointer;padding:8px 5px;text-align:left}
+.calendar-day.empty{background:transparent;cursor:default}
+.calendar-day.future{opacity:.38;cursor:default}
+.calendar-day:hover:not(.empty):not(.future){border-color:var(--line)}
+.calendar-day.selected{border-color:var(--peach);background:color-mix(in srgb,var(--peach) 12%,var(--surface))}
+.calendar-day .num{font-size:10px;font-weight:900;color:var(--text)}
+.calendar-day .marker{position:absolute;right:7px;bottom:7px;width:7px;height:7px;border-radius:50%;background:var(--muted)}
+.calendar-day.mine .marker{background:var(--peach)}
+.calendar-day.both .marker{background:var(--navy)}
+.calendar-day.both .num{color:var(--navy)}
+.calendar-detail{margin-top:12px;padding:15px;border-radius:18px;background:var(--soft);border:1px solid var(--line)}
+.calendar-detail h3{font-size:13px;color:var(--navy)}
+.calendar-detail p{margin-top:5px;color:var(--muted);font-size:10px;line-height:1.5}
+.calendar-detail .answer-mini{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:10px;line-height:1.6}
+.calendar-detail .answer-mini strong{color:var(--text)}
+.insights{margin-top:14px}
+.insight-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:13px}
+.insight{padding:14px;border-radius:16px;background:var(--soft);border:1px solid var(--line)}
+.insight .value{font-size:20px;font-weight:950;color:var(--navy)}
+.insight .label{margin-top:4px;font-size:9px;color:var(--muted);font-weight:800;line-height:1.4}
 .week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:13px}
 .day{padding:10px 5px;border-radius:14px;background:var(--soft);text-align:center;min-height:83px}
 .day .dow{font-size:8px;font-weight:900;color:var(--muted);text-transform:uppercase}
@@ -110,6 +137,10 @@ button:focus-visible{outline:3px solid color-mix(in srgb,var(--peach) 60%,transp
  .card{padding:18px}
  .answers{grid-template-columns:1fr}
  .week{gap:4px}
+ .calendar-weekdays,.calendar-grid{gap:3px}
+ .calendar-day{min-height:50px;padding:7px 4px}
+ .calendar-day .marker{right:5px;bottom:5px}
+ .insight-grid{grid-template-columns:1fr}
  .day{padding:8px 2px}
 }
 @media(max-width:460px){
@@ -218,6 +249,26 @@ button:focus-visible{outline:3px solid color-mix(in srgb,var(--peach) 60%,transp
 <div class="section-title"><h2>Our week 🌈</h2><span>Only shared days</span></div>
 <div id="historyContent"><div class="loading">Loading your week...</div></div>
 </div>
+
+<div class="card history">
+<div class="section-title"><h2>Check-in calendar 📅</h2><span>All saved days</span></div>
+<div class="calendar-head">
+  <button class="calendar-btn" id="prevMonth" type="button" aria-label="Previous month">‹</button>
+  <div class="calendar-title" id="calendarMonth">Loading...</div>
+  <div class="calendar-actions">
+    <button class="calendar-btn" id="todayMonth" type="button" aria-label="Go to current month">Today</button>
+    <button class="calendar-btn" id="nextMonth" type="button" aria-label="Next month">›</button>
+  </div>
+</div>
+<div class="calendar-weekdays"><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div></div>
+<div class="calendar-grid" id="calendarGrid"></div>
+<div class="calendar-detail" id="calendarDetail"><h3>Select a day</h3><p>Your saved check-ins will appear here. A partner answer is revealed only after both of you have submitted.</p></div>
+</div>
+
+<div class="card insights">
+<div class="section-title"><h2>Check-in insights 📈</h2><span>Shared days only</span></div>
+<div id="insightsContent"><div class="loading">Loading insights...</div></div>
+</div>
 </section>
 
 <footer class="footer">A private little snapshot of your day · just for the two of you</footer>
@@ -229,7 +280,7 @@ const SUPABASE_URL="https://ywflohxufmfydkpkkqly.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_qTMUO8KxerEQBDQ-A7Huyg_8N2Tqpmr";
 const client=supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 const SPACE_ID="6547fe99-ae80-421c-8572-50ae3fb6fbe4";
-const state={user:null,date:null,mood:null,relationship:null,connection:null,vibes:[],saved:false,profileNames:{}};
+const state={user:null,date:null,mood:null,relationship:null,connection:null,vibes:[],saved:false,profileNames:{},calendarMonth:new Date(),calendarRows:[],selectedDate:null};
 
 const $=id=>document.getElementById(id);
 const escapeHtml=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
@@ -316,16 +367,75 @@ function weekEmoji(score){
   return ["","🥀","🌧️","🌤️","🥰","💞"][Math.round(score)]||"🌤️";
 }
 async function loadHistory(){
-  const {data,error}=await client.rpc("get_daily_checkin_history",{p_space_id:SPACE_ID,p_days:7});
+  const {data,error}=await client.rpc("get_daily_checkin_history",{p_space_id:SPACE_ID,p_days:30});
   if(error){console.error(error);$("historyContent").innerHTML='<div class="error">Your week could not be loaded yet.</div>';return;}
   const rows=Array.isArray(data)?data:[];
-  $("historyContent").innerHTML='<div class="week">'+rows.map(row=>{
+  $("historyContent").innerHTML='<div class="week">'+rows.slice(-7).map(row=>{
     const date=new Date(row.date+"T12:00:00");
     const dow=new Intl.DateTimeFormat(undefined,{weekday:"short"}).format(date);
     const score=row.average_relationship;
     return '<div class="day"><div class="dow">'+dow+'</div><div class="dayemoji">'+weekEmoji(score)+'</div><div class="dayscore">'+(row.both_submitted?(score+"/5"):"—")+'</div></div>';
   }).join("")+'</div><div class="legend">Your shared history appears only after you both check in on a day.</div>';
+  renderInsights(rows);
 }
+
+function renderInsights(rows){
+  const shared=rows.filter(r=>r.both_submitted);
+  if(!shared.length){$("insightsContent").innerHTML='<div class="loading">Your shared insights will appear after you have a few days together.</div>';return;}
+  const avg=(key)=>shared.reduce((s,r)=>s+Number(r[key]||0),0)/shared.length;
+  const rel=avg("average_relationship"), con=avg("average_connection");
+  const emoji=n=>n>=4.5?"💞":n>=3.5?"🥰":n>=2.5?"🌤️":n>=1.5?"🌧️":"🥀";
+  $("insightsContent").innerHTML='<div class="insight-grid">'+
+    '<div class="insight"><div class="value">'+emoji(rel)+' '+rel.toFixed(1)+'</div><div class="label">Average “us” feeling across shared days</div></div>'+
+    '<div class="insight"><div class="value">'+emoji(con)+' '+con.toFixed(1)+'</div><div class="label">Average connection across shared days</div></div>'+
+    '<div class="insight"><div class="value">'+shared.length+'</div><div class="label">Shared check-in days in this recent history window</div></div>'+
+    '</div><div class="legend">Descriptive snapshots only — not a diagnosis or a measure of relationship health.</div>';
+}
+
+function monthKeyDate(year,month,day){return year+"-"+String(month+1).padStart(2,"0")+"-"+String(day).padStart(2,"0");}
+function daysInMonth(year,month){return new Date(Date.UTC(year,month+1,0)).getUTCDate();}
+function mondayOffset(year,month){return (new Date(Date.UTC(year,month,1)).getUTCDay()+6)%7;}
+function calendarMonthLabel(year,month){return new Intl.DateTimeFormat(undefined,{month:"long",year:"numeric"}).format(new Date(Date.UTC(year,month,1,12)));}
+function isFutureDate(date){return date>todayMorocco();}
+async function loadCalendar(){
+  const y=state.calendarMonth.getFullYear(),m=state.calendarMonth.getMonth();
+  $("calendarMonth").textContent=calendarMonthLabel(y,m);
+  const startDate=monthKeyDate(y,m,1),endDate=monthKeyDate(y,m,daysInMonth(y,m));
+  const {data,error}=await client.rpc("get_daily_checkin_calendar",{p_space_id:SPACE_ID,p_start:startDate,p_end:endDate});
+  if(error){console.error(error);$("calendarGrid").innerHTML='<div class="error" style="grid-column:1/-1">Could not load this month.</div>';return;}
+  state.calendarRows=Array.isArray(data)?data:[];
+  const byDate=Object.fromEntries(state.calendarRows.map(r=>[r.date,r]));
+  const cells=[];
+  for(let i=0;i<mondayOffset(y,m);i++) cells.push('<div class="calendar-day empty"></div>');
+  for(let day=1;day<=daysInMonth(y,m);day++){
+    const date=monthKeyDate(y,m,day),row=byDate[date]||{},future=isFutureDate(date),selected=state.selectedDate===date;
+    const cls=["calendar-day",row.mine_submitted?"mine":"",row.both_submitted?"both":"",future?"future":"",selected?"selected":""].filter(Boolean).join(" ");
+    cells.push('<button class="'+cls+'" data-calendar-date="'+date+'" type="button" '+(future?'disabled':'')+'><span class="num">'+day+'</span>'+(row.mine_submitted?'<span class="marker" aria-hidden="true"></span>':'')+'</button>');
+  }
+  $("calendarGrid").innerHTML=cells.join("");
+  $("nextMonth").disabled=(y>new Date().getFullYear() || (y===new Date().getFullYear() && m>=new Date().getMonth()));
+  document.querySelectorAll("[data-calendar-date]").forEach(b=>b.addEventListener("click",()=>selectCalendarDate(b.dataset.calendarDate)));
+}
+async function selectCalendarDate(date){
+  if(!date||isFutureDate(date))return;
+  state.selectedDate=date;
+  document.querySelectorAll("[data-calendar-date]").forEach(b=>b.classList.toggle("selected",b.dataset.calendarDate===date));
+  $("calendarDetail").innerHTML='<h3>'+formatDate(date)+'</h3><p>Loading this day...</p>';
+  const {data,error}=await client.rpc("get_daily_checkin",{p_space_id:SPACE_ID,p_date:date});
+  if(error){console.error(error);$("calendarDetail").innerHTML='<h3>'+formatDate(date)+'</h3><p>Could not load this day.</p>';return;}
+  const p=data||{};
+  if(!p.has_submitted){$("calendarDetail").innerHTML='<h3>'+formatDate(date)+'</h3><p>No check-in saved by you on this day.</p>';return;}
+  const s=p.submitted||{};
+  let html='<h3>'+formatDate(date)+'</h3><div class="answer-mini">Your day: <strong>'+ratingLabel(s.mood)+'</strong> · Us: <strong>'+s.relationship_rating+'/5</strong> · Connection: <strong>'+s.connection_rating+'/5</strong><br>Vibes: <strong>'+((s.vibes||[]).map(escapeHtml).join(" · ")||"None")+'</strong>'+(s.note?'<br>Note: <strong>“'+escapeHtml(s.note)+'”</strong>':"")+'</div>';
+  if(p.partner_submitted&&Array.isArray(p.answers)&&p.answers.length>=2){
+    const partner=p.answers.find(a=>a.user_id!==state.user?.id);
+    if(partner) html+='<div class="answer-mini">Partner: <strong>'+ratingLabel(partner.mood)+'</strong> · Us: <strong>'+partner.relationship_rating+'/5</strong> · Connection: <strong>'+partner.connection_rating+'/5</strong><br>Vibes: <strong>'+((partner.vibes||[]).map(escapeHtml).join(" · ")||"None")+'</strong>'+(partner.note?'<br>Note: <strong>“'+escapeHtml(partner.note)+'”</strong>':"")+'</div>';
+  }else html+='<p style="margin-top:10px">Your partner has not submitted this day yet, so their answers stay hidden.</p>';
+  $("calendarDetail").innerHTML=html;
+}
+$("prevMonth").addEventListener("click",()=>{state.calendarMonth=new Date(state.calendarMonth.getFullYear(),state.calendarMonth.getMonth()-1,1);loadCalendar();});
+$("nextMonth").addEventListener("click",()=>{if($("nextMonth").disabled)return;state.calendarMonth=new Date(state.calendarMonth.getFullYear(),state.calendarMonth.getMonth()+1,1);loadCalendar();});
+$("todayMonth").addEventListener("click",()=>{const d=new Date();state.calendarMonth=new Date(d.getFullYear(),d.getMonth(),1);loadCalendar();});
 
 $("saveButton").addEventListener("click",async()=>{
   if(!state.mood||!state.relationship||!state.connection){
@@ -355,12 +465,12 @@ async function start(){
   const {data:{user},error}=await client.auth.getUser();
   if(error||!user){location.href="login.html";return;}
   if(!window.OurSpaceGateway.isUnlocked(user.id)){location.href="calculator.html";return;}
-  state.user=user;state.date=todayMorocco();
+  state.user=user;state.date=todayMorocco();state.calendarMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);
   $("todayLabel").textContent=formatDate(state.date);
   $("partnerDateState").textContent="Today";
   window.OurSpaceTheme.syncFromUser(user);
   document.documentElement.classList.remove("theme-pending","gateway-pending");
-  await Promise.allSettled([loadProfiles(),loadToday(),loadHistory()]);
+  await Promise.allSettled([loadProfiles(),loadToday(),loadHistory(),loadCalendar()]);
 }
 start();
 </script>
