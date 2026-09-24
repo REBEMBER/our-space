@@ -413,34 +413,15 @@ function todayInMorocco(){
   return get("year")+"-"+get("month")+"-"+get("day");
 }
 
-function scheduleDailyQuestionRollover(){
-  const now=new Date();
-  const today=todayInMorocco();
-  let delay=60000;
+let dailyDayPollTimer=null;
 
-  for(let minutes=1;minutes<=180;minutes++){
-    const probe=new Date(now.getTime()+minutes*60000);
-    if(todayInMoroccoAt(probe)!==today){
-      delay=minutes*60000+1500;
-      break;
+function startDailyDayWatcher(){
+  if(dailyDayPollTimer)clearInterval(dailyDayPollTimer);
+  dailyDayPollTimer=setInterval(()=>{
+    if(dailyCurrentUser?.id && dailyQuestion && todayInMorocco()!==dailyQuestion.question_date){
+      void loadDailyQuestion(dailyCurrentUser);
     }
-  }
-
-  window.setTimeout(async()=>{
-    const next=todayInMorocco();
-    if(next!==todayInMorocco()){
-      await loadDailyQuestion(dailyCurrentUser);
-    }
-    scheduleDailyQuestionRollover();
-  },delay);
-}
-
-function todayInMoroccoAt(date){
-  const parts=new Intl.DateTimeFormat("en-US",{
-    timeZone:"Africa/Casablanca",year:"numeric",month:"2-digit",day:"2-digit"
-  }).formatToParts(date);
-  const get=type=>parts.find(part=>part.type===type)?.value||"";
-  return get("year")+"-"+get("month")+"-"+get("day");
+  },30000);
 }
 
 function withTimeout(promise,ms,label){
@@ -826,7 +807,7 @@ client.auth.onAuthStateChange((event,session)=>{
   void loadProfile(user);
   void loadDailyQuestion(user);
   startUnreadSync(user);
-  scheduleDailyQuestionRollover();
+  startDailyDayWatcher();
 })();
 </script>
 </body>
