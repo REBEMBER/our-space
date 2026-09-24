@@ -150,6 +150,14 @@ button:focus-visible{outline:3px solid color-mix(in srgb,var(--peach) 60%,transp
  .save{width:100%}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* DARK-MODE CONTRAST HARDENING */
+html[data-theme="dark"]{
+ --hero-a:#152B46;--hero-b:#1F3B52;--hero-text:#F7FAFC;--button-bg:#F1F6FA;--button-text:#0B121B;
+}
+html[data-theme="dark"] .hero{background:linear-gradient(135deg,var(--hero-a),var(--hero-b));}
+html[data-theme="dark"] .save{background:var(--button-bg);color:var(--button-text);}
+html[data-theme="dark"] .calendar-btn{color:#EDF3F7;}
 </style>
 </head>
 <body>
@@ -271,7 +279,7 @@ const state={user:null,date:null,mood:null,relationship:null,connection:null,vib
 
 const $=id=>document.getElementById(id);
 const escapeHtml=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
-function todayMorocco(){return new Intl.DateTimeFormat("en-CA",{timeZone:"Africa/Casablanca",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());}
+function todayMorocco(){const parts=new Intl.DateTimeFormat("en-US",{timeZone:"Africa/Casablanca",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());const get=type=>parts.find(part=>part.type===type)?.value||"";return get("year")+"-"+get("month")+"-"+get("day");}
 function formatDate(d){return new Intl.DateTimeFormat(undefined,{weekday:"long",month:"long",day:"numeric"}).format(new Date(d+"T12:00:00"));}
 function ratingLabel(n){return ["","Rough","Meh","Okay","Good","Amazing"][n]||"";}
 
@@ -443,7 +451,7 @@ async function start(){
   const {data:{user},error}=await client.auth.getUser();
   if(error||!user){location.href="login.html";return;}
   if(!window.OurSpaceGateway.isUnlocked(user.id)){location.href="calculator.html";return;}
-  state.user=user;state.date=todayMorocco();state.calendarMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);
+  state.user=user;state.date=todayMorocco();const [todayYear,todayMonth]=state.date.split("-").map(Number);state.calendarMonth=new Date(todayYear,todayMonth-1,1);
   $("todayLabel").textContent=formatDate(state.date);
   $("partnerDateState").textContent="Today";
   window.OurSpaceTheme.syncFromUser(user);
