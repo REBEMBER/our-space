@@ -188,6 +188,20 @@ button:focus-visible{outline:3px solid rgba(243,178,159,.65);outline-offset:3px}
 @media(prefers-reduced-motion:reduce){
   *{scroll-behavior:auto!important;transition:none!important}
 }
+
+/* DARK-MODE CONTRAST HARDENING */
+html[data-theme="dark"]{
+  --hero-a:#152B46;--hero-b:#1F3B52;--hero-c:#2B4A63;
+  --hero-text:#F7FAFC;--hero-soft:rgba(247,250,252,.76);
+  --action-bg:#F1F6FA;--action-text:#0B121B;--icon-bg:#243444;--icon-fg:#F1F6FA;
+}
+html[data-theme="dark"] .hero{background:linear-gradient(135deg,var(--hero-a),var(--hero-b) 56%,var(--hero-c));}
+html[data-theme="dark"] .open-chat{background:var(--action-bg);color:var(--action-text);}
+html[data-theme="dark"] .daily-submit{background:var(--action-bg);color:var(--action-text);}
+html[data-theme="dark"] .action-icon{background:var(--icon-bg);color:var(--icon-fg);}
+html[data-theme="dark"] .open-chat-unread{border-color:#182431;}
+html[data-theme="dark"] .brand-mark{background:#152B46;color:#F1F6FA;}
+html[data-theme="dark"] .mobile-nav button.active{color:#F1F6FA;}
 </style>
 </head>
 <body>
@@ -392,9 +406,11 @@ function formatDailyDate(dateString){
 }
 
 function todayInMorocco(){
-  return new Intl.DateTimeFormat("en-CA",{
+  const parts=new Intl.DateTimeFormat("en-US",{
     timeZone:"Africa/Casablanca",year:"numeric",month:"2-digit",day:"2-digit"
-  }).format(new Date());
+  }).formatToParts(new Date());
+  const get=type=>parts.find(part=>part.type===type)?.value||"";
+  return get("year")+"-"+get("month")+"-"+get("day");
 }
 
 function withTimeout(promise,ms,label){
