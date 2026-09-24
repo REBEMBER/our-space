@@ -96,7 +96,7 @@ button:focus-visible{outline:3px solid color-mix(in srgb,var(--peach) 60%,transp
 .calendar-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px}
 .calendar-title{font-size:16px;font-weight:900;color:var(--navy);letter-spacing:-.02em}
 .calendar-actions{display:flex;gap:6px}
-.calendar-btn{width:36px;height:36px;border-radius:11px;background:var(--soft);border:1px solid var(--line);color:var(--navy);cursor:pointer;font-weight:900}
+ .calendar-btn{min-width:44px;width:auto;height:44px;border-radius:11px;background:var(--soft);border:1px solid var(--line);color:var(--navy);cursor:pointer;font-weight:900}
 .calendar-btn:disabled{opacity:.35;cursor:default}
 .calendar-weekdays,.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin-top:10px}
 .calendar-weekdays div{text-align:center;font-size:8px;font-weight:900;color:var(--muted);text-transform:uppercase}
@@ -254,7 +254,7 @@ button:focus-visible{outline:3px solid color-mix(in srgb,var(--peach) 60%,transp
 <div class="section-title"><h2>Check-in calendar 📅</h2><span>All saved days</span></div>
 <div class="calendar-head">
   <button class="calendar-btn" id="prevMonth" type="button" aria-label="Previous month">‹</button>
-  <div class="calendar-title" id="calendarMonth">Loading...</div>
+  <div class="calendar-title" id="calendarMonth" aria-live="polite">Loading...</div>
   <div class="calendar-actions">
     <button class="calendar-btn" id="todayMonth" type="button" aria-label="Go to current month">Today</button>
     <button class="calendar-btn" id="nextMonth" type="button" aria-label="Next month">›</button>
@@ -410,7 +410,7 @@ async function loadCalendar(){
   for(let day=1;day<=daysInMonth(y,m);day++){
     const date=monthKeyDate(y,m,day),row=byDate[date]||{},future=isFutureDate(date),selected=state.selectedDate===date;
     const cls=["calendar-day",row.mine_submitted?"mine":"",row.both_submitted?"both":"",future?"future":"",selected?"selected":""].filter(Boolean).join(" ");
-    cells.push('<button class="'+cls+'" data-calendar-date="'+date+'" type="button" '+(future?'disabled':'')+'><span class="num">'+day+'</span>'+(row.mine_submitted?'<span class="marker" aria-hidden="true"></span>':'')+'</button>');
+    cells.push('<button class="'+cls+'" data-calendar-date="'+date+'" aria-label="'+date+(row.both_submitted?' — both checked in':row.mine_submitted?' — you checked in':future?' — future day':' — no check-in')+'" type="button" '+(future?'disabled':'')+'><span class="num">'+day+'</span>'+(row.mine_submitted?'<span class="marker" aria-hidden="true"></span>':'')+'</button>');
   }
   $("calendarGrid").innerHTML=cells.join("");
   $("nextMonth").disabled=(y>new Date().getFullYear() || (y===new Date().getFullYear() && m>=new Date().getMonth()));
