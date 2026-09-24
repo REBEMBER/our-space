@@ -298,7 +298,7 @@ function updateRelationshipStreak(){
 }
 updateRelationshipStreak();
 
-const DAILY_SPACE_ID="6547fe99-ed80-421c-8572-50ae3fb6fbe4";
+const DAILY_SPACE_ID="6547fe99-ae80-421c-8572-50ae3fb6fbe4";
 let dailyQuestion=null;
 let dailyStatus=null;
 let dailyProfileNames={};
@@ -423,19 +423,38 @@ async function submitDailyAnswer(){
 async function loadDailyQuestion(user){
   dailyCurrentUser=user;
   $("dailyQuestionText").textContent="Preparing today's question...";
-  const {data:members}=await client.from("space_members").select("user_id").eq("space_id",DAILY_SPACE_ID);
-  const memberIds=(members||[]).map(row=>row.user_id).filter(Boolean);
-  if(memberIds.length){
-    const {data:profiles}=await client.from("user_profiles").select("user_id,username").in("user_id",memberIds);
-    (profiles||[]).forEach(row=>{dailyProfileNames[row.user_id]=row.username;});
-  }
-  const {data,error}=await client.functions.invoke("daily-question",{body:{space_id:DAILY_SPACE_ID}});
+
+  // Start profiles and the question request at the same time.
+  const profilePromise=(async()=>{
+    const {data:members}=await client.from("space_members")
+      .select("user_id").eq("space_id",DAILY_SPACE_ID);
+    const memberIds=(members||[]).map(row=>row.user_id).filter(Boolean);
+    if(memberIds.length){
+      const {data:profiles}=await client.from("user_profiles")
+        .select("user_id,username").in("user_id",memberIds);
+      (profiles||[]).forEach(row=>{dailyProfileNames[row.user_id]=row.username;});
+    }
+  })();
+
+  const questionPromise=Promise.race([
+    client.functions.invoke("daily-question",{body:{space_id:DAILY_SPACE_ID}}),
+    new Promise((resolve)=>setTimeout(
+      ()=>resolve({data:null,error:new Error("Daily question request timed out.")}),7000
+    ))
+  ]);
+
+  const [{data,error}]=await Promise.all([questionPromise,profilePromise]);
+
   if(error||!data?.question){
     console.error("daily question",error,data);
-    $("dailyQuestionText").textContent="Today's question is taking a little longer than usual.";
-    $("dailyAnswerArea").innerHTML='<div class="daily-error">Please refresh in a moment. Your space is still safe and no answer was lost.</div>';
+    $("dailyQuestionText").textContent="Today's question could not be loaded.";
+    $("dailyAnswerArea").innerHTML=
+      '<div class="daily-error">The question service did not respond. Please try again.</div>'+
+      '<button class="daily-submit" id="dailyRetryButton" type="button" style="margin-top:10px">Try again</button>';
+    $("dailyRetryButton").addEventListener("click",()=>loadDailyQuestion(user));
     return;
   }
+
   dailyQuestion=data.question;
   await refreshDailyStatus();
   if(!dailyPollTimer)dailyPollTimer=setInterval(refreshDailyStatus,12000);
