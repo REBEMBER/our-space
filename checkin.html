@@ -426,7 +426,7 @@ $("saveButton").addEventListener("click",async()=>{
   $("saveStatus").textContent="Saved. Waiting for your partner 💞";
   button.disabled=false;
   await loadToday();
-  await loadHistory();
+  await loadCalendar();
 });
 
 $("backButton").addEventListener("click",()=>location.href="index.html");
