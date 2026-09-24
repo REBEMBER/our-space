@@ -90,6 +90,22 @@ button:focus-visible{outline:3px solid rgba(243,178,159,.65);outline-offset:3px}
 .hero p{max-width:600px;margin-top:18px;color:var(--hero-soft);font-size:15px;line-height:1.7}
 .open-chat{display:inline-flex;align-items:center;justify-content:center;gap:9px;margin-top:27px;min-height:50px;padding:0 20px;border-radius:15px;background:var(--surface);color:var(--navy);font-size:13px;font-weight:850;cursor:pointer;box-shadow:0 14px 30px rgba(0,0,0,.17)}
 .open-chat svg{width:18px;height:18px}
+.rs-streak{
+  margin-top:18px;width:max-content;min-width:214px;padding:10px 13px;
+  display:flex;align-items:center;gap:11px;border:1px solid rgba(255,255,255,.14);
+  border-radius:16px;background:rgba(255,255,255,.10);
+  box-shadow:0 10px 28px rgba(0,0,0,.10);backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+.rs-streak-flame{
+  width:36px;height:36px;flex:0 0 36px;border-radius:11px;
+  display:grid;place-items:center;background:rgba(243,178,159,.18);color:var(--peach);
+}
+.rs-streak-flame svg{width:20px;height:20px;fill:currentColor;stroke:currentColor}
+.rs-streak-copy{display:flex;align-items:baseline;gap:6px;min-width:0}
+.rs-streak-number{color:var(--hero-text);font-size:22px;line-height:1;font-weight:900;letter-spacing:-.045em}
+.rs-streak-label{color:var(--hero-soft);font-size:11px;font-weight:800}
+.rs-streak-since{margin-top:3px;color:rgba(255,255,255,.58);font-size:8.5px;font-weight:700}
 .actions{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:16px}
 .action-card{position:relative;overflow:hidden;min-height:190px;padding:23px;border-radius:24px;border:1px solid var(--line);cursor:pointer;box-shadow:var(--shadow);transition:transform .18s ease,box-shadow .18s ease}
 .action-card:hover{transform:translateY(-2px);box-shadow:0 22px 48px rgba(21,43,70,.11)}
@@ -122,6 +138,7 @@ button:focus-visible{outline:3px solid rgba(243,178,159,.65);outline-offset:3px}
   .hero h1{font-size:43px}
   .hero p{font-size:14px}
   .open-chat{width:100%}
+  .rs-streak{width:100%;min-width:0}
   .action-card{min-height:142px;padding:20px}
   .action-card h2{margin-top:22px;font-size:18px}
 }
@@ -161,6 +178,22 @@ button:focus-visible{outline:3px solid rgba(243,178,159,.65);outline-offset:3px}
       <div class="eyebrow">Your private space</div>
       <h1>Welcome back, <span id="heroName">there</span>.</h1>
       <p>Your shared space for conversations, photos, and little moments. Everything important stays one tap away.</p>
+      <div class="rs-streak" aria-label="Relationship streak">
+        <div class="rs-streak-flame" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M13.5 2.5c.3 3.1-1.2 4.8-2.7 6.1C9.2 9.9 8 11.2 8 13.4c0 1.7 1 3 2.5 3.8-.2-1.6.4-2.9 1.7-4.1.1 2.2 1.5 3.1 2.7 4.2 1.2 1.1 1.7 2.4 1.6 3.7 2.3-1.2 3.8-3.6 3.8-6.4 0-3.7-2.4-6.6-6.8-12.1Z"/>
+            <path d="M8.7 18.3c.7 1.1 1.8 1.8 3.2 1.9-1.2-.9-1.5-2.1-1.2-3.2-.9.4-1.6.8-2 1.3Z" fill="rgba(255,255,255,.7)" stroke="none"/>
+          </svg>
+        </div>
+        <div>
+          <div class="rs-streak-copy">
+            <span class="rs-streak-number" id="rsStreakNumber">0</span>
+            <span class="rs-streak-label">day streak</span>
+          </div>
+          <div class="rs-streak-since">Since March 15, 2026</div>
+        </div>
+      </div>
+
       <button class="open-chat" id="openChatButton" type="button">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
           <path d="M7 9h10"/><path d="M7 13h6"/>
@@ -208,6 +241,15 @@ const {createClient}=supabase;
 const client=createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 const $=id=>document.getElementById(id);
 function go(path){window.location.href=path}
+function updateRelationshipStreak(){
+  const start=new Date(2026,2,15);
+  const now=new Date();
+  const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const startDay=new Date(start.getFullYear(),start.getMonth(),start.getDate());
+  const days=Math.max(0,Math.floor((today-startDay)/86400000)+1);
+  $("rsStreakNumber").textContent=days.toLocaleString();
+}
+updateRelationshipStreak();
 
 document.querySelectorAll("[data-go]").forEach((el)=>{
   el.addEventListener("click",()=>go(el.dataset.go));
