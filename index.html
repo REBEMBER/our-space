@@ -88,16 +88,6 @@ button:focus-visible{outline:3px solid rgba(243,178,159,.65);outline-offset:3px}
 .hero h1{margin-top:21px;color:var(--hero-text);font-size:clamp(42px,6vw,72px);line-height:.96;letter-spacing:-.06em}
 .hero h1 span{color:var(--peach)}
 .hero p{max-width:600px;margin-top:18px;color:var(--hero-soft);font-size:15px;line-height:1.7}
-.open-chat{display:inline-flex;align-items:center;justify-content:center;gap:9px;margin-top:27px;min-height:50px;padding:0 20px;border-radius:15px;background:var(--surface);color:var(--navy);font-size:13px;font-weight:850;cursor:pointer;box-shadow:0 14px 30px rgba(0,0,0,.17)}
-.open-chat{position:relative}
-.open-chat svg{width:18px;height:18px}
-.open-chat-unread{
-  position:absolute;top:-8px;right:-8px;min-width:23px;height:23px;padding:0 6px;
-  display:none;align-items:center;justify-content:center;border-radius:999px;
-  background:#E5484D;color:#fff;border:0;
-  font-size:10px;line-height:1;font-weight:950;box-shadow:0 5px 14px rgba(229,72,77,.30);
-}
-.open-chat-unread.visible{display:flex}
 .rs-streak{
   margin-top:18px;width:max-content;min-width:214px;padding:9px 12px;
   display:flex;align-items:center;gap:10px;border:1px solid rgba(255,255,255,.15);
@@ -149,19 +139,6 @@ button:focus-visible{outline:3px solid rgba(243,178,159,.65);outline-offset:3px}
   .daily-reveal{grid-template-columns:1fr}
 }
 
-.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:16px}
-.action-card{position:relative;overflow:hidden;min-height:190px;padding:23px;border-radius:24px;border:1px solid var(--line);cursor:pointer;box-shadow:var(--shadow);transition:transform .18s ease,box-shadow .18s ease}
-.action-card:hover{transform:translateY(-2px);box-shadow:0 22px 48px rgba(21,43,70,.11)}
-.action-card:after{content:"";position:absolute;width:150px;height:150px;right:-60px;bottom:-75px;border-radius:50%;opacity:.48}
-.card-chat{background:var(--soft)}.card-chat:after{background:color-mix(in srgb,var(--navy) 18%,var(--surface))}
-.card-gallery{background:var(--soft-2)}.card-gallery:after{background:color-mix(in srgb,var(--blue) 88%,var(--surface))}
-.card-ai{background:var(--soft-3)}.card-ai:after{background:var(--peach)}
-.card-calculator{background:color-mix(in srgb,var(--blue) 52%,var(--surface))}.card-calculator:after{background:var(--peach)}
-
-.action-icon{width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,.80);color:var(--navy);display:grid;place-items:center}
-.action-icon svg{width:20px;height:20px}
-.action-card h2{position:relative;z-index:1;margin-top:31px;color:var(--navy);font-size:20px;letter-spacing:-.02em}
-.action-card p{position:relative;z-index:1;max-width:215px;margin-top:7px;color:color-mix(in srgb,var(--text) 66%,transparent);font-size:12px;line-height:1.55}
 .footer{padding:22px 2px 8px;text-align:center;color:#9AA4AE;font-size:10px}
 .mobile-nav{display:none}
 @media(max-width:900px){
@@ -171,8 +148,6 @@ button:focus-visible{outline:3px solid rgba(243,178,159,.65);outline-offset:3px}
   .mobile-nav button.active{background:color-mix(in srgb,var(--peach) 16%,var(--surface));color:var(--navy)}
   .mobile-nav svg{width:18px;height:18px}
   .app{padding:13px 13px 88px}
-  .actions{grid-template-columns:repeat(2,1fr)}
-  .action-card{min-height:145px}
 }
 @media(max-width:560px){
   .actions{grid-template-columns:1fr}
@@ -180,10 +155,7 @@ button:focus-visible{outline:3px solid rgba(243,178,159,.65);outline-offset:3px}
   .hero{padding:25px;min-height:350px;border-radius:25px}
   .hero h1{font-size:43px}
   .hero p{font-size:14px}
-  .open-chat{width:100%}
   .rs-streak{width:100%;min-width:0}
-  .action-card{min-height:142px;padding:20px}
-  .action-card h2{margin-top:22px;font-size:18px}
 }
 @media(prefers-reduced-motion:reduce){
   *{scroll-behavior:auto!important;transition:none!important}
@@ -196,7 +168,6 @@ html[data-theme="dark"]{
   --action-bg:#F1F6FA;--action-text:#0B121B;--icon-bg:#243444;--icon-fg:#F1F6FA;
 }
 html[data-theme="dark"] .hero{background:linear-gradient(135deg,var(--hero-a),var(--hero-b) 56%,var(--hero-c));}
-html[data-theme="dark"] .open-chat{background:var(--action-bg);color:var(--action-text);}
 html[data-theme="dark"] .daily-submit{background:var(--action-bg);color:var(--action-text);}
 html[data-theme="dark"] .action-icon{background:var(--icon-bg);color:var(--icon-fg);}
 html[data-theme="dark"] .open-chat-unread{border:0;}
@@ -250,14 +221,6 @@ html[data-theme="dark"] .mobile-nav button.active{color:#F1F6FA;}
         </div>
       </div>
 
-      <button class="open-chat" id="openChatButton" type="button" aria-label="Open chat">
-        <span class="open-chat-unread" id="openChatUnread" aria-label="Unread messages">0</span>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M7 9h10"/><path d="M7 13h6"/>
-          <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H17.5A2.5 2.5 0 0 1 20 5.5V13.5A2.5 2.5 0 0 1 17.5 16H11L6.5 20V16H6.5A2.5 2.5 0 0 1 4 13.5Z"/>
-        </svg>
-        Open chat
-      </button>
     </div>
   </section>
 
@@ -274,23 +237,7 @@ html[data-theme="dark"] .mobile-nav button.active{color:#F1F6FA;}
     </div>
   </section>
 
-  <section class="actions" aria-label="Our Space">
-    <article class="action-card card-chat" data-go="chat.html" tabindex="0" role="button">
-      <div class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9h10"/><path d="M7 13h6"/><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H17.5A2.5 2.5 0 0 1 20 5.5V13.5A2.5 2.5 0 0 1 17.5 16H11L6.5 20V16H6.5A2.5 2.5 0 0 1 4 13.5Z"/></svg></div>
-      <h2>Private chat</h2><p>Continue your conversation together.</p>
-    </article>
 
-    <article class="action-card card-gallery" data-go="gallery.html" tabindex="0" role="button">
-      <div class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4" width="17" height="16" rx="2.5"/><circle cx="8.5" cy="9" r="1.4"/><path d="m4.5 17 4.7-4.8 3.4 3.2 2.3-2.3 2.3-2.3 4.6 4.4"/></svg></div>
-      <h2>Shared gallery</h2><p>Keep your photos together in one private place.</p>
-    </article>
-
-    <article class="action-card card-ai" data-go="checkin.html" tabindex="0" role="button">
-      <div class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="4"/></svg></div>
-      <h2>Daily check-in</h2><p>Rate your day, your relationship, and your vibe together.</p>
-    </article>
-
-  </section>
 
   <footer class="footer">Our Space · Private for two</footer>
 </div>
@@ -766,7 +713,6 @@ document.querySelectorAll("[data-go]").forEach((el)=>{
   }
 });
 
-$("openChatButton").addEventListener("click",()=>go("chat.html"));
 $("settingsButton").addEventListener("click",()=>go("settings.html"));
 $("mobileSettings").addEventListener("click",()=>go("settings.html"));
 
