@@ -252,7 +252,7 @@ html[data-theme="dark"] .mobile-nav button.active{color:#F1F6FA;}
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 6.5A3.5 3.5 0 0 1 8.5 3h7A3.5 3.5 0 0 1 19 6.5v6A3.5 3.5 0 0 1 15.5 16H10l-4.5 4v-4.7A3.5 3.5 0 0 1 5 12.5Z"/></svg>
         </span>
         <span class="message-counter-total" id="messageCounterTotal">0 msgs</span>
-        <span class="message-counter-split" id="messageCounterSplit">you 0 · her 0</span>
+        <span class="message-counter-split" id="messageCounterSplit">Mohammad 0 · Salma 0</span>
       </div>
 
     </div>
@@ -350,8 +350,8 @@ async function refreshMessageCounter(){
     const total=mineCount+herCount;
 
     $("messageCounterTotal").textContent=total.toLocaleString()+" msg"+(total===1?"":"s");
-    $("messageCounterSplit").textContent="you "+mineCount.toLocaleString()+" · her "+herCount.toLocaleString();
-    $("messageCounter").setAttribute("aria-label",total+" messages: "+mineCount+" from you and "+herCount+" from your partner");
+    $("messageCounterSplit").textContent="Mohammad "+mineCount.toLocaleString()+" · Salma "+herCount.toLocaleString();
+    $("messageCounter").setAttribute("aria-label",total+" messages: "+mineCount+" from Mohammad and "+herCount+" from Salma");
   }catch(error){
     console.warn("Message counter failed:",error);
   }
