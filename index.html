@@ -356,6 +356,19 @@ async function refreshUnreadMessages(){
     const badge=$("openChatUnread");
     if(!badge)return;
     const n=Math.max(0,Number(count||0));
+
+    // Keep the visible home-page bubble and the installed PWA's outside
+    // app-icon badge driven by the same unread-message count.
+    if("setAppBadge" in navigator){
+      try{
+        if(n>0) await navigator.setAppBadge(n);
+        else if("clearAppBadge" in navigator) await navigator.clearAppBadge();
+        else await navigator.setAppBadge(0);
+      }catch(error){
+        console.warn("App icon badge update failed:",error);
+      }
+    }
+
     if(n>0){
       badge.textContent=n>99?"99+":String(n);
       badge.classList.add("visible");
