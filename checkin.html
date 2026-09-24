@@ -22,9 +22,9 @@
  --navy:#152B46;--navy2:#193651;--peach:#F3B29F;--blue:#DCEAF5;
  --bg:#F8F0EC;--surface:#fff;--text:#26313D;--muted:#7A8794;
  --line:rgba(21,43,70,.10);--soft:#F6F8FA;--soft2:#EEF6FA;
- --shadow:0 18px 50px rgba(21,43,70,.08);
+ --shadow:0 18px 50px rgba(21,43,70,.08);--button-text:#fff;
 }
-html[data-theme="dark"]{--navy:#F1F6FA;--navy2:#233649;--peach:#EFA58C;--blue:#263B50;--bg:#0B121B;--surface:#182431;--text:#EDF3F7;--muted:#A6B5C1;--line:rgba(237,243,247,.14);--soft:#162333;--soft2:#1D3548}
+html[data-theme="dark"]{--navy:#F1F6FA;--navy2:#233649;--peach:#EFA58C;--blue:#263B50;--bg:#0B121B;--surface:#182431;--text:#EDF3F7;--muted:#A6B5C1;--line:rgba(237,243,247,.14);--soft:#162333;--soft2:#1D3548;--button-text:#0B121B}
 html[data-theme="ocean"]{--navy:#0E4266;--navy2:#17567C;--peach:#72CAE6;--blue:#D3EDF8;--bg:#ECF7FC;--surface:#fff;--text:#193547;--muted:#6A8495;--line:rgba(14,66,102,.12);--soft:#F3FAFD;--soft2:#E7F5FB}
 html[data-theme="forest"]{--navy:#164638;--navy2:#286554;--peach:#DDA187;--blue:#D7EAE1;--bg:#EEF6F1;--surface:#fff;--text:#253A32;--muted:#71857D;--line:rgba(22,70,56,.12);--soft:#F4FAF7;--soft2:#E9F4EF}
 html[data-theme="blush"]{--navy:#762B49;--navy2:#9B3F62;--peach:#F3A2BC;--blue:#FADCE7;--bg:#FFF1F5;--surface:#fff;--text:#3D2731;--muted:#8D6A78;--line:rgba(118,43,73,.12);--soft:#FFF7F9;--soft2:#FDEBF2}
@@ -38,7 +38,7 @@ button:focus-visible{outline:3px solid color-mix(in srgb,var(--peach) 60%,transp
 .app{min-height:100vh;padding:16px}
 .shell{width:min(920px,100%);margin:0 auto}
 .topbar{height:58px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.back{display:inline-flex;align-items:center;gap:8px;color:var(--navy);font-size:12px;font-weight:850;background:var(--surface);border:1px solid var(--line);padding:10px 13px;border-radius:13px;cursor:pointer}
+.back{display:inline-flex;align-items:center;gap:8px;color:var(--text);font-size:12px;font-weight:850;background:var(--surface);border:1px solid var(--line);padding:10px 13px;border-radius:13px;cursor:pointer}
 .back svg{width:16px;height:16px}
 .brand{font-size:11px;letter-spacing:.12em;font-weight:900;color:var(--muted)}
 .hero{position:relative;overflow:hidden;border-radius:30px;padding:30px;background:linear-gradient(135deg,var(--navy),var(--navy2));box-shadow:0 25px 65px rgba(21,43,70,.17)}
@@ -75,7 +75,7 @@ button:focus-visible{outline:3px solid color-mix(in srgb,var(--peach) 60%,transp
 .note:focus{border-color:var(--peach);box-shadow:0 0 0 4px color-mix(in srgb,var(--peach) 13%,transparent)}
 .actions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:17px}
 .status{color:var(--muted);font-size:10px;line-height:1.5}
-.save{min-height:46px;padding:0 18px;border-radius:14px;background:var(--navy);color:#fff;font-size:12px;font-weight:900;cursor:pointer;box-shadow:0 10px 24px rgba(21,43,70,.16)}
+.save{min-height:46px;padding:0 18px;border-radius:14px;background:var(--navy);color:var(--button-text);font-size:12px;font-weight:900;cursor:pointer;box-shadow:0 10px 24px rgba(21,43,70,.16)}
 .save:disabled{opacity:.55;cursor:default}
 .saved{display:none;margin-top:16px;padding:13px 14px;border-radius:16px;background:var(--soft2);border:1px solid var(--line);color:var(--text);font-size:11px;line-height:1.5}
 .saved.show{display:block}
@@ -87,16 +87,24 @@ button:focus-visible{outline:3px solid color-mix(in srgb,var(--peach) 60%,transp
 .answers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
 .answer{padding:16px;border-radius:18px;background:var(--soft);border:1px solid var(--line)}
 .answer.partner{background:color-mix(in srgb,var(--peach) 10%,var(--surface))}
-.answer-name{font-size:11px;font-weight:900;color:var(--navy)}
-.answer-line{display:flex;align-items:center;gap:6px;margin-top:11px;font-size:11px;color:var(--muted)}
-.answer-line strong{color:var(--text);font-size:12px}
-.answer-vibes{margin-top:10px;font-size:18px;line-height:1.4}
-.answer-note{margin-top:9px;color:var(--text);font-size:11px;line-height:1.55}
+.reveal-intro{padding:15px 16px;border-radius:18px;background:var(--soft2);border:1px solid var(--line);margin-top:14px}
+.reveal-badge{display:inline-flex;padding:6px 9px;border-radius:999px;background:var(--surface);color:var(--navy);font-size:9px;font-weight:900}
+.reveal-intro h3{margin-top:9px;font-size:15px;color:var(--navy)}
+.reveal-intro p{margin-top:4px;color:var(--muted);font-size:10px;line-height:1.5}
+.answer-name{font-size:14px;font-weight:900;color:var(--navy);padding-bottom:10px;border-bottom:1px solid var(--line)}
+.answer-question{margin-top:13px;font-size:9px;font-weight:850;color:var(--muted)}
+.answer-line{display:flex;align-items:center;gap:7px;margin-top:5px;font-size:11px;color:var(--text)}
+.answer-line strong{margin-left:auto;color:var(--text);font-size:12px}
+.detail-icon{font-size:14px}
+.detail-label{color:var(--muted);font-weight:750}
+.answer-vibes{margin-top:6px;font-size:14px;line-height:1.55;color:var(--text)}
+.answer-note{margin-top:6px;color:var(--text);font-size:11px;line-height:1.55;background:var(--surface);border-radius:12px;padding:9px 10px}
+.answer.partner{box-shadow:inset 3px 0 0 var(--peach)}
 .history{margin-top:14px}
 .calendar-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px}
 .calendar-title{font-size:16px;font-weight:900;color:var(--navy);letter-spacing:-.02em}
 .calendar-actions{display:flex;gap:6px}
- .calendar-btn{min-width:44px;width:auto;height:44px;border-radius:11px;background:var(--soft);border:1px solid var(--line);color:var(--navy);cursor:pointer;font-weight:900}
+ .calendar-btn{min-width:44px;width:auto;height:44px;border-radius:11px;background:var(--soft);border:1px solid var(--line);color:var(--text);cursor:pointer;font-weight:900}
 .calendar-btn:disabled{opacity:.35;cursor:default}
 .calendar-weekdays,.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin-top:10px}
 .calendar-weekdays div{text-align:center;font-size:8px;font-weight:900;color:var(--muted);text-transform:uppercase}
@@ -115,16 +123,6 @@ button:focus-visible{outline:3px solid color-mix(in srgb,var(--peach) 60%,transp
 .calendar-detail p{margin-top:5px;color:var(--muted);font-size:10px;line-height:1.5}
 .calendar-detail .answer-mini{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:10px;line-height:1.6}
 .calendar-detail .answer-mini strong{color:var(--text)}
-.insights{margin-top:14px}
-.insight-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:13px}
-.insight{padding:14px;border-radius:16px;background:var(--soft);border:1px solid var(--line)}
-.insight .value{font-size:20px;font-weight:950;color:var(--navy)}
-.insight .label{margin-top:4px;font-size:9px;color:var(--muted);font-weight:800;line-height:1.4}
-.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:13px}
-.day{padding:10px 5px;border-radius:14px;background:var(--soft);text-align:center;min-height:83px}
-.day .dow{font-size:8px;font-weight:900;color:var(--muted);text-transform:uppercase}
-.day .dayemoji{font-size:21px;margin-top:8px;line-height:1}
-.day .dayscore{margin-top:5px;font-size:8px;color:var(--muted);font-weight:800}
 .legend{margin-top:10px;color:var(--muted);font-size:9px;text-align:center}
 .loading{padding:30px;text-align:center;color:var(--muted);font-size:11px}
 .error{padding:13px 14px;background:var(--soft);border-radius:14px;color:var(--text);font-size:11px}
@@ -136,11 +134,9 @@ button:focus-visible{outline:3px solid color-mix(in srgb,var(--peach) 60%,transp
  .choice .label{font-size:8px}
  .card{padding:18px}
  .answers{grid-template-columns:1fr}
- .week{gap:4px}
  .calendar-weekdays,.calendar-grid{gap:3px}
  .calendar-day{min-height:50px;padding:7px 4px}
  .calendar-day .marker{right:5px;bottom:5px}
- .insight-grid{grid-template-columns:1fr}
  .day{padding:8px 2px}
 }
 @media(max-width:460px){
@@ -245,11 +241,6 @@ button:focus-visible{outline:3px solid color-mix(in srgb,var(--peach) 60%,transp
 <div id="partnerContent"><div class="loading">Checking your shared check-in...</div></div>
 </div>
 
-<div class="card history" id="historyCard">
-<div class="section-title"><h2>Our week 🌈</h2><span>Only shared days</span></div>
-<div id="historyContent"><div class="loading">Loading your week...</div></div>
-</div>
-
 <div class="card history">
 <div class="section-title"><h2>Check-in calendar 📅</h2><span>All saved days</span></div>
 <div class="calendar-head">
@@ -265,10 +256,6 @@ button:focus-visible{outline:3px solid color-mix(in srgb,var(--peach) 60%,transp
 <div class="calendar-detail" id="calendarDetail"><h3>Select a day</h3><p>Your saved check-ins will appear here. A partner answer is revealed only after both of you have submitted.</p></div>
 </div>
 
-<div class="card insights">
-<div class="section-title"><h2>Check-in insights 📈</h2><span>Shared days only</span></div>
-<div id="insightsContent"><div class="loading">Loading insights...</div></div>
-</div>
 </section>
 
 <footer class="footer">A private little snapshot of your day · just for the two of you</footer>
@@ -343,53 +330,36 @@ function renderPartner(payload){
   const answers=Array.isArray(payload.answers)?payload.answers:[];
   const own=answers.find(a=>a.user_id===state.user?.id);
   const partner=answers.find(a=>a.user_id!==state.user?.id);
-  if(!own||!partner){$("partnerContent").innerHTML='<div class="loading">Putting your answers together...</div>';return;}
+  if(!own||!partner){
+    $("partnerContent").innerHTML='<div class="loading">Putting your answers together...</div>';
+    return;
+  }
 
   const ownName=escapeHtml(state.profileNames[own.user_id]||"You");
   const partnerName=escapeHtml(state.profileNames[partner.user_id]||"Your partner");
 
+  const ratingRow=(emoji,label,value)=>
+    '<div class="answer-line"><span class="detail-icon">'+emoji+'</span><span class="detail-label">'+label+'</span><strong>'+value+'</strong></div>';
+
   const card=(a,name,extra)=>
-    '<div class="answer '+extra+'"><div class="answer-name">'+name+'</div>'+
-    '<div class="answer-line">🌤️ <span>Day</span><strong>'+ratingLabel(a.mood)+'</strong></div>'+
-    '<div class="answer-line">🫶 <span>Us</span><strong>'+a.relationship_rating+'/5</strong></div>'+
-    '<div class="answer-line">🔗 <span>Connection</span><strong>'+a.connection_rating+'/5</strong></div>'+
-    '<div class="answer-vibes">'+(a.vibes||[]).map(escapeHtml).join(" · ")+'</div>'+
-    (a.note?'<div class="answer-note">“'+escapeHtml(a.note)+'”</div>':"")+
-    '</div>';
+    '<article class="answer '+extra+'">'+
+      '<div class="answer-name">'+name+'</div>'+
+      '<div class="answer-question">How did your day feel?</div>'+
+      ratingRow("🌤️","Your day",ratingLabel(a.mood))+
+      '<div class="answer-question">How did “us” feel?</div>'+
+      ratingRow("🫶","Relationship",a.relationship_rating+"/5")+
+      '<div class="answer-question">How connected did you feel?</div>'+
+      ratingRow("🔗","Connection",a.connection_rating+"/5")+
+      '<div class="answer-question">What was today’s vibe?</div>'+
+      '<div class="answer-vibes">'+((a.vibes||[]).map(escapeHtml).join(" · ")||"No vibes selected")+'</div>'+
+      '<div class="answer-question">One little note</div>'+
+      '<div class="answer-note">'+(a.note?"“"+escapeHtml(a.note)+"”":"No note for this day.")+'</div>'+
+    '</article>';
 
   $("partnerContent").innerHTML=
-    '<div class="answers">'+card(own,ownName,"") + card(partner,partnerName,"partner")+'</div>'+
-    '<div class="saved show" style="margin-top:12px">💞 Both check-ins are open. You can talk about the day, celebrate the good parts, or just send a little love.</div>';
-}
-
-function weekEmoji(score){
-  if(score==null)return "·";
-  return ["","🥀","🌧️","🌤️","🥰","💞"][Math.round(score)]||"🌤️";
-}
-async function loadHistory(){
-  const {data,error}=await client.rpc("get_daily_checkin_history",{p_space_id:SPACE_ID,p_days:30});
-  if(error){console.error(error);$("historyContent").innerHTML='<div class="error">Your week could not be loaded yet.</div>';return;}
-  const rows=Array.isArray(data)?data:[];
-  $("historyContent").innerHTML='<div class="week">'+rows.slice(-7).map(row=>{
-    const date=new Date(row.date+"T12:00:00");
-    const dow=new Intl.DateTimeFormat(undefined,{weekday:"short"}).format(date);
-    const score=row.average_relationship;
-    return '<div class="day"><div class="dow">'+dow+'</div><div class="dayemoji">'+weekEmoji(score)+'</div><div class="dayscore">'+(row.both_submitted?(score+"/5"):"—")+'</div></div>';
-  }).join("")+'</div><div class="legend">Your shared history appears only after you both check in on a day.</div>';
-  renderInsights(rows);
-}
-
-function renderInsights(rows){
-  const shared=rows.filter(r=>r.both_submitted);
-  if(!shared.length){$("insightsContent").innerHTML='<div class="loading">Your shared insights will appear after you have a few days together.</div>';return;}
-  const avg=(key)=>shared.reduce((s,r)=>s+Number(r[key]||0),0)/shared.length;
-  const rel=avg("average_relationship"), con=avg("average_connection");
-  const emoji=n=>n>=4.5?"💞":n>=3.5?"🥰":n>=2.5?"🌤️":n>=1.5?"🌧️":"🥀";
-  $("insightsContent").innerHTML='<div class="insight-grid">'+
-    '<div class="insight"><div class="value">'+emoji(rel)+' '+rel.toFixed(1)+'</div><div class="label">Average “us” feeling across shared days</div></div>'+
-    '<div class="insight"><div class="value">'+emoji(con)+' '+con.toFixed(1)+'</div><div class="label">Average connection across shared days</div></div>'+
-    '<div class="insight"><div class="value">'+shared.length+'</div><div class="label">Shared check-in days in this recent history window</div></div>'+
-    '</div><div class="legend">Descriptive snapshots only — not a diagnosis or a measure of relationship health.</div>';
+    '<div class="reveal-intro"><div class="reveal-badge">💞 Both checked in</div><h3>Here is how you each experienced the day.</h3><p>Take a look at the details, not just the numbers.</p></div>'+
+    '<div class="answers">'+card(own,ownName,"")+card(partner,partnerName,"partner")+'</div>'+
+    '<div class="saved show" style="margin-top:12px">💗 Your answers are now open to each other. Use the details as a conversation starter, not a scorecard.</div>';
 }
 
 function monthKeyDate(year,month,day){return year+"-"+String(month+1).padStart(2,"0")+"-"+String(day).padStart(2,"0");}
@@ -470,7 +440,7 @@ async function start(){
   $("partnerDateState").textContent="Today";
   window.OurSpaceTheme.syncFromUser(user);
   document.documentElement.classList.remove("theme-pending","gateway-pending");
-  await Promise.allSettled([loadProfiles(),loadToday(),loadHistory(),loadCalendar()]);
+  await Promise.allSettled([loadProfiles(),loadToday(),loadCalendar()]);
 }
 start();
 </script>
