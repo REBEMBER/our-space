@@ -155,14 +155,14 @@ button:focus-visible{outline:3px solid rgba(243,178,159,.65);outline-offset:3px}
 .action-card h2{position:relative;z-index:1;margin-top:31px;color:var(--navy);font-size:20px;letter-spacing:-.02em}
 .action-card p{position:relative;z-index:1;max-width:215px;margin-top:7px;color:color-mix(in srgb,var(--text) 66%,transparent);font-size:12px;line-height:1.55}
 .footer{padding:22px 2px 8px;text-align:center;color:#9AA4AE;font-size:10px}
-.mobile-nav{display:none!important}
+.mobile-nav{display:none}
 @media(max-width:900px){
   .desktop-nav{display:none}
   .mobile-nav{position:fixed;left:12px;right:12px;bottom:12px;z-index:20;display:grid;grid-template-columns:repeat(5,1fr);gap:3px;padding:6px;border:1px solid var(--line);border-radius:19px;background:color-mix(in srgb,var(--surface) 94%,transparent);box-shadow:0 15px 45px rgba(21,43,70,.15);backdrop-filter:blur(15px)}
   .mobile-nav button{height:50px;border-radius:14px;background:transparent;color:#8A949E;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:9px;font-weight:850;cursor:pointer}
   .mobile-nav button.active{background:color-mix(in srgb,var(--peach) 16%,var(--surface));color:var(--navy)}
   .mobile-nav svg{width:18px;height:18px}
-  .app{padding:13px 13px 24px}
+  .app{padding:13px 13px 88px}
   .actions{grid-template-columns:repeat(2,1fr)}
   .action-card{min-height:145px}
 }
@@ -273,7 +273,13 @@ button:focus-visible{outline:3px solid rgba(243,178,159,.65);outline-offset:3px}
 </div>
 </main>
 
-
+<nav class="mobile-nav" aria-label="Mobile navigation">
+  <button class="active" data-go="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m4 10 8-6 8 6v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19Z"/><path d="M9.5 20.5v-6h5v6"/></svg>Home</button>
+  <button data-go="gallery.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4" width="17" height="16" rx="2.5"/><circle cx="8.5" cy="9" r="1.4"/><path d="m4.5 17 4.7-4.8 2.3-2.3 4.6 4.4"/></svg>Gallery</button>
+  <button data-go="checkin.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="4"/></svg>Check-in</button>
+  <button data-go="ai.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="4"/></svg>AI</button>
+  <button id="mobileSettings" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2M12 19.2v2M21.2 12h-2M4.8 12h-2M18.5 5.5l-1.4 1.4M6.9 17.1l-1.4 1.4M18.5 18.5l-1.4-1.4M6.9 6.9 5.5 5.5"/></svg>Settings</button>
+</nav>
 
 <script>
 const SUPABASE_URL="https://ywflohxufmfydkpkkqly.supabase.co";
