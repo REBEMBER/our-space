@@ -140,6 +140,20 @@ Deno.serve(async (req) => {
       user.user_metadata?.name ||
       "Our Space";
 
+    // The launcher/app-icon badge must represent the recipient's actual
+    // unread-message total, not merely the number of push events received.
+    // This is calculated with the service-role client so it remains correct
+    // even while the recipient's app is closed.
+    const { count: unreadCount, error: unreadCountError } = await admin
+      .from("messages")
+      .select("id", { count: "exact", head: true })
+      .eq("space_id", space_id)
+      .neq("sender_id", sender_id)
+      .is("seen_at", null)
+      .is("deleted_at", null);
+
+    if (unreadCountError) throw unreadCountError;
+
     webpush.setVapidDetails(
       vapid.subject,
       vapid.publicKey,
@@ -156,6 +170,7 @@ Deno.serve(async (req) => {
           row.subscription,
           JSON.stringify({
             message_id,
+            unread_count: Math.max(0, Number(unreadCount || 0)),
             preview_enabled: previewEnabled,
             sender_name: senderName,
             content: previewEnabled ? (content || message.content || "") : ""
