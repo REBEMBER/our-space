@@ -327,35 +327,17 @@ let messageCounterRealtimeChannel=null;
 async function refreshMessageCounter(){
   if(!dailyCurrentUser?.id)return;
   try{
-    const {data:members,error:memberError}=await client
-      .from("space_members")
-      .select("user_id")
-      .eq("space_id",DAILY_SPACE_ID);
-    if(memberError)throw memberError;
+    // These are the two members of the real Our Space. Keep the labels tied
+    // to their actual user IDs so the counts can never swap by login order.
+    const MOHAMMAD_USER_ID="28c4929b-ed2c-4eec-a850-88d50bce8e91";
+    const SALMA_USER_ID="6ccfc966-4ab2-4c96-b6db-845b157af56d";
 
-    const memberIds=(members||[]).map(row=>row.user_id).filter(Boolean);
-    const {data:profiles,error:profileError}=await client
-      .from("user_profiles")
-      .select("user_id,username")
-      .in("user_id",memberIds);
-    if(profileError)throw profileError;
-
-    const namesById={};
-    (profiles||[]).forEach(profile=>{
-      namesById[profile.user_id]=(profile.username||"").trim().toLowerCase();
-    });
-
-    const mohammadId=memberIds.find(id=>namesById[id]==="mohammad");
-    const salmaId=memberIds.find(id=>namesById[id]==="salma");
-
-    if(!mohammadId||!salmaId){
-      throw new Error("Could not identify Mohammad and Salma for the message counter.");
-    }
-
-    const mohammadResult=await client.from("messages").select("id",{count:"exact",head:true})
-      .eq("space_id",DAILY_SPACE_ID).eq("sender_id",mohammadId).is("deleted_at",null);
-    const salmaResult=await client.from("messages").select("id",{count:"exact",head:true})
-      .eq("space_id",DAILY_SPACE_ID).eq("sender_id",salmaId).is("deleted_at",null);
+    const [mohammadResult,salmaResult]=await Promise.all([
+      client.from("messages").select("id",{count:"exact",head:true})
+        .eq("space_id",DAILY_SPACE_ID).eq("sender_id",MOHAMMAD_USER_ID).is("deleted_at",null),
+      client.from("messages").select("id",{count:"exact",head:true})
+        .eq("space_id",DAILY_SPACE_ID).eq("sender_id",SALMA_USER_ID).is("deleted_at",null)
+    ]);
 
     if(mohammadResult.error)throw mohammadResult.error;
     if(salmaResult.error)throw salmaResult.error;
