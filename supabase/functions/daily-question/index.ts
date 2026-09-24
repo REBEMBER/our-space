@@ -30,7 +30,13 @@ const FALLBACK=[
 ];
 
 const out=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{...corsHeaders,"Content-Type":"application/json; charset=utf-8","Cache-Control":"no-store"}});
-const today=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Africa/Casablanca",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+const today=()=>{
+  const parts=new Intl.DateTimeFormat("en-US",{
+    timeZone:"Africa/Casablanca",year:"numeric",month:"2-digit",day:"2-digit"
+  }).formatToParts(new Date());
+  const get=(type:string)=>parts.find(part=>part.type===type)?.value||"";
+  return get("year")+"-"+get("month")+"-"+get("day");
+};
 const norm=(s:string)=>String(s||"").toLowerCase().replace(/[^a-z0-9\\s]/g," ").replace(/\\s+/g," ").trim();
 const similar=(a:string,b:string)=>{
   const A=new Set(norm(a).split(" ").filter(x=>x.length>2)),B=new Set(norm(b).split(" ").filter(x=>x.length>2));
