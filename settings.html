@@ -206,7 +206,7 @@
 
 
     const client=supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
-    const allowedThemes=new Set(["warm","dark","ocean","forest","blush","sunset"]);
+    const allowedThemes=new Set(["warm","dark","ocean","forest","blush","sunset","graphite","lavender"]);
 
     function applyTheme(theme){
       const safeTheme=window.OurSpaceTheme.apply(theme);
