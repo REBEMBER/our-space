@@ -13,7 +13,17 @@
 <meta name="theme-color" content="#F8F0EC">
 <title>Our Space</title>
 <script src="/theme.js?v=final"></script>
-<style>html.theme-pending body{visibility:hidden}</style>
+<style>html.theme-pending body{visibility:hidden}.open-chat{display:inline-flex;align-items:center;justify-content:center;gap:9px;margin-top:27px;min-height:50px;padding:0 20px;border-radius:15px;background:var(--surface);color:var(--navy);font-size:13px;font-weight:850;cursor:pointer;box-shadow:0 14px 30px rgba(0,0,0,.17)}
+.open-chat{position:relative}
+.open-chat svg{width:18px;height:18px}
+.open-chat-unread{
+  position:absolute;top:-8px;right:-8px;min-width:23px;height:23px;padding:0 6px;
+  display:none;align-items:center;justify-content:center;border-radius:999px;
+  background:#E5484D;color:#fff;border:0;
+  font-size:10px;line-height:1;font-weight:950;box-shadow:0 5px 14px rgba(229,72,77,.30);
+}
+.open-chat-unread.visible{display:flex}
+</style>
 <script>document.documentElement.classList.add("theme-pending");</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/gateway.js?v=2"></script>
@@ -155,6 +165,7 @@ button:focus-visible{outline:3px solid rgba(243,178,159,.65);outline-offset:3px}
   .hero{padding:25px;min-height:350px;border-radius:25px}
   .hero h1{font-size:43px}
   .hero p{font-size:14px}
+  .open-chat{width:100%}
   .rs-streak{width:100%;min-width:0}
 }
 @media(prefers-reduced-motion:reduce){
@@ -168,6 +179,7 @@ html[data-theme="dark"]{
   --action-bg:#F1F6FA;--action-text:#0B121B;--icon-bg:#243444;--icon-fg:#F1F6FA;
 }
 html[data-theme="dark"] .hero{background:linear-gradient(135deg,var(--hero-a),var(--hero-b) 56%,var(--hero-c));}
+html[data-theme="dark"] .open-chat{background:var(--action-bg);color:var(--action-text);}
 html[data-theme="dark"] .daily-submit{background:var(--action-bg);color:var(--action-text);}
 html[data-theme="dark"] .action-icon{background:var(--icon-bg);color:var(--icon-fg);}
 html[data-theme="dark"] .open-chat-unread{border:0;}
@@ -206,6 +218,15 @@ html[data-theme="dark"] .mobile-nav button.active{color:#F1F6FA;}
       <div class="eyebrow">Your private space</div>
       <h1>Welcome back, <span id="heroName">there</span>.</h1>
       <p>Your shared space for conversations, photos, and little moments. Everything important stays one tap away.</p>
+      <button class="open-chat" id="openChatButton" type="button" aria-label="Open chat">
+        <span class="open-chat-unread" id="openChatUnread" aria-label="Unread messages">0</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 9h10"/><path d="M7 13h6"/>
+          <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H17.5A2.5 2.5 0 0 1 20 5.5V13.5A2.5 2.5 0 0 1 17.5 16H11L6.5 20V16H6.5A2.5 2.5 0 0 1 4 13.5Z"/>
+        </svg>
+        Open chat
+      </button>
+
       <div class="rs-streak" aria-label="Relationship streak">
         <div class="rs-streak-flame" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="currentColor">
@@ -713,6 +734,7 @@ document.querySelectorAll("[data-go]").forEach((el)=>{
   }
 });
 
+$("openChatButton").addEventListener("click",()=>go("chat.html"));
 $("settingsButton").addEventListener("click",()=>go("settings.html"));
 $("mobileSettings").addEventListener("click",()=>go("settings.html"));
 
