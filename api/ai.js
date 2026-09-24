@@ -37,21 +37,36 @@ module.exports = async (req, res) => {
       body: JSON.stringify(req.body || {}),
     });
 
-    const body = await response.text();
-
-    if (!response.ok) {
-      console.error("Our Space AI upstream error:", response.status, body.slice(0, 1000));
-    }
-
     res.status(response.status);
     res.setHeader(
       "Content-Type",
       response.headers.get("content-type") ||
         "application/json; charset=utf-8"
     );
-    res.setHeader("Cache-Control", "no-store");
+    res.setHeader("Cache-Control", "no-cache, no-transform");
+    res.setHeader("X-Accel-Buffering", "no");
 
-    res.end(body);
+    if (!response.ok) {
+      const body = await response.text();
+      console.error(
+        "Our Space AI upstream error:",
+        response.status,
+        body.slice(0, 1000)
+      );
+      res.end(body);
+      return;
+    }
+
+    if (!response.body) {
+      res.status(502).json({ error: "The AI service returned no response body." });
+      return;
+    }
+
+    for await (const chunk of response.body) {
+      res.write(Buffer.from(chunk));
+    }
+
+    res.end();
   } catch (error) {
     console.error("Our Space AI proxy error:", error);
     res.status(502).json({
