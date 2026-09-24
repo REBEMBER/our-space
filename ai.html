@@ -120,6 +120,13 @@ button{cursor:pointer}
   .memory-btn{padding:0 8px}
 }
 @media(prefers-reduced-motion:reduce){.sidebar{transition:none}}
+
+/* DARK-MODE ICON CONTRAST HARDENING */
+html[data-theme="dark"] .mark,
+html[data-theme="dark"] .dot{background:#152B46;color:#F1F6FA;}
+html[data-theme="dark"] .mark svg,
+html[data-theme="dark"] .dot svg{color:currentColor;stroke:currentColor;}
+html[data-theme="dark"] .send{background:#F1F6FA;color:#0B121B;}
 </style>
 </head>
 <body>
