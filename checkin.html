@@ -24,7 +24,7 @@
  --line:rgba(21,43,70,.10);--soft:#F6F8FA;--soft2:#EEF6FA;
  --shadow:0 18px 50px rgba(21,43,70,.08);--button-text:#fff;
 }
-html[data-theme="dark"]{--navy:#F1F6FA;--navy2:#233649;--peach:#EFA58C;--blue:#263B50;--bg:#0B121B;--surface:#182431;--text:#EDF3F7;--muted:#A6B5C1;--line:rgba(237,243,247,.14);--soft:#162333;--soft2:#1D3548;--button-text:#0B121B}
+html[data-theme="dark"]{--navy:#F1F6FA;--navy2:#233649;--peach:#EFA58C;--blue:#263B50;--bg:#0B121B;--surface:#182431;--text:#EDF3F7;--muted:#A6B5C1;--line:rgba(237,243,247,.14);--soft:#162333;--soft2:#1D3548;--hero-text:#fff;--button-text:#0B121B}
 html[data-theme="ocean"]{--navy:#0E4266;--navy2:#17567C;--peach:#72CAE6;--blue:#D3EDF8;--bg:#ECF7FC;--surface:#fff;--text:#193547;--muted:#6A8495;--line:rgba(14,66,102,.12);--soft:#F3FAFD;--soft2:#E7F5FB}
 html[data-theme="forest"]{--navy:#164638;--navy2:#286554;--peach:#DDA187;--blue:#D7EAE1;--bg:#EEF6F1;--surface:#fff;--text:#253A32;--muted:#71857D;--line:rgba(22,70,56,.12);--soft:#F4FAF7;--soft2:#E9F4EF}
 html[data-theme="blush"]{--navy:#762B49;--navy2:#9B3F62;--peach:#F3A2BC;--blue:#FADCE7;--bg:#FFF1F5;--surface:#fff;--text:#3D2731;--muted:#8D6A78;--line:rgba(118,43,73,.12);--soft:#FFF7F9;--soft2:#FDEBF2}
@@ -46,11 +46,11 @@ button:focus-visible{outline:3px solid color-mix(in srgb,var(--peach) 60%,transp
 .hero:before{width:260px;height:260px;right:-100px;top:-140px;background:var(--peach);opacity:.25}
 .hero:after{width:210px;height:210px;left:-120px;bottom:-140px;background:var(--blue);opacity:.18}
 .hero>*{position:relative;z-index:1}
-.eyebrow{display:inline-flex;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.10);color:#fff;border:1px solid rgba(255,255,255,.14);font-size:10px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
-.hero h1{margin-top:14px;color:#fff;font-size:clamp(35px,6vw,58px);line-height:.98;letter-spacing:-.055em}
+.eyebrow{display:inline-flex;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.10);color:var(--hero-text);border:1px solid rgba(255,255,255,.14);font-size:10px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+.hero h1{margin-top:14px;color:var(--hero-text);font-size:clamp(35px,6vw,58px);line-height:.98;letter-spacing:-.055em}
 .hero h1 span{color:var(--peach)}
 .hero p{max-width:620px;margin-top:12px;color:rgba(255,255,255,.76);font-size:14px;line-height:1.6}
-.date-pill{margin-top:18px;display:inline-flex;align-items:center;gap:8px;color:#fff;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.14);padding:8px 11px;border-radius:12px;font-size:10px;font-weight:800}
+.date-pill{margin-top:18px;display:inline-flex;align-items:center;gap:8px;color:var(--hero-text);background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.14);padding:8px 11px;border-radius:12px;font-size:10px;font-weight:800}
 .content{margin-top:14px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:22px}
 .section-title{display:flex;align-items:center;justify-content:space-between;gap:12px}
@@ -405,7 +405,15 @@ async function selectCalendarDate(date){
 }
 $("prevMonth").addEventListener("click",()=>{state.calendarMonth=new Date(state.calendarMonth.getFullYear(),state.calendarMonth.getMonth()-1,1);loadCalendar();});
 $("nextMonth").addEventListener("click",()=>{if($("nextMonth").disabled)return;state.calendarMonth=new Date(state.calendarMonth.getFullYear(),state.calendarMonth.getMonth()+1,1);loadCalendar();});
-$("todayMonth").addEventListener("click",()=>{const d=new Date();state.calendarMonth=new Date(d.getFullYear(),d.getMonth(),1);loadCalendar();});
+$("todayMonth").addEventListener("click",(event)=>{
+  event.preventDefault();
+  event.stopPropagation();
+  const todayString=todayMorocco();
+  const [year,month]=todayString.split("-").map(Number);
+  state.calendarMonth=new Date(year,month-1,1);
+  state.selectedDate=null;
+  loadCalendar();
+});
 
 $("saveButton").addEventListener("click",async()=>{
   if(!state.mood||!state.relationship||!state.connection){
