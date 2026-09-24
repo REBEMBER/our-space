@@ -6,13 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS"
 };
 
-const MODELS = [
-  "gemini-3.8-flash",
-  "gemini-3.7-flash",
-  "gemini-3.6-flash",
-  "gemini-3.5-flash",
-  "gemini-2.5-flash"
-];
+const MODELS = ["gemini-3.8-flash"];
 
 const FALLBACK_QUESTIONS = [
   { category: "appreciation", question: "What is one small thing your partner did recently that made you feel especially appreciated?" },
@@ -103,7 +97,7 @@ async function generateQuestion(apiKey: string, history: Array<{question: string
               responseMimeType: "application/json"
             }
           }),
-          signal: AbortSignal.timeout(8000)
+          signal: AbortSignal.timeout(4000)
         }
       );
 
