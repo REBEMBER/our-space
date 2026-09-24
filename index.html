@@ -285,9 +285,12 @@ button:focus-visible{outline:3px solid rgba(243,178,159,.65);outline-offset:3px}
 const SUPABASE_URL="https://ywflohxufmfydkpkkqly.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_qTMUO8KxerEQBDQ-A7Huyg_8N2Tqpmr";
 const {createClient}=supabase;
-const client=createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+const client=createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
+  auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
+});
 const $=id=>document.getElementById(id);
 function go(path){window.location.href=path}
+
 function updateRelationshipStreak(){
   const start=new Date(2026,2,15);
   const now=new Date();
@@ -299,48 +302,89 @@ function updateRelationshipStreak(){
 updateRelationshipStreak();
 
 const DAILY_SPACE_ID="6547fe99-ae80-421c-8572-50ae3fb6fbe4";
+const DAILY_QUESTION_TIMEOUT_MS=3000;
+const DAILY_STATUS_TIMEOUT_MS=2500;
+
+let dailyCurrentUser=null;
 let dailyQuestion=null;
 let dailyStatus=null;
 let dailyProfileNames={};
 let dailyPollTimer=null;
+let dailyRealtimeChannel=null;
+let dailyLoadToken=0;
 
 function escapeHtml(value){
-  return String(value??"").replace(/[&<>"']/g,(char)=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;", "'":"&#039;"}[char]));
+  return String(value??"").replace(/[&<>"']/g,(char)=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[char]));
 }
+
 function formatDailyDate(dateString){
   if(!dateString)return "Today";
   const date=new Date(dateString+"T12:00:00");
   return new Intl.DateTimeFormat(undefined,{month:"short",day:"numeric"}).format(date);
 }
+
+function todayInMorocco(){
+  return new Intl.DateTimeFormat("en-CA",{
+    timeZone:"Africa/Casablanca",year:"numeric",month:"2-digit",day:"2-digit"
+  }).format(new Date());
+}
+
+function withTimeout(promise,ms,label){
+  return Promise.race([
+    promise,
+    new Promise(resolve=>setTimeout(
+      ()=>resolve({data:null,error:new Error(label+" timed out.")}),ms
+    ))
+  ]);
+}
+
 function dailySetStatus(text){
   $("dailyQuestionStatus").textContent=text||"";
 }
+
+function renderDailyLoading(message="Loading today's question..."){
+  $("dailyQuestionText").textContent=message;
+  $("dailyQuestionDate").textContent="Today";
+  dailySetStatus("");
+  $("dailyAnswerArea").innerHTML='<div class="daily-loading">Please wait a moment...</div>';
+}
+
+function renderDailyError(message="We could not load today's question."){
+  $("dailyQuestionText").textContent="Today's question is unavailable.";
+  dailySetStatus("");
+  $("dailyAnswerArea").innerHTML=
+    '<div class="daily-error">'+escapeHtml(message)+'</div>'+
+    '<button class="daily-submit" id="dailyRetryButton" type="button" style="margin-top:10px">Try again</button>';
+  $("dailyRetryButton").addEventListener("click",()=>loadDailyQuestion(dailyCurrentUser));
+}
+
 function renderDailyQuestion(){
   const area=$("dailyAnswerArea");
+
   if(!dailyQuestion){
-    $("dailyQuestionText").textContent="Today's question is not available yet.";
-    area.innerHTML='<div class="daily-error">We could not prepare today\'s question. Try again in a moment.</div>';
+    renderDailyError();
     return;
   }
+
   $("dailyQuestionDate").textContent=formatDailyDate(dailyQuestion.question_date);
   $("dailyQuestionText").textContent=dailyQuestion.question;
 
   if(!dailyStatus){
-    dailySetStatus("");
-    area.innerHTML='<div class="daily-loading">Checking your answer...</div>';
+    dailySetStatus("Loading your answer...");
+    area.innerHTML='<div class="daily-loading">Loading your answer...</div>';
     return;
   }
 
   if(dailyStatus.revealed){
-    dailySetStatus("You both answered. Your answers are revealed.");
-    loadRevealedAnswers();
+    dailySetStatus("You both answered. Your answers are now visible.");
+    renderRevealedAnswers(dailyStatus.answers||[]);
     return;
   }
 
   if(dailyStatus.has_answered){
-    dailySetStatus(dailyStatus.partner_answered
-      ? "Your partner has answered too. Revealing your answers..."
-      : "Your answer is saved. Your partner's answer stays hidden until both of you answer.");
+    dailySetStatus("Your answer is saved. Your partner's answer stays hidden until both of you answer.");
     area.innerHTML=
       '<div class="daily-own-answer">'+
         '<div class="daily-answer-label">Your answer</div>'+
@@ -354,6 +398,7 @@ function renderDailyQuestion(){
   dailySetStatus("Answer on your own first. Your partner's answer stays hidden until both of you answer.");
   showDailyEditor("");
 }
+
 function showDailyEditor(value){
   const area=$("dailyAnswerArea");
   area.innerHTML=
@@ -362,132 +407,255 @@ function showDailyEditor(value){
       '<span class="daily-answer-count" id="dailyAnswerCount">0 / 2000</span>'+
       '<button class="daily-submit" id="dailySubmitButton" type="button">Submit answer</button>'+
     '</div>';
+
   const input=$("dailyAnswerInput");
   const submit=$("dailySubmitButton");
   input.value=value||"";
+
   const sync=()=>{
     $("dailyAnswerCount").textContent=input.value.length+" / 2000";
     submit.disabled=!input.value.trim();
   };
+
   input.addEventListener("input",sync);
   submit.addEventListener("click",submitDailyAnswer);
   sync();
 }
-async function loadRevealedAnswers(){
-  const {data,error}=await client.from("daily_question_answers")
-    .select("user_id,answer,created_at")
-    .eq("question_id",dailyQuestion.id)
-    .order("created_at",{ascending:true});
-  if(error||!Array.isArray(data)||data.length<2){
+
+function renderRevealedAnswers(answers){
+  const ownId=dailyCurrentUser?.id;
+  const own=answers.find(row=>row.user_id===ownId);
+  const partner=answers.find(row=>row.user_id!==ownId);
+
+  if(!own||!partner){
     $("dailyAnswerArea").innerHTML='<div class="daily-loading">The reveal is being prepared...</div>';
     return;
   }
-  const ownId=dailyCurrentUser?.id;
-  const own=data.find(row=>row.user_id===ownId);
-  const partner=data.find(row=>row.user_id!==ownId);
-  const ownName="You";
-  const partnerName=escapeHtml(dailyProfileNames[partner?.user_id]||"Your partner");
+
+  const partnerName=escapeHtml(dailyProfileNames[partner.user_id]||"Your partner");
+
   $("dailyAnswerArea").innerHTML=
     '<div class="daily-reveal">'+
-      '<div class="daily-reveal-card"><div class="daily-reveal-title">'+ownName+'</div><div class="daily-reveal-answer">'+escapeHtml(own?.answer||"")+'</div></div>'+
-      '<div class="daily-reveal-card partner"><div class="daily-reveal-title">'+partnerName+'</div><div class="daily-reveal-answer">'+escapeHtml(partner?.answer||"")+'</div></div>'+
+      '<div class="daily-reveal-card">'+
+        '<div class="daily-reveal-title">You</div>'+
+        '<div class="daily-reveal-answer">'+escapeHtml(own.answer)+'</div>'+
+      '</div>'+
+      '<div class="daily-reveal-card partner">'+
+        '<div class="daily-reveal-title">'+partnerName+'</div>'+
+        '<div class="daily-reveal-answer">'+escapeHtml(partner.answer)+'</div>'+
+      '</div>'+
     '</div>'+
     '<div class="daily-reveal-note">Both answers are now visible to both of you.</div>';
 }
+
+async function loadDailyProfiles(){
+  try{
+    const {data:members,error:memberError}=await withTimeout(
+      client.from("space_members").select("user_id").eq("space_id",DAILY_SPACE_ID),
+      2500,
+      "Daily member lookup"
+    );
+    if(memberError||!Array.isArray(members))return;
+
+    const ids=members.map(row=>row.user_id).filter(Boolean);
+    if(!ids.length)return;
+
+    const {data:profiles,error}=await withTimeout(
+      client.from("user_profiles").select("user_id,username").in("user_id",ids),
+      2500,
+      "Daily profile lookup"
+    );
+    if(error||!Array.isArray(profiles))return;
+
+    profiles.forEach(row=>{
+      dailyProfileNames[row.user_id]=row.username||"Your partner";
+    });
+
+    if(dailyStatus?.revealed)renderRevealedAnswers(dailyStatus.answers||[]);
+  }catch(error){
+    console.error("daily profiles",error);
+  }
+}
+
+async function fetchDailyQuestion(){
+  const today=todayInMorocco();
+
+  const direct=await withTimeout(
+    client.from("daily_questions")
+      .select("id,space_id,question_date,question,category,difficulty,ai_model,created_at")
+      .eq("space_id",DAILY_SPACE_ID)
+      .eq("question_date",today)
+      .maybeSingle(),
+    DAILY_QUESTION_TIMEOUT_MS,
+    "Daily question lookup"
+  );
+
+  if(direct?.data)return direct.data;
+  if(direct?.error)console.error("daily question lookup",direct.error);
+
+  const generated=await withTimeout(
+    client.functions.invoke("daily-question",{body:{space_id:DAILY_SPACE_ID}}),
+    DAILY_QUESTION_TIMEOUT_MS,
+    "Daily question generation"
+  );
+
+  if(generated?.data?.question)return generated.data.question;
+  if(generated?.error)console.error("daily question generation",generated.error);
+  return null;
+}
+
 async function refreshDailyStatus(){
   if(!dailyQuestion)return;
-  const {data,error}=await client.rpc("get_daily_question_status",{p_question_id:dailyQuestion.id});
-  if(error){console.error("daily status",error);return;}
-  dailyStatus=data||null;
+
+  const questionId=dailyQuestion.id;
+
+  // Read the answer rows directly. RLS intentionally exposes:
+  // - the user's own answer before reveal
+  // - both answers once both partners have answered.
+  const result=await withTimeout(
+    client.from("daily_question_answers")
+      .select("user_id,answer,created_at,updated_at")
+      .eq("question_id",questionId)
+      .order("created_at",{ascending:true}),
+    DAILY_STATUS_TIMEOUT_MS,
+    "Daily answer lookup"
+  );
+
+  if(result?.error||!Array.isArray(result?.data)){
+    console.error("daily answer lookup",result?.error);
+    dailySetStatus("We could not check your answer yet.");
+    $("dailyAnswerArea").innerHTML=
+      '<div class="daily-error">Your question is ready. We could not check the answer state. Please try again.</div>'+
+      '<button class="daily-submit" id="dailyStatusRetryButton" type="button" style="margin-top:10px">Check again</button>';
+    $("dailyStatusRetryButton").addEventListener("click",refreshDailyStatus);
+    return;
+  }
+
+  const answers=result.data;
+  const own=answers.find(row=>row.user_id===dailyCurrentUser?.id);
+  const revealed=answers.length>=2;
+
+  dailyStatus={
+    own_answer:own?.answer||null,
+    has_answered:Boolean(own),
+    partner_answered:revealed,
+    revealed,
+    answer_count:answers.length,
+    answers
+  };
+
   renderDailyQuestion();
-  if(dailyStatus?.revealed&&dailyPollTimer){clearInterval(dailyPollTimer);dailyPollTimer=null;}
+
+  if(revealed&&dailyPollTimer){
+    clearInterval(dailyPollTimer);
+    dailyPollTimer=null;
+  }
 }
+
 async function submitDailyAnswer(){
   const input=$("dailyAnswerInput");
   const submit=$("dailySubmitButton");
   const answer=input?.value.trim()||"";
-  if(!answer||!dailyQuestion)return;
+
+  if(!answer||!dailyQuestion||!dailyCurrentUser)return;
+
   submit.disabled=true;
   submit.textContent="Saving...";
-  const {data,error}=await client.rpc("submit_daily_answer",{p_question_id:dailyQuestion.id,p_answer:answer});
-  if(error){
-    console.error("daily submit",error);
+
+  const payload={
+    question_id:dailyQuestion.id,
+    user_id:dailyCurrentUser.id,
+    answer
+  };
+
+  const result=await withTimeout(
+    client.from("daily_question_answers")
+      .upsert(payload,{onConflict:"question_id,user_id"})
+      .select("user_id,answer,created_at,updated_at")
+      .single(),
+    4000,
+    "Saving your answer"
+  );
+
+  if(result?.error||!result?.data){
+    console.error("daily submit",result?.error);
     submit.disabled=false;
     submit.textContent="Submit answer";
-    dailySetStatus(error.message||"Could not save your answer.");
+    dailySetStatus(result?.error?.message||"Could not save your answer. Try again.");
     return;
   }
-  dailyStatus=data||null;
-  renderDailyQuestion();
+
+  await refreshDailyStatus();
 }
+
+function startDailyRealtime(){
+  if(!dailyQuestion)return;
+
+  if(dailyRealtimeChannel){
+    client.removeChannel(dailyRealtimeChannel);
+    dailyRealtimeChannel=null;
+  }
+
+  dailyRealtimeChannel=client
+    .channel("daily-question-"+dailyQuestion.id)
+    .on(
+      "postgres_changes",
+      {
+        event:"*",
+        schema:"public",
+        table:"daily_question_answers",
+        filter:"question_id=eq."+dailyQuestion.id
+      },
+      ()=>refreshDailyStatus()
+    )
+    .subscribe();
+}
+
 async function loadDailyQuestion(user){
+  const token=++dailyLoadToken;
   dailyCurrentUser=user;
-  $("dailyQuestionText").textContent="Loading today's question...";
+  dailyQuestion=null;
+  dailyStatus=null;
 
-  // Profiles are secondary. Never let them block the question itself.
-  (async()=>{
-    try{
-      const {data:members}=await client.from("space_members")
-        .select("user_id").eq("space_id",DAILY_SPACE_ID);
-      const memberIds=(members||[]).map(row=>row.user_id).filter(Boolean);
-      if(memberIds.length){
-        const {data:profiles}=await client.from("user_profiles")
-          .select("user_id,username").in("user_id",memberIds);
-        (profiles||[]).forEach(row=>{dailyProfileNames[row.user_id]=row.username;});
-      }
-    }catch(error){ console.error("daily profiles",error); }
-  })();
-
-  // IMPORTANT: read an already-created question directly first.
-  // This avoids an unnecessary Edge Function round-trip every time Home opens.
-  const today=new Intl.DateTimeFormat("en-CA",{
-    timeZone:"Africa/Casablanca",year:"numeric",month:"2-digit",day:"2-digit"
-  }).format(new Date());
-
-  let {data:existing,error:existingError}=await client.from("daily_questions")
-    .select("id,space_id,question_date,question,category,difficulty,ai_model,created_at")
-    .eq("space_id",DAILY_SPACE_ID)
-    .eq("question_date",today)
-    .maybeSingle();
-
-  if(existingError){
-    console.error("daily question lookup",existingError);
+  if(dailyPollTimer){
+    clearInterval(dailyPollTimer);
+    dailyPollTimer=null;
   }
 
-  let question=existing;
+  renderDailyLoading();
 
-  // Only generate when today's row genuinely does not exist.
-  if(!question){
-    const result=await Promise.race([
-      client.functions.invoke("daily-question",{body:{space_id:DAILY_SPACE_ID}}),
-      new Promise((resolve)=>setTimeout(
-        ()=>resolve({data:null,error:new Error("Daily question request timed out.")}),6000
-      ))
-    ]);
-    if(result?.data?.question) question=result.data.question;
-    else console.error("daily question generation",result?.error,result?.data);
-  }
+  // These are independent. Neither profile loading nor AI generation blocks the UI.
+  loadDailyProfiles();
+
+  const question=await fetchDailyQuestion();
+
+  // Ignore stale requests caused by repeated Retry clicks.
+  if(token!==dailyLoadToken)return;
 
   if(!question){
-    $("dailyQuestionText").textContent="Today's question could not be loaded.";
-    $("dailyAnswerArea").innerHTML=
-      '<div class="daily-error">We could not load today\'s question.</div>'+
-      '<button class="daily-submit" id="dailyRetryButton" type="button" style="margin-top:10px">Try again</button>';
-    $("dailyRetryButton").addEventListener("click",()=>loadDailyQuestion(user));
+    renderDailyError("The daily question service did not respond. Nothing was lost; try again.");
     return;
   }
 
   dailyQuestion=question;
+  renderDailyQuestion();
+
+  // Status is separate from question loading. The question is visible immediately.
   await refreshDailyStatus();
-  if(!dailyPollTimer)dailyPollTimer=setInterval(refreshDailyStatus,12000);
+  if(token!==dailyLoadToken)return;
+
+  startDailyRealtime();
+  dailyPollTimer=setInterval(refreshDailyStatus,8000);
 }
-let dailyCurrentUser=null;
 
 document.querySelectorAll("[data-go]").forEach((el)=>{
   el.addEventListener("click",()=>go(el.dataset.go));
   if(el.getAttribute("role")==="button"){
     el.addEventListener("keydown",(event)=>{
-      if(event.key==="Enter"||event.key===" "){event.preventDefault();go(el.dataset.go)}
+      if(event.key==="Enter"||event.key===" "){
+        event.preventDefault();
+        go(el.dataset.go);
+      }
     });
   }
 });
@@ -498,11 +666,16 @@ $("mobileSettings").addEventListener("click",()=>go("settings.html"));
 
 async function checkAuthentication(){
   const {data:{user},error}=await client.auth.getUser();
-  if(error||!user){go("login.html");return false}
+  if(error||!user){
+    go("login.html");
+    return false;
+  }
+
   if(!window.OurSpaceGateway.isUnlocked(user.id)){
     go("calculator.html");
     return false;
   }
+
   window.OurSpaceTheme.syncFromUser(user);
   document.documentElement.classList.remove("theme-pending");
   document.documentElement.classList.remove("gateway-pending");
@@ -510,13 +683,22 @@ async function checkAuthentication(){
 }
 
 async function loadProfile(user){
-  const {data,error}=await client.from("user_profiles").select("username").eq("user_id",user.id).maybeSingle();
-  if(error||!data?.username){
+  try{
+    const result=await withTimeout(
+      client.from("user_profiles").select("username").eq("user_id",user.id).maybeSingle(),
+      2500,
+      "Profile lookup"
+    );
+    if(result?.error||!result?.data?.username){
+      $("heroName").textContent="there";
+      return;
+    }
+    const username=result.data.username;
+    $("heroName").textContent=username.charAt(0).toUpperCase()+username.slice(1);
+  }catch(error){
+    console.error("profile",error);
     $("heroName").textContent="there";
-    return;
   }
-  const username=data.username;
-  $("heroName").textContent=username.charAt(0).toUpperCase()+username.slice(1);
 }
 
 client.auth.onAuthStateChange((event,session)=>{
@@ -526,8 +708,11 @@ client.auth.onAuthStateChange((event,session)=>{
 (async()=>{
   const user=await checkAuthentication();
   if(!user)return;
-  await loadProfile(user);
-  await loadDailyQuestion(user);
+
+  // Start both independent home-page tasks together.
+  // A slow profile query can never block the Daily Question.
+  void loadProfile(user);
+  void loadDailyQuestion(user);
 })();
 </script>
 </body>
