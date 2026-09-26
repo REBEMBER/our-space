@@ -64,7 +64,7 @@ async function ai(apiKey:string,h:any[],date:string){
   try{
     const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",{
       method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":apiKey},
-      body:JSON.stringify({system_instruction:{parts:[{text:prompt}]},contents:[{role:"user",parts:[{text:"Generate it now."}]}],generationConfig:{temperature:.85,maxOutputTokens:160,candidateCount:1,responseMimeType:"application/json"}}),
+      body:JSON.stringify({system_instruction:{parts:[{text:prompt}]},contents:[{role:"user",parts:[{text:"Generate it now."}]}],generationConfig:{maxOutputTokens:160,responseMimeType:"application/json",thinkingConfig:{thinkingLevel:"low"}}}),
       signal:AbortSignal.timeout(2200)
     });
     if(!r.ok)return null;
