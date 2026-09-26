@@ -190,6 +190,9 @@ html[data-theme="dark"] .action-icon{background:var(--icon-bg);color:var(--icon-
 html[data-theme="dark"] .open-chat-unread{border:0;}
 html[data-theme="dark"] .brand-mark{background:#152B46;color:#F1F6FA;}
 html[data-theme="dark"] .mobile-nav button.active{color:#F1F6FA;}
+
+/* Prevent mobile browser auto-zoom when focusing editable controls. */
+@media(max-width:560px){input,textarea,select{font-size:16px!important;}}
 </style>
 </head>
 <body>
