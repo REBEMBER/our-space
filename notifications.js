@@ -408,6 +408,7 @@
   });
 
   window.OurSpaceNotifications = {
+    clear: clearAppNotifications,
     register: registerNotifications,
     enable: enableNotifications,
     sendMessage: sendMessageNotification,
