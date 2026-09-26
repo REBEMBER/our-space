@@ -37,6 +37,9 @@ html[data-theme="lavender"]{--bg:#F7F5FC;--surface:#fff;--soft:#FCFBFE;--soft2:#
 @media(prefers-reduced-motion:reduce){.sidebar,.messages{transition:none;scroll-behavior:auto}.status-dot.busy,.typing span{animation:none}}
 </style>
 <script>document.documentElement.classList.add("theme-pending");document.documentElement.classList.add("gateway-pending");</script>
+
+/* Prevent mobile browser auto-zoom when focusing editable controls. */
+@media(max-width:560px){input,textarea,select{font-size:16px!important;}}
 </head>
 <body>
 <div class="app"><div class="shell">
