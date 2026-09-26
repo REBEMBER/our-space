@@ -113,7 +113,10 @@
     .danger-section{border-color:color-mix(in srgb,var(--danger) 18%,var(--border))}
     @media(max-width:760px){.theme-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.form-grid{grid-template-columns:1fr}.hero{padding:24px}.section{padding:19px}}
     @media(max-width:430px){.page{width:min(100% - 18px,980px);padding-top:12px}.theme-grid{gap:8px}.theme-option{padding:9px}.theme-preview{height:62px}.hero h2{font-size:35px}.action-row{flex-wrap:wrap}.primary-button,.secondary-button,.danger-button{width:100%}}
-  </style>
+  
+/* Prevent mobile browser auto-zoom when focusing editable controls. */
+@media(max-width:560px){input,textarea,select{font-size:16px!important;}}
+</style>
 </head>
 <body>
   <main class="page">
