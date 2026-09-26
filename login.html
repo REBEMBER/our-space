@@ -374,7 +374,10 @@
     html[data-theme="forest"] body { background:#EEF4F0 !important; }
     html[data-theme="forest"] .brand-panel { background:linear-gradient(145deg,#173A31,#255447) !important; }
 
-  </style>
+  
+/* Prevent mobile browser auto-zoom when focusing editable controls. */
+@media(max-width:560px){input,textarea,select{font-size:16px!important;}}
+</style>
 </head>
 
 <body>
