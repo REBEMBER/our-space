@@ -1148,6 +1148,24 @@
       { passive: true }
     );
 
+function clearChatNotifications(){
+      try{
+        if(window.OurSpaceNotifications?.clear){
+          window.OurSpaceNotifications.clear();
+        }else if("serviceWorker" in navigator){
+          navigator.serviceWorker.ready.then(reg=>{
+            (reg.active||navigator.serviceWorker.controller)?.postMessage({type:"CLEAR_OUR_SPACE_NOTIFICATIONS"});
+          }).catch(()=>{});
+        }
+      }catch(_){ }
+    }
+
+    document.addEventListener("visibilitychange",()=>{
+      if(document.visibilityState==="visible") clearChatNotifications();
+    });
+
+    window.addEventListener("pageshow",clearChatNotifications);
+
 async function revealInitialChat() {
       // The first visible frame must already be at the latest message.
       // Do NOT animate into the bottom: WhatsApp-style chat entry is position-first.
