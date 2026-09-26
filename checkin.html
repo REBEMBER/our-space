@@ -158,6 +158,9 @@ html[data-theme="dark"]{
 html[data-theme="dark"] .hero{background:linear-gradient(135deg,var(--hero-a),var(--hero-b));}
 html[data-theme="dark"] .save{background:var(--button-bg);color:var(--button-text);}
 html[data-theme="dark"] .calendar-btn{color:#EDF3F7;}
+
+/* Prevent mobile browser auto-zoom when focusing editable controls. */
+@media(max-width:560px){input,textarea,select{font-size:16px!important;}}
 </style>
 </head>
 <body>
