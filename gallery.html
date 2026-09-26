@@ -82,7 +82,10 @@
     .gallery-delete-cancel{background:color-mix(in srgb,var(--blue) 35%,var(--surface));color:var(--navy)}
     .gallery-delete-confirm{background:var(--danger);color:#fff}
     .gallery-delete-confirm:disabled{opacity:.55;cursor:wait}
-  </style>
+  
+/* Prevent mobile browser auto-zoom when focusing editable controls. */
+@media(max-width:560px){input,textarea,select{font-size:16px!important;}}
+</style>
 </head>
 <body>
   <div class="app">
