@@ -622,8 +622,21 @@ async function loadDailyProfiles(){
 }
 
 async function fetchDailyQuestion(){
-  const today=todayInMorocco();
+  // The Edge Function is the single authoritative source for the daily
+  // question. It uses the Morocco-local date and returns the existing row
+  // before generating anything, so Mohammad and Salma can never get separate
+  // questions because of a stale browser/API read.
+  const authoritative=await withTimeout(
+    client.functions.invoke("daily-question",{body:{space_id:DAILY_SPACE_ID}}),
+    DAILY_QUESTION_TIMEOUT_MS,
+    "Daily question service"
+  );
 
+  if(authoritative?.data?.question)return authoritative.data.question;
+  if(authoritative?.error)console.error("daily question service",authoritative.error);
+
+  // Read-only fallback if the function request itself fails.
+  const today=todayInMorocco();
   const direct=await withTimeout(
     client.from("daily_questions")
       .select("id,space_id,question_date,question,category,difficulty,ai_model,created_at")
@@ -636,15 +649,6 @@ async function fetchDailyQuestion(){
 
   if(direct?.data)return direct.data;
   if(direct?.error)console.error("daily question lookup",direct.error);
-
-  const generated=await withTimeout(
-    client.functions.invoke("daily-question",{body:{space_id:DAILY_SPACE_ID}}),
-    DAILY_QUESTION_TIMEOUT_MS,
-    "Daily question generation"
-  );
-
-  if(generated?.data?.question)return generated.data.question;
-  if(generated?.error)console.error("daily question generation",generated.error);
   return null;
 }
 
